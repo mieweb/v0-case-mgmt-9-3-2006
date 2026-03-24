@@ -106,6 +106,7 @@ export function CaseTab() {
   const [injuryShift, setInjuryShift] = useState("")
   const [shiftStartTime, setShiftStartTime] = useState("")
   const [injurySupervisor, setInjurySupervisor] = useState("")
+  const [supervisorNotifiedDate, setSupervisorNotifiedDate] = useState("")
   const [injuryDescription, setInjuryDescription] = useState("")
   const [bodyPartAffected, setBodyPartAffected] = useState("")
   const [injuryNature, setInjuryNature] = useState("")
@@ -146,6 +147,7 @@ export function CaseTab() {
       setInjuryShift(currentCase.injuryShift || "")
       setShiftStartTime(currentCase.shiftStartTime || "")
       setInjurySupervisor(currentCase.injurySupervisor || "")
+      setSupervisorNotifiedDate(currentCase.supervisorNotifiedDate || "")
       setInjuryDescription(currentCase.injuryDescription || "")
       setBodyPartAffected(currentCase.bodyPartAffected || "")
       setInjuryNature(currentCase.injuryNature || "")
@@ -940,6 +942,23 @@ export function CaseTab() {
               onChange={(e) => {
                 setInjurySupervisor(e.target.value)
                 handleFieldUpdate("injurySupervisor", e.target.value)
+              }}
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="supervisor-notified-date" className="text-sm text-muted-foreground">
+              When was the supervisor notified?
+            </Label>
+            <Input
+              id="supervisor-notified-date"
+              type="datetime-local"
+              className="bg-background"
+              value={supervisorNotifiedDate}
+              onChange={(e) => {
+                setSupervisorNotifiedDate(e.target.value)
+                handleFieldUpdate("supervisorNotifiedDate", e.target.value)
               }}
             />
           </div>
