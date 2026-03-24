@@ -99,6 +99,7 @@ export function CaseTab() {
   const [showConfidentialWarning, setShowConfidentialWarning] = useState(false)
   
   // Occupational Injury Information
+  const [siteCaseNumber, setSiteCaseNumber] = useState("")
   const [injuryDate, setInjuryDate] = useState("")
   const [injuryTime, setInjuryTime] = useState("")
   const [injuryLocation, setInjuryLocation] = useState("")
@@ -135,6 +136,7 @@ export function CaseTab() {
       setPayEndDate(currentCase.payEndDate || "")
       setFicaDate(currentCase.ficaDate || "")
       // Occupational Injury Information
+      setSiteCaseNumber(currentCase.siteCaseNumber || "")
       setInjuryDate(currentCase.injuryDate || "")
       setInjuryTime(currentCase.injuryTime || "")
       setInjuryLocation(currentCase.injuryLocation || "")
@@ -815,6 +817,23 @@ export function CaseTab() {
 
       <div className="occupational-injury-section phi-data space-y-4">
         <h3 className="text-sm font-semibold text-foreground border-b pb-2">Occupational Injury Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="site-case-number" className="text-sm text-muted-foreground">
+              Site Case #
+            </Label>
+            <Input
+              id="site-case-number"
+              placeholder="Enter site case number"
+              className="bg-background"
+              value={siteCaseNumber}
+              onChange={(e) => {
+                setSiteCaseNumber(e.target.value)
+                handleFieldUpdate("siteCaseNumber", e.target.value)
+              }}
+            />
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="injury-date" className="text-sm text-muted-foreground">
