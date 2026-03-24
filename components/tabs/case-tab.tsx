@@ -103,6 +103,9 @@ export function CaseTab() {
   const [injuryDate, setInjuryDate] = useState("")
   const [injuryTime, setInjuryTime] = useState("")
   const [injuryLocation, setInjuryLocation] = useState("")
+  const [injuryShift, setInjuryShift] = useState("")
+  const [shiftStartTime, setShiftStartTime] = useState("")
+  const [injurySupervisor, setInjurySupervisor] = useState("")
   const [injuryDescription, setInjuryDescription] = useState("")
   const [bodyPartAffected, setBodyPartAffected] = useState("")
   const [injuryNature, setInjuryNature] = useState("")
@@ -140,6 +143,9 @@ export function CaseTab() {
       setInjuryDate(currentCase.injuryDate || "")
       setInjuryTime(currentCase.injuryTime || "")
       setInjuryLocation(currentCase.injuryLocation || "")
+      setInjuryShift(currentCase.injuryShift || "")
+      setShiftStartTime(currentCase.shiftStartTime || "")
+      setInjurySupervisor(currentCase.injurySupervisor || "")
       setInjuryDescription(currentCase.injuryDescription || "")
       setBodyPartAffected(currentCase.bodyPartAffected || "")
       setInjuryNature(currentCase.injuryNature || "")
@@ -877,6 +883,63 @@ export function CaseTab() {
               onChange={(e) => {
                 setInjuryLocation(e.target.value)
                 handleFieldUpdate("injuryLocation", e.target.value)
+              }}
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="injury-shift" className="text-sm text-muted-foreground">
+              Shift
+            </Label>
+            <Select
+              value={injuryShift}
+              onValueChange={(val) => {
+                setInjuryShift(val)
+                handleFieldUpdate("injuryShift", val)
+              }}
+            >
+              <SelectTrigger id="injury-shift" className="bg-background">
+                <SelectValue placeholder="Select shift..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1st Shift">1st Shift</SelectItem>
+                <SelectItem value="2nd Shift">2nd Shift</SelectItem>
+                <SelectItem value="3rd Shift">3rd Shift</SelectItem>
+                <SelectItem value="Day Shift">Day Shift</SelectItem>
+                <SelectItem value="Night Shift">Night Shift</SelectItem>
+                <SelectItem value="Rotating">Rotating</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="shift-start-time" className="text-sm text-muted-foreground">
+              Shift Start Time
+            </Label>
+            <Input
+              id="shift-start-time"
+              type="time"
+              className="bg-background"
+              value={shiftStartTime}
+              onChange={(e) => {
+                setShiftStartTime(e.target.value)
+                handleFieldUpdate("shiftStartTime", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="injury-supervisor" className="text-sm text-muted-foreground">
+              Supervisor
+            </Label>
+            <Input
+              id="injury-supervisor"
+              placeholder="Supervisor name"
+              className="bg-background"
+              value={injurySupervisor}
+              onChange={(e) => {
+                setInjurySupervisor(e.target.value)
+                handleFieldUpdate("injurySupervisor", e.target.value)
               }}
             />
           </div>
