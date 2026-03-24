@@ -823,7 +823,7 @@ export function CaseTab() {
 
       <div className="occupational-injury-section phi-data space-y-4">
         <h3 className="text-sm font-semibold text-foreground border-b pb-2">Occupational Injury Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="site-case-number" className="text-sm text-muted-foreground">
               Site Case #
@@ -836,6 +836,21 @@ export function CaseTab() {
               onChange={(e) => {
                 setSiteCaseNumber(e.target.value)
                 handleFieldUpdate("siteCaseNumber", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="injury-supervisor" className="text-sm text-muted-foreground">
+              Supervisor
+            </Label>
+            <Input
+              id="injury-supervisor"
+              placeholder="Supervisor name"
+              className="bg-background"
+              value={injurySupervisor}
+              onChange={(e) => {
+                setInjurySupervisor(e.target.value)
+                handleFieldUpdate("injurySupervisor", e.target.value)
               }}
             />
           </div>
@@ -925,21 +940,6 @@ export function CaseTab() {
               onChange={(e) => {
                 setShiftStartTime(e.target.value)
                 handleFieldUpdate("shiftStartTime", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="injury-supervisor" className="text-sm text-muted-foreground">
-              Supervisor
-            </Label>
-            <Input
-              id="injury-supervisor"
-              placeholder="Supervisor name"
-              className="bg-background"
-              value={injurySupervisor}
-              onChange={(e) => {
-                setInjurySupervisor(e.target.value)
-                handleFieldUpdate("injurySupervisor", e.target.value)
               }}
             />
           </div>
