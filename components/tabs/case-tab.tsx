@@ -97,6 +97,19 @@ export function CaseTab() {
   const [ddgDaysError, setDdgDaysError] = useState("")
   const [isConfidential, setIsConfidential] = useState(currentCase?.confidential || false)
   const [showConfidentialWarning, setShowConfidentialWarning] = useState(false)
+  
+  // Occupational Injury Information
+  const [injuryDate, setInjuryDate] = useState("")
+  const [injuryTime, setInjuryTime] = useState("")
+  const [injuryLocation, setInjuryLocation] = useState("")
+  const [injuryDescription, setInjuryDescription] = useState("")
+  const [bodyPartAffected, setBodyPartAffected] = useState("")
+  const [injuryNature, setInjuryNature] = useState("")
+  const [injuryCause, setInjuryCause] = useState("")
+  const [oshaRecordable, setOshaRecordable] = useState(false)
+  const [oshaClassification, setOshaClassification] = useState("")
+  const [workersCompClaim, setWorkersCompClaim] = useState("")
+  const [workersCompClaimNumber, setWorkersCompClaimNumber] = useState("")
 
   useEffect(() => {
     if (currentCase) {
@@ -121,6 +134,18 @@ export function CaseTab() {
       setPayStartDate(currentCase.payStartDate || "")
       setPayEndDate(currentCase.payEndDate || "")
       setFicaDate(currentCase.ficaDate || "")
+      // Occupational Injury Information
+      setInjuryDate(currentCase.injuryDate || "")
+      setInjuryTime(currentCase.injuryTime || "")
+      setInjuryLocation(currentCase.injuryLocation || "")
+      setInjuryDescription(currentCase.injuryDescription || "")
+      setBodyPartAffected(currentCase.bodyPartAffected || "")
+      setInjuryNature(currentCase.injuryNature || "")
+      setInjuryCause(currentCase.injuryCause || "")
+      setOshaRecordable(currentCase.oshaRecordable || false)
+      setOshaClassification(currentCase.oshaClassification || "")
+      setWorkersCompClaim(currentCase.workersCompClaim || "")
+      setWorkersCompClaimNumber(currentCase.workersCompClaimNumber || "")
     }
   }, [currentCase])
 
@@ -785,6 +810,235 @@ export function CaseTab() {
               Date of disability + 6 months + first day of next month
             </p>
           </div>
+        </div>
+      </div>
+
+      <div className="occupational-injury-section phi-data space-y-4">
+        <h3 className="text-sm font-semibold text-foreground border-b pb-2">Occupational Injury Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="injury-date" className="text-sm text-muted-foreground">
+              Date of injury
+            </Label>
+            <Input
+              id="injury-date"
+              type="date"
+              className="bg-background"
+              value={injuryDate}
+              onChange={(e) => {
+                setInjuryDate(e.target.value)
+                handleFieldUpdate("injuryDate", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="injury-time" className="text-sm text-muted-foreground">
+              Time of injury
+            </Label>
+            <Input
+              id="injury-time"
+              type="time"
+              className="bg-background"
+              value={injuryTime}
+              onChange={(e) => {
+                setInjuryTime(e.target.value)
+                handleFieldUpdate("injuryTime", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="injury-location" className="text-sm text-muted-foreground">
+              Location of injury
+            </Label>
+            <Input
+              id="injury-location"
+              placeholder="e.g., Warehouse, Office, Job Site"
+              className="bg-background"
+              value={injuryLocation}
+              onChange={(e) => {
+                setInjuryLocation(e.target.value)
+                handleFieldUpdate("injuryLocation", e.target.value)
+              }}
+            />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="injury-description" className="text-sm text-muted-foreground">
+            Description of injury/illness
+          </Label>
+          <textarea
+            id="injury-description"
+            placeholder="Describe how the injury occurred..."
+            className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            value={injuryDescription}
+            onChange={(e) => {
+              setInjuryDescription(e.target.value)
+              handleFieldUpdate("injuryDescription", e.target.value)
+            }}
+          />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="body-part" className="text-sm text-muted-foreground">
+              Body part affected
+            </Label>
+            <Input
+              id="body-part"
+              placeholder="e.g., Lower back, Right hand"
+              className="bg-background"
+              value={bodyPartAffected}
+              onChange={(e) => {
+                setBodyPartAffected(e.target.value)
+                handleFieldUpdate("bodyPartAffected", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="injury-nature" className="text-sm text-muted-foreground">
+              Nature of injury
+            </Label>
+            <Select
+              value={injuryNature}
+              onValueChange={(val) => {
+                setInjuryNature(val)
+                handleFieldUpdate("injuryNature", val)
+              }}
+            >
+              <SelectTrigger id="injury-nature" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Sprain/Strain">Sprain/Strain</SelectItem>
+                <SelectItem value="Fracture">Fracture</SelectItem>
+                <SelectItem value="Cut/Laceration">Cut/Laceration</SelectItem>
+                <SelectItem value="Contusion/Bruise">Contusion/Bruise</SelectItem>
+                <SelectItem value="Burn">Burn</SelectItem>
+                <SelectItem value="Amputation">Amputation</SelectItem>
+                <SelectItem value="Carpal Tunnel">Carpal Tunnel</SelectItem>
+                <SelectItem value="Hernia">Hernia</SelectItem>
+                <SelectItem value="Hearing Loss">Hearing Loss</SelectItem>
+                <SelectItem value="Respiratory">Respiratory</SelectItem>
+                <SelectItem value="Dermatitis">Dermatitis</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="injury-cause" className="text-sm text-muted-foreground">
+              Cause of injury
+            </Label>
+            <Select
+              value={injuryCause}
+              onValueChange={(val) => {
+                setInjuryCause(val)
+                handleFieldUpdate("injuryCause", val)
+              }}
+            >
+              <SelectTrigger id="injury-cause" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Overexertion">Overexertion</SelectItem>
+                <SelectItem value="Fall - Same Level">Fall - Same Level</SelectItem>
+                <SelectItem value="Fall - Different Level">Fall - Different Level</SelectItem>
+                <SelectItem value="Struck By Object">Struck By Object</SelectItem>
+                <SelectItem value="Struck Against Object">Struck Against Object</SelectItem>
+                <SelectItem value="Caught In/Between">Caught In/Between</SelectItem>
+                <SelectItem value="Repetitive Motion">Repetitive Motion</SelectItem>
+                <SelectItem value="Motor Vehicle">Motor Vehicle</SelectItem>
+                <SelectItem value="Exposure - Chemical">Exposure - Chemical</SelectItem>
+                <SelectItem value="Exposure - Temperature">Exposure - Temperature</SelectItem>
+                <SelectItem value="Violence">Violence</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">OSHA recordable?</Label>
+            <div className="flex items-center space-x-2 pt-2">
+              <Checkbox
+                id="osha-recordable"
+                checked={oshaRecordable}
+                onCheckedChange={(checked) => {
+                  setOshaRecordable(checked as boolean)
+                  handleFieldUpdate("oshaRecordable", checked)
+                }}
+              />
+              <label
+                htmlFor="osha-recordable"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Yes, this is an OSHA recordable injury
+              </label>
+            </div>
+          </div>
+          {oshaRecordable && (
+            <div className="space-y-2">
+              <Label htmlFor="osha-classification" className="text-sm text-muted-foreground">
+                OSHA classification
+              </Label>
+              <Select
+                value={oshaClassification}
+                onValueChange={(val) => {
+                  setOshaClassification(val)
+                  handleFieldUpdate("oshaClassification", val)
+                }}
+              >
+                <SelectTrigger id="osha-classification" className="bg-background">
+                  <SelectValue placeholder="Select..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Death">Death</SelectItem>
+                  <SelectItem value="Days Away From Work">Days Away From Work</SelectItem>
+                  <SelectItem value="Job Transfer/Restriction">Job Transfer/Restriction</SelectItem>
+                  <SelectItem value="Other Recordable">Other Recordable</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="wc-claim" className="text-sm text-muted-foreground">
+              Workers' Comp claim filed?
+            </Label>
+            <Select
+              value={workersCompClaim}
+              onValueChange={(val) => {
+                setWorkersCompClaim(val)
+                handleFieldUpdate("workersCompClaim", val)
+              }}
+            >
+              <SelectTrigger id="wc-claim" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+                <SelectItem value="Pending">Pending</SelectItem>
+                <SelectItem value="N/A">N/A</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {workersCompClaim === "Yes" && (
+            <div className="space-y-2">
+              <Label htmlFor="wc-claim-number" className="text-sm text-muted-foreground">
+                Workers' Comp claim number
+              </Label>
+              <Input
+                id="wc-claim-number"
+                placeholder="Claim number"
+                className="bg-background"
+                value={workersCompClaimNumber}
+                onChange={(e) => {
+                  setWorkersCompClaimNumber(e.target.value)
+                  handleFieldUpdate("workersCompClaimNumber", e.target.value)
+                }}
+              />
+            </div>
+          )}
         </div>
       </div>
 
