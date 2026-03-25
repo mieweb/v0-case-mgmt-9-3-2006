@@ -42,10 +42,15 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
 
   // Get open/active cases for the selected employee
   const openCasesForEmployee = useMemo(() => {
+    console.log("[v0] formData.employeeNumber:", formData.employeeNumber)
+    console.log("[v0] total cases:", cases.length)
+    console.log("[v0] all cases:", cases.map(c => ({ caseNumber: c.caseNumber, employeeNumber: c.employeeNumber, status: c.status })))
     if (!formData.employeeNumber) return []
-    return cases.filter(
+    const filtered = cases.filter(
       (c) => c.employeeNumber === formData.employeeNumber && (c.status === "Open" || c.status === "Active")
     )
+    console.log("[v0] filtered open cases for employee:", filtered)
+    return filtered
   }, [cases, formData.employeeNumber])
 
   const handleOpenExistingCase = (caseNumber: string) => {
