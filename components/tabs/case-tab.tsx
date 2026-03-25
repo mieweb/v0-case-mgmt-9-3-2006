@@ -128,6 +128,14 @@ export function CaseTab() {
   const [objectSubstanceCaused, setObjectSubstanceCaused] = useState("")
   const [accidentType, setAccidentType] = useState("")
   const [jsaReference, setJsaReference] = useState("")
+  const [medicalTreatmentProvided, setMedicalTreatmentProvided] = useState("")
+  const [treatmentDescription, setTreatmentDescription] = useState("")
+  const [whereTreatmentProvided, setWhereTreatmentProvided] = useState("")
+  const [hospitalName, setHospitalName] = useState("")
+  const [hospitalAddress, setHospitalAddress] = useState("")
+  const [hospitalPhone, setHospitalPhone] = useState("")
+  const [providerInformation, setProviderInformation] = useState("")
+  const [treatedInEmergencyRoom, setTreatedInEmergencyRoom] = useState("")
   const [injuryShift, setInjuryShift] = useState("")
   const [shiftStartTime, setShiftStartTime] = useState("")
   const [injurySupervisor, setInjurySupervisor] = useState("")
@@ -190,6 +198,14 @@ export function CaseTab() {
       setObjectSubstanceCaused(currentCase.objectSubstanceCaused || "")
       setAccidentType(currentCase.accidentType || "")
       setJsaReference(currentCase.jsaReference || "")
+      setMedicalTreatmentProvided(currentCase.medicalTreatmentProvided || "")
+      setTreatmentDescription(currentCase.treatmentDescription || "")
+      setWhereTreatmentProvided(currentCase.whereTreatmentProvided || "")
+      setHospitalName(currentCase.hospitalName || "")
+      setHospitalAddress(currentCase.hospitalAddress || "")
+      setHospitalPhone(currentCase.hospitalPhone || "")
+      setProviderInformation(currentCase.providerInformation || "")
+      setTreatedInEmergencyRoom(currentCase.treatedInEmergencyRoom || "")
       setInjuryShift(currentCase.injuryShift || "")
       setShiftStartTime(currentCase.shiftStartTime || "")
       setInjurySupervisor(currentCase.injurySupervisor || "")
@@ -1531,6 +1547,154 @@ export function CaseTab() {
               }}
             />
           </div>
+        </div>
+
+        <h4 className="text-sm font-semibold text-foreground border-b pb-2 mt-4">Treatment Information</h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="medical-treatment-provided" className="text-sm text-muted-foreground">
+              Was medical treatment provided before reporting?
+            </Label>
+            <Select
+              value={medicalTreatmentProvided}
+              onValueChange={(val) => {
+                setMedicalTreatmentProvided(val)
+                handleFieldUpdate("medicalTreatmentProvided", val)
+              }}
+            >
+              <SelectTrigger id="medical-treatment-provided" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="where-treatment-provided" className="text-sm text-muted-foreground">
+              Where treatment was provided
+            </Label>
+            <Select
+              value={whereTreatmentProvided}
+              onValueChange={(val) => {
+                setWhereTreatmentProvided(val)
+                handleFieldUpdate("whereTreatmentProvided", val)
+              }}
+            >
+              <SelectTrigger id="where-treatment-provided" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Onsite">Onsite</SelectItem>
+                <SelectItem value="Hospital">Hospital</SelectItem>
+                <SelectItem value="External Provider">External Provider</SelectItem>
+                <SelectItem value="Urgent Care">Urgent Care</SelectItem>
+                <SelectItem value="Self-Treated">Self-Treated</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="treated-emergency-room" className="text-sm text-muted-foreground">
+              Was employee treated in an emergency room?
+            </Label>
+            <Select
+              value={treatedInEmergencyRoom}
+              onValueChange={(val) => {
+                setTreatedInEmergencyRoom(val)
+                handleFieldUpdate("treatedInEmergencyRoom", val)
+              }}
+            >
+              <SelectTrigger id="treated-emergency-room" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="treatment-description" className="text-sm text-muted-foreground">
+            Description of treatment
+          </Label>
+          <textarea
+            id="treatment-description"
+            placeholder="Describe the treatment provided..."
+            className="w-full min-h-[60px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            value={treatmentDescription}
+            onChange={(e) => {
+              setTreatmentDescription(e.target.value)
+              handleFieldUpdate("treatmentDescription", e.target.value)
+            }}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="hospital-name" className="text-sm text-muted-foreground">
+              Hospital/Facility Name
+            </Label>
+            <Input
+              id="hospital-name"
+              placeholder="Hospital or facility name"
+              className="bg-background"
+              value={hospitalName}
+              onChange={(e) => {
+                setHospitalName(e.target.value)
+                handleFieldUpdate("hospitalName", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="hospital-address" className="text-sm text-muted-foreground">
+              Hospital/Facility Address
+            </Label>
+            <Input
+              id="hospital-address"
+              placeholder="Address"
+              className="bg-background"
+              value={hospitalAddress}
+              onChange={(e) => {
+                setHospitalAddress(e.target.value)
+                handleFieldUpdate("hospitalAddress", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="hospital-phone" className="text-sm text-muted-foreground">
+              Hospital/Facility Phone
+            </Label>
+            <Input
+              id="hospital-phone"
+              placeholder="Phone number"
+              className="bg-background"
+              value={hospitalPhone}
+              onChange={(e) => {
+                setHospitalPhone(e.target.value)
+                handleFieldUpdate("hospitalPhone", e.target.value)
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="provider-information" className="text-sm text-muted-foreground">
+            Provider Information
+          </Label>
+          <Input
+            id="provider-information"
+            placeholder="Treating physician or provider details"
+            className="bg-background"
+            value={providerInformation}
+            onChange={(e) => {
+              setProviderInformation(e.target.value)
+              handleFieldUpdate("providerInformation", e.target.value)
+            }}
+          />
         </div>
 
         <div className="space-y-2">
