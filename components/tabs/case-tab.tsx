@@ -1817,21 +1817,6 @@ export function CaseTab() {
 
         <h4 className="text-sm font-semibold text-foreground border-b pb-2 mt-4">Injury Details</h4>
 
-        <div className="space-y-2">
-          <Label htmlFor="injury-description" className="text-sm text-muted-foreground">
-            Description of injury/illness
-          </Label>
-          <textarea
-            id="injury-description"
-            placeholder="Describe how the injury occurred..."
-            className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            value={injuryDescription}
-            onChange={(e) => {
-              setInjuryDescription(e.target.value)
-              handleFieldUpdate("injuryDescription", e.target.value)
-            }}
-          />
-        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="body-part" className="text-sm text-muted-foreground">
@@ -1908,6 +1893,22 @@ export function CaseTab() {
               </SelectContent>
             </Select>
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="injury-description" className="text-sm text-muted-foreground">
+            Description of injury/illness
+          </Label>
+          <textarea
+            id="injury-description"
+            placeholder="Describe how the injury occurred..."
+            className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            value={injuryDescription}
+            onChange={(e) => {
+              setInjuryDescription(e.target.value)
+              handleFieldUpdate("injuryDescription", e.target.value)
+            }}
+          />
         </div>
         </div>
 
