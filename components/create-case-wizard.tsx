@@ -1,15 +1,17 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { ChevronLeft, ChevronRight, Check } from "lucide-react"
+import { ChevronLeft, ChevronRight, Check, AlertTriangle, FileText } from "lucide-react"
 import { EmployeeAutocomplete } from "@/components/employee-autocomplete"
 import { useCases } from "@/contexts/cases-context"
 import { useAdmin } from "@/contexts/admin-context"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
 
 interface CreateCaseWizardProps {
   onComplete: () => void
@@ -18,7 +20,7 @@ interface CreateCaseWizardProps {
 export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
   const [step, setStep] = useState(1)
   const totalSteps = 4
-  const { addCase } = useCases()
+  const { addCase, cases, setCurrentCase } = useCases()
   const { caseTypes, codes, caseManagers } = useAdmin()
 
   const [formData, setFormData] = useState({
@@ -37,6 +39,22 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
     stdStartDate: "",
     absenceNotes: "",
   })
+
+  // Get open/active cases for the selected employee
+  const openCasesForEmployee = useMemo(() => {
+    if (!formData.employeeNumber) return []
+    return cases.filter(
+      (c) => c.employeeNumber === formData.employeeNumber && (c.status === "Open" || c.status === "Active")
+    )
+  }, [cases, formData.employeeNumber])
+
+  const handleOpenExistingCase = (caseNumber: string) => {
+    const existingCase = cases.find((c) => c.caseNumber === caseNumber)
+    if (existingCase) {
+      setCurrentCase(existingCase)
+      onComplete()
+    }
+  }
 
   const steps = [
     { number: 1, title: "Employee Information", description: "Select the employee for this case" },
@@ -166,6 +184,52 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Show open/active cases for selected employee */}
+              {formData.employeeNumber && openCasesForEmployee.length > 0 && (
+                <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20">
+                  <AlertTriangle className="h-4 w-4 text-amber-600" />
+                  <AlertTitle className="text-amber-800 dark:text-amber-200">Open Cases Found</AlertTitle>
+                  <AlertDescription className="text-amber-700 dark:text-amber-300">
+                    <p className="mb-3">
+                      This employee has {openCasesForEmployee.length} open/active case{openCasesForEmployee.length !== 1 ? "s" : ""}. 
+                      If this is related to an existing injury or absence, please continue documenting on the existing case instead of creating a new one.
+                    </p>
+                    <div className="space-y-2">
+                      {openCasesForEmployee.map((c) => (
+                        <div
+                          key={c.caseNumber}
+                          className="flex items-center justify-between p-3 bg-background rounded-md border"
+                        >
+                          <div className="flex items-center gap-3">
+                            <FileText className="h-4 w-4 text-muted-foreground" />
+                            <div>
+                              <p className="font-medium text-foreground">{c.caseNumber}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {c.caseType} - Opened {c.dateOpened}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={c.status === "Open" ? "default" : "secondary"}>{c.status}</Badge>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleOpenExistingCase(c.caseNumber)}
+                            >
+                              Open Case
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="mt-3 text-sm">
+                      If this is a <strong>new injury or absence</strong>, continue to create a new case.
+                    </p>
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
           </div>
         )}
