@@ -119,6 +119,9 @@ export function CaseTab() {
   const [shiftStartTime, setShiftStartTime] = useState("")
   const [injurySupervisor, setInjurySupervisor] = useState("")
   const [supervisorNotifiedDate, setSupervisorNotifiedDate] = useState("")
+  const [isCaseWorkRelated, setIsCaseWorkRelated] = useState("")
+  const [typeOfInjuryOrIllness, setTypeOfInjuryOrIllness] = useState("")
+  const [significantInjuryIllness, setSignificantInjuryIllness] = useState("")
   const [injuryDescription, setInjuryDescription] = useState("")
   const [bodyPartAffected, setBodyPartAffected] = useState("")
   const [injuryNature, setInjuryNature] = useState("")
@@ -160,6 +163,9 @@ export function CaseTab() {
       setShiftStartTime(currentCase.shiftStartTime || "")
       setInjurySupervisor(currentCase.injurySupervisor || "")
       setSupervisorNotifiedDate(currentCase.supervisorNotifiedDate || "")
+      setIsCaseWorkRelated(currentCase.isCaseWorkRelated || "")
+      setTypeOfInjuryOrIllness(currentCase.typeOfInjuryOrIllness || "")
+      setSignificantInjuryIllness(currentCase.significantInjuryIllness || "")
       setInjuryDescription(currentCase.injuryDescription || "")
       setBodyPartAffected(currentCase.bodyPartAffected || "")
       setInjuryNature(currentCase.injuryNature || "")
@@ -999,6 +1005,71 @@ export function CaseTab() {
         
         <h4 className="text-sm font-semibold text-foreground border-b pb-2 mt-4">Work Related Details</h4>
         
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="is-case-work-related" className="text-sm text-muted-foreground">
+              Is the case work related?
+            </Label>
+            <Select
+              value={isCaseWorkRelated}
+              onValueChange={(val) => {
+                setIsCaseWorkRelated(val)
+                handleFieldUpdate("isCaseWorkRelated", val)
+              }}
+            >
+              <SelectTrigger id="is-case-work-related" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+                <SelectItem value="Under Investigation">Under Investigation</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="type-of-injury-illness" className="text-sm text-muted-foreground">
+              Type of injury or illness
+            </Label>
+            <Select
+              value={typeOfInjuryOrIllness}
+              onValueChange={(val) => {
+                setTypeOfInjuryOrIllness(val)
+                handleFieldUpdate("typeOfInjuryOrIllness", val)
+              }}
+            >
+              <SelectTrigger id="type-of-injury-illness" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Injury">Injury</SelectItem>
+                <SelectItem value="Illness">Illness</SelectItem>
+                <SelectItem value="Both">Both</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="significant-injury-illness" className="text-sm text-muted-foreground">
+              Significant injury/illness
+            </Label>
+            <Select
+              value={significantInjuryIllness}
+              onValueChange={(val) => {
+                setSignificantInjuryIllness(val)
+                handleFieldUpdate("significantInjuryIllness", val)
+              }}
+            >
+              <SelectTrigger id="significant-injury-illness" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="injury-description" className="text-sm text-muted-foreground">
             Description of injury/illness
