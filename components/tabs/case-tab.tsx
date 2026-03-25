@@ -130,6 +130,7 @@ export function CaseTab() {
   const [oshaClassification, setOshaClassification] = useState("")
   const [workersCompClaim, setWorkersCompClaim] = useState("")
   const [workersCompClaimNumber, setWorkersCompClaimNumber] = useState("")
+  const [claimStatusResolution, setClaimStatusResolution] = useState("")
 
   useEffect(() => {
     if (currentCase) {
@@ -174,6 +175,7 @@ export function CaseTab() {
       setOshaClassification(currentCase.oshaClassification || "")
       setWorkersCompClaim(currentCase.workersCompClaim || "")
       setWorkersCompClaimNumber(currentCase.workersCompClaimNumber || "")
+      setClaimStatusResolution(currentCase.claimStatusResolution || "")
     }
   }, [currentCase])
 
@@ -1070,6 +1072,74 @@ export function CaseTab() {
           </div>
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="wc-claim" className="text-sm text-muted-foreground">
+              Workers&apos; Comp claim filed?
+            </Label>
+            <Select
+              value={workersCompClaim}
+              onValueChange={(val) => {
+                setWorkersCompClaim(val)
+                handleFieldUpdate("workersCompClaim", val)
+              }}
+            >
+              <SelectTrigger id="wc-claim" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+                <SelectItem value="Pending">Pending</SelectItem>
+                <SelectItem value="N/A">N/A</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {workersCompClaim === "Yes" && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="wc-claim-number" className="text-sm text-muted-foreground">
+                  Workers&apos; Comp claim number
+                </Label>
+                <Input
+                  id="wc-claim-number"
+                  placeholder="Claim number"
+                  className="bg-background"
+                  value={workersCompClaimNumber}
+                  onChange={(e) => {
+                    setWorkersCompClaimNumber(e.target.value)
+                    handleFieldUpdate("workersCompClaimNumber", e.target.value)
+                  }}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="claim-status-resolution" className="text-sm text-muted-foreground">
+                  Claim status and resolution
+                </Label>
+                <Select
+                  value={claimStatusResolution}
+                  onValueChange={(val) => {
+                    setClaimStatusResolution(val)
+                    handleFieldUpdate("claimStatusResolution", val)
+                  }}
+                >
+                  <SelectTrigger id="claim-status-resolution" className="bg-background">
+                    <SelectValue placeholder="Select..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Open">Open</SelectItem>
+                    <SelectItem value="Under Review">Under Review</SelectItem>
+                    <SelectItem value="Approved">Approved</SelectItem>
+                    <SelectItem value="Denied">Denied</SelectItem>
+                    <SelectItem value="Settled">Settled</SelectItem>
+                    <SelectItem value="Closed">Closed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </>
+          )}
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="injury-description" className="text-sm text-muted-foreground">
             Description of injury/illness
@@ -1207,48 +1277,7 @@ export function CaseTab() {
             </div>
           )}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="wc-claim" className="text-sm text-muted-foreground">
-              Workers' Comp claim filed?
-            </Label>
-            <Select
-              value={workersCompClaim}
-              onValueChange={(val) => {
-                setWorkersCompClaim(val)
-                handleFieldUpdate("workersCompClaim", val)
-              }}
-            >
-              <SelectTrigger id="wc-claim" className="bg-background">
-                <SelectValue placeholder="Select..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Yes">Yes</SelectItem>
-                <SelectItem value="No">No</SelectItem>
-                <SelectItem value="Pending">Pending</SelectItem>
-                <SelectItem value="N/A">N/A</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          {workersCompClaim === "Yes" && (
-            <div className="space-y-2">
-              <Label htmlFor="wc-claim-number" className="text-sm text-muted-foreground">
-                Workers' Comp claim number
-              </Label>
-              <Input
-                id="wc-claim-number"
-                placeholder="Claim number"
-                className="bg-background"
-                value={workersCompClaimNumber}
-                onChange={(e) => {
-                  setWorkersCompClaimNumber(e.target.value)
-                  handleFieldUpdate("workersCompClaimNumber", e.target.value)
-                }}
-              />
-            </div>
-          )}
         </div>
-      </div>
 
       <AlertDialog open={showConfidentialWarning} onOpenChange={setShowConfidentialWarning}>
         <AlertDialogContent>
