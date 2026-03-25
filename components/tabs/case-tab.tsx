@@ -123,6 +123,11 @@ export function CaseTab() {
   const [locationCountry, setLocationCountry] = useState("")
   const [locationDescription, setLocationDescription] = useState("")
   const [workstation, setWorkstation] = useState("")
+  const [employeeDoingBefore, setEmployeeDoingBefore] = useState("")
+  const [howInjuryHappened, setHowInjuryHappened] = useState("")
+  const [objectSubstanceCaused, setObjectSubstanceCaused] = useState("")
+  const [accidentType, setAccidentType] = useState("")
+  const [jsaReference, setJsaReference] = useState("")
   const [injuryShift, setInjuryShift] = useState("")
   const [shiftStartTime, setShiftStartTime] = useState("")
   const [injurySupervisor, setInjurySupervisor] = useState("")
@@ -180,6 +185,11 @@ export function CaseTab() {
       setLocationCountry(currentCase.locationCountry || "")
       setLocationDescription(currentCase.locationDescription || "")
       setWorkstation(currentCase.workstation || "")
+      setEmployeeDoingBefore(currentCase.employeeDoingBefore || "")
+      setHowInjuryHappened(currentCase.howInjuryHappened || "")
+      setObjectSubstanceCaused(currentCase.objectSubstanceCaused || "")
+      setAccidentType(currentCase.accidentType || "")
+      setJsaReference(currentCase.jsaReference || "")
       setInjuryShift(currentCase.injuryShift || "")
       setShiftStartTime(currentCase.shiftStartTime || "")
       setInjurySupervisor(currentCase.injurySupervisor || "")
@@ -1423,6 +1433,101 @@ export function CaseTab() {
               onChange={(e) => {
                 setLocationDescription(e.target.value)
                 handleFieldUpdate("locationDescription", e.target.value)
+              }}
+            />
+          </div>
+        </div>
+
+        <h4 className="text-sm font-semibold text-foreground border-b pb-2 mt-4">Incident Description</h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="employee-doing-before" className="text-sm text-muted-foreground">
+              What the employee was doing before the incident
+            </Label>
+            <Input
+              id="employee-doing-before"
+              placeholder="Describe activity before incident..."
+              className="bg-background"
+              value={employeeDoingBefore}
+              onChange={(e) => {
+                setEmployeeDoingBefore(e.target.value)
+                handleFieldUpdate("employeeDoingBefore", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="how-injury-happened" className="text-sm text-muted-foreground">
+              How the injury happened
+            </Label>
+            <Input
+              id="how-injury-happened"
+              placeholder="Describe how injury occurred..."
+              className="bg-background"
+              value={howInjuryHappened}
+              onChange={(e) => {
+                setHowInjuryHappened(e.target.value)
+                handleFieldUpdate("howInjuryHappened", e.target.value)
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="object-substance-caused" className="text-sm text-muted-foreground">
+              What object or substance caused the injury
+            </Label>
+            <Input
+              id="object-substance-caused"
+              placeholder="e.g., forklift, chemical, ladder"
+              className="bg-background"
+              value={objectSubstanceCaused}
+              onChange={(e) => {
+                setObjectSubstanceCaused(e.target.value)
+                handleFieldUpdate("objectSubstanceCaused", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="accident-type" className="text-sm text-muted-foreground">
+              Accident Type
+            </Label>
+            <Select
+              value={accidentType}
+              onValueChange={(val) => {
+                setAccidentType(val)
+                handleFieldUpdate("accidentType", val)
+              }}
+            >
+              <SelectTrigger id="accident-type" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Slip/Trip/Fall">Slip/Trip/Fall</SelectItem>
+                <SelectItem value="Struck By">Struck By</SelectItem>
+                <SelectItem value="Struck Against">Struck Against</SelectItem>
+                <SelectItem value="Caught In/Between">Caught In/Between</SelectItem>
+                <SelectItem value="Overexertion">Overexertion</SelectItem>
+                <SelectItem value="Repetitive Motion">Repetitive Motion</SelectItem>
+                <SelectItem value="Exposure">Exposure</SelectItem>
+                <SelectItem value="Motor Vehicle">Motor Vehicle</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="jsa-reference" className="text-sm text-muted-foreground">
+              Safety Risk Assessment (JSA) Reference
+            </Label>
+            <Input
+              id="jsa-reference"
+              placeholder="JSA reference number..."
+              className="bg-background"
+              value={jsaReference}
+              onChange={(e) => {
+                setJsaReference(e.target.value)
+                handleFieldUpdate("jsaReference", e.target.value)
               }}
             />
           </div>
