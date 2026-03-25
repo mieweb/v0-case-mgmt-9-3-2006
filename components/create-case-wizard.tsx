@@ -42,16 +42,13 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
 
   // Get open/active cases for the selected employee
   const openCasesForEmployee = useMemo(() => {
-    console.log("[v0] formData.employeeNumber:", formData.employeeNumber)
-    console.log("[v0] total cases:", cases.length)
-    console.log("[v0] all cases:", cases.map(c => ({ caseNumber: c.caseNumber, employeeNumber: c.employeeNumber, status: c.status })))
-    if (!formData.employeeNumber) return []
-    const filtered = cases.filter(
-      (c) => c.employeeNumber === formData.employeeNumber && (c.status === "Open" || c.status === "Active")
+    if (!formData.employeeNumber && !formData.employeeName) return []
+    return cases.filter(
+      (c) => 
+        (c.employeeNumber === formData.employeeNumber || c.employeeName === formData.employeeName) && 
+        (c.status === "Open" || c.status === "Active")
     )
-    console.log("[v0] filtered open cases for employee:", filtered)
-    return filtered
-  }, [cases, formData.employeeNumber])
+  }, [cases, formData.employeeNumber, formData.employeeName])
 
   const handleOpenExistingCase = (caseNumber: string) => {
     const existingCase = cases.find((c) => c.caseNumber === caseNumber)
@@ -191,8 +188,7 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
               </div>
 
               {/* Show open/active cases for selected employee */}
-              {console.log("[v0] Render check - employeeNumber:", formData.employeeNumber, "openCases:", openCasesForEmployee.length)}
-              {formData.employeeNumber && openCasesForEmployee.length > 0 && (
+              {(formData.employeeNumber || formData.employeeName) && openCasesForEmployee.length > 0 && (
                 <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20">
                   <AlertTriangle className="h-4 w-4 text-amber-600" />
                   <AlertTitle className="text-amber-800 dark:text-amber-200">Open Cases Found</AlertTitle>
