@@ -115,6 +115,14 @@ export function CaseTab() {
   const [injuryDate, setInjuryDate] = useState("")
   const [injuryTime, setInjuryTime] = useState("")
   const [injuryLocation, setInjuryLocation] = useState("")
+  const [incidentOnsiteOffsite, setIncidentOnsiteOffsite] = useState("")
+  const [locationAddress, setLocationAddress] = useState("")
+  const [locationCity, setLocationCity] = useState("")
+  const [locationState, setLocationState] = useState("")
+  const [locationZip, setLocationZip] = useState("")
+  const [locationCountry, setLocationCountry] = useState("")
+  const [locationDescription, setLocationDescription] = useState("")
+  const [workstation, setWorkstation] = useState("")
   const [injuryShift, setInjuryShift] = useState("")
   const [shiftStartTime, setShiftStartTime] = useState("")
   const [injurySupervisor, setInjurySupervisor] = useState("")
@@ -164,6 +172,14 @@ export function CaseTab() {
       setInjuryDate(currentCase.injuryDate || "")
       setInjuryTime(currentCase.injuryTime || "")
       setInjuryLocation(currentCase.injuryLocation || "")
+      setIncidentOnsiteOffsite(currentCase.incidentOnsiteOffsite || "")
+      setLocationAddress(currentCase.locationAddress || "")
+      setLocationCity(currentCase.locationCity || "")
+      setLocationState(currentCase.locationState || "")
+      setLocationZip(currentCase.locationZip || "")
+      setLocationCountry(currentCase.locationCountry || "")
+      setLocationDescription(currentCase.locationDescription || "")
+      setWorkstation(currentCase.workstation || "")
       setInjuryShift(currentCase.injuryShift || "")
       setShiftStartTime(currentCase.shiftStartTime || "")
       setInjurySupervisor(currentCase.injurySupervisor || "")
@@ -938,6 +954,143 @@ export function CaseTab() {
             />
           </div>
         </div>
+
+        <h4 className="text-sm font-semibold text-foreground border-b pb-2 mt-4">Location Information</h4>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="incident-onsite-offsite" className="text-sm text-muted-foreground">
+              Where the incident happened
+            </Label>
+            <Select
+              value={incidentOnsiteOffsite}
+              onValueChange={(val) => {
+                setIncidentOnsiteOffsite(val)
+                handleFieldUpdate("incidentOnsiteOffsite", val)
+              }}
+            >
+              <SelectTrigger id="incident-onsite-offsite" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Onsite">Onsite</SelectItem>
+                <SelectItem value="Offsite">Offsite</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="workstation" className="text-sm text-muted-foreground">
+              Workstation
+            </Label>
+            <Input
+              id="workstation"
+              placeholder="Enter workstation"
+              className="bg-background"
+              value={workstation}
+              onChange={(e) => {
+                setWorkstation(e.target.value)
+                handleFieldUpdate("workstation", e.target.value)
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="location-address" className="text-sm text-muted-foreground">
+              Address
+            </Label>
+            <Input
+              id="location-address"
+              placeholder="Street address"
+              className="bg-background"
+              value={locationAddress}
+              onChange={(e) => {
+                setLocationAddress(e.target.value)
+                handleFieldUpdate("locationAddress", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="location-city" className="text-sm text-muted-foreground">
+              City
+            </Label>
+            <Input
+              id="location-city"
+              placeholder="City"
+              className="bg-background"
+              value={locationCity}
+              onChange={(e) => {
+                setLocationCity(e.target.value)
+                handleFieldUpdate("locationCity", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="location-state" className="text-sm text-muted-foreground">
+              State
+            </Label>
+            <Input
+              id="location-state"
+              placeholder="State"
+              className="bg-background"
+              value={locationState}
+              onChange={(e) => {
+                setLocationState(e.target.value)
+                handleFieldUpdate("locationState", e.target.value)
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="location-zip" className="text-sm text-muted-foreground">
+              Zip Code
+            </Label>
+            <Input
+              id="location-zip"
+              placeholder="Zip"
+              className="bg-background"
+              value={locationZip}
+              onChange={(e) => {
+                setLocationZip(e.target.value)
+                handleFieldUpdate("locationZip", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="location-country" className="text-sm text-muted-foreground">
+              Country
+            </Label>
+            <Input
+              id="location-country"
+              placeholder="Country"
+              className="bg-background"
+              value={locationCountry}
+              onChange={(e) => {
+                setLocationCountry(e.target.value)
+                handleFieldUpdate("locationCountry", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="location-description" className="text-sm text-muted-foreground">
+              Description of where the event occurred
+            </Label>
+            <Input
+              id="location-description"
+              placeholder="e.g., loading dock, north end"
+              className="bg-background"
+              value={locationDescription}
+              onChange={(e) => {
+                setLocationDescription(e.target.value)
+                handleFieldUpdate("locationDescription", e.target.value)
+              }}
+            />
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="injury-shift" className="text-sm text-muted-foreground">
