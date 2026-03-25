@@ -1815,6 +1815,8 @@ export function CaseTab() {
           />
         </div>
 
+        <h4 className="text-sm font-semibold text-foreground border-b pb-2 mt-4">Injury Details</h4>
+
         <div className="space-y-2">
           <Label htmlFor="injury-description" className="text-sm text-muted-foreground">
             Description of injury/illness
