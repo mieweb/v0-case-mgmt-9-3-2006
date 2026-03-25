@@ -362,12 +362,11 @@ export function CaseTab() {
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
-            <Label className="text-sm text-muted-foreground">Close Case</Label>
+          <div className="space-y-2 flex items-end">
             <Button
               type="button"
               variant={status === "Closed" ? "secondary" : "destructive"}
-              className="w-full"
+              size="sm"
               disabled={status === "Closed"}
               onClick={() => {
                 if (openTodos.length > 0 || openRestrictions.length > 0) {
