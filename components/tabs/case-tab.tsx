@@ -1205,125 +1205,119 @@ export function CaseTab() {
 
       {/* Close Case Dialog - Shows open restrictions and todos */}
       <AlertDialog open={showCloseCaseDialog} onOpenChange={setShowCloseCaseDialog}>
-        <AlertDialogContent className="max-w-2xl">
+        <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
           <AlertDialogHeader>
             <AlertDialogTitle>Close Case - Review Open Items</AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-4">
-                <p>
-                  This case has open items that should be reviewed before closing. 
-                  Select items to close them along with the case, or leave unchecked to keep them open.
-                </p>
-
-                {openTodos.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-foreground">Open To-Dos ({openTodos.length})</h4>
-                    <ScrollArea className="max-h-40 rounded border p-2">
-                      <div className="space-y-2">
-                        {openTodos.map((todo) => (
-                          <div key={todo.id} className="flex items-start gap-2 p-2 rounded hover:bg-muted/50">
-                            <Checkbox
-                              id={`todo-${todo.id}`}
-                              checked={selectedTodosToClose.includes(todo.id)}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setSelectedTodosToClose((prev) => [...prev, todo.id])
-                                } else {
-                                  setSelectedTodosToClose((prev) => prev.filter((id) => id !== todo.id))
-                                }
-                              }}
-                            />
-                            <label htmlFor={`todo-${todo.id}`} className="text-sm cursor-pointer flex-1">
-                              <span className="font-medium">{todo.activity}</span>
-                              {todo.dateScheduled && (
-                                <span className="text-muted-foreground ml-2">
-                                  (Due: {todo.dateScheduled})
-                                </span>
-                              )}
-                              {todo.caseManager && (
-                                <span className="text-muted-foreground ml-2">
-                                  - {todo.caseManager}
-                                </span>
-                              )}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedTodosToClose(openTodos.map((t) => t.id))}
-                      >
-                        Select All To-Dos
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedTodosToClose([])}
-                      >
-                        Deselect All
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-                {openRestrictions.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-foreground">Active Restrictions ({openRestrictions.length})</h4>
-                    <ScrollArea className="max-h-40 rounded border p-2">
-                      <div className="space-y-2">
-                        {openRestrictions.map((restriction) => (
-                          <div key={restriction.id} className="flex items-start gap-2 p-2 rounded hover:bg-muted/50">
-                            <Checkbox
-                              id={`restriction-${restriction.id}`}
-                              checked={selectedRestrictionsToClose.includes(restriction.id)}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setSelectedRestrictionsToClose((prev) => [...prev, restriction.id])
-                                } else {
-                                  setSelectedRestrictionsToClose((prev) => prev.filter((id) => id !== restriction.id))
-                                }
-                              }}
-                            />
-                            <label htmlFor={`restriction-${restriction.id}`} className="text-sm cursor-pointer flex-1">
-                              <span className="font-medium">{restriction.restriction}</span>
-                              <span className="text-muted-foreground ml-2">
-                                (Started: {restriction.startDate}
-                                {restriction.isPermanent ? " - Permanent" : restriction.endDate ? ` - Ends: ${restriction.endDate}` : ""})
-                              </span>
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedRestrictionsToClose(openRestrictions.map((r) => r.id))}
-                      >
-                        Select All Restrictions
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedRestrictionsToClose([])}
-                      >
-                        Deselect All
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
+            <AlertDialogDescription>
+              This case has open items that should be reviewed before closing. 
+              Select items to close them along with the case, or leave unchecked to keep them open.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          
+          <div className="flex-1 overflow-y-auto space-y-6 py-4">
+            {openTodos.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-semibold text-foreground">Open To-Dos ({openTodos.length})</h4>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedTodosToClose(openTodos.map((t) => t.id))}
+                    >
+                      Select All
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedTodosToClose([])}
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                </div>
+                <div className="border rounded-md divide-y max-h-48 overflow-y-auto">
+                  {openTodos.map((todo) => (
+                    <div key={todo.id} className="flex items-center gap-3 p-3 hover:bg-muted/50">
+                      <Checkbox
+                        id={`todo-${todo.id}`}
+                        checked={selectedTodosToClose.includes(todo.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedTodosToClose((prev) => [...prev, todo.id])
+                          } else {
+                            setSelectedTodosToClose((prev) => prev.filter((id) => id !== todo.id))
+                          }
+                        }}
+                      />
+                      <label htmlFor={`todo-${todo.id}`} className="text-sm cursor-pointer flex-1">
+                        <span className="font-medium">{todo.activity}</span>
+                        {todo.dateScheduled && (
+                          <span className="text-muted-foreground ml-2 text-xs">
+                            Due: {todo.dateScheduled}
+                          </span>
+                        )}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {openRestrictions.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-semibold text-foreground">Active Restrictions ({openRestrictions.length})</h4>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedRestrictionsToClose(openRestrictions.map((r) => r.id))}
+                    >
+                      Select All
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedRestrictionsToClose([])}
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                </div>
+                <div className="border rounded-md divide-y max-h-48 overflow-y-auto">
+                  {openRestrictions.map((restriction) => (
+                    <div key={restriction.id} className="flex items-center gap-3 p-3 hover:bg-muted/50">
+                      <Checkbox
+                        id={`restriction-${restriction.id}`}
+                        checked={selectedRestrictionsToClose.includes(restriction.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedRestrictionsToClose((prev) => [...prev, restriction.id])
+                          } else {
+                            setSelectedRestrictionsToClose((prev) => prev.filter((id) => id !== restriction.id))
+                          }
+                        }}
+                      />
+                      <label htmlFor={`restriction-${restriction.id}`} className="text-sm cursor-pointer flex-1">
+                        <span className="font-medium">{restriction.restriction}</span>
+                        <span className="text-muted-foreground ml-2 text-xs">
+                          Started: {restriction.startDate}
+                          {restriction.isPermanent ? " (Permanent)" : restriction.endDate ? ` - Ends: ${restriction.endDate}` : ""}
+                        </span>
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <AlertDialogFooter className="border-t pt-4">
             <AlertDialogCancel onClick={() => setPendingStatus(null)}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
