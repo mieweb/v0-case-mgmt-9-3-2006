@@ -191,6 +191,7 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
               </div>
 
               {/* Show open/active cases for selected employee */}
+              {console.log("[v0] Render check - employeeNumber:", formData.employeeNumber, "openCases:", openCasesForEmployee.length)}
               {formData.employeeNumber && openCasesForEmployee.length > 0 && (
                 <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20">
                   <AlertTriangle className="h-4 w-4 text-amber-600" />
