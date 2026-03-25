@@ -344,16 +344,8 @@ export function CaseTab() {
             <Select
               value={status}
               onValueChange={(val) => {
-                // If closing the case and there are open items, show the dialog
-                if (val === "Closed" && (openTodos.length > 0 || openRestrictions.length > 0)) {
-                  setPendingStatus(val)
-                  setSelectedTodosToClose([])
-                  setSelectedRestrictionsToClose([])
-                  setShowCloseCaseDialog(true)
-                } else {
-                  setStatus(val)
-                  handleFieldUpdate("status", val)
-                }
+                setStatus(val)
+                handleFieldUpdate("status", val)
               }}
             >
               <SelectTrigger id="status" className="bg-background">
@@ -361,7 +353,7 @@ export function CaseTab() {
               </SelectTrigger>
               <SelectContent>
                 {codes.caseStatus
-                  .filter((s) => s.active)
+                  .filter((s) => s.active && s.code !== "Closed")
                   .map((statusCode) => (
                     <SelectItem key={statusCode.id} value={statusCode.code}>
                       {statusCode.code}
@@ -369,6 +361,28 @@ export function CaseTab() {
                   ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Close Case</Label>
+            <Button
+              type="button"
+              variant={status === "Closed" ? "secondary" : "destructive"}
+              className="w-full"
+              disabled={status === "Closed"}
+              onClick={() => {
+                if (openTodos.length > 0 || openRestrictions.length > 0) {
+                  setPendingStatus("Closed")
+                  setSelectedTodosToClose([])
+                  setSelectedRestrictionsToClose([])
+                  setShowCloseCaseDialog(true)
+                } else {
+                  setStatus("Closed")
+                  handleFieldUpdate("status", "Closed")
+                }
+              }}
+            >
+              {status === "Closed" ? "Case Closed" : "Close Case"}
+            </Button>
           </div>
           <div className="space-y-2">
             <Label htmlFor="case-type" className="text-sm text-muted-foreground">
