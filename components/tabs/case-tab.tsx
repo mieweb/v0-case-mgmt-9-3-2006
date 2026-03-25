@@ -156,6 +156,12 @@ export function CaseTab() {
   const [workersCompClaim, setWorkersCompClaim] = useState("")
   const [workersCompClaimNumber, setWorkersCompClaimNumber] = useState("")
   const [claimStatusResolution, setClaimStatusResolution] = useState("")
+  const [wcClaimNumber, setWcClaimNumber] = useState("")
+  const [adjusterContact, setAdjusterContact] = useState("")
+  const [investigationDetails, setInvestigationDetails] = useState("")
+  const [recordOnly, setRecordOnly] = useState("")
+  const [daysAway, setDaysAway] = useState("")
+  const [daysRestricted, setDaysRestricted] = useState("")
 
   useEffect(() => {
     if (currentCase) {
@@ -226,6 +232,12 @@ export function CaseTab() {
       setWorkersCompClaim(currentCase.workersCompClaim || "")
       setWorkersCompClaimNumber(currentCase.workersCompClaimNumber || "")
       setClaimStatusResolution(currentCase.claimStatusResolution || "")
+      setWcClaimNumber(currentCase.wcClaimNumber || "")
+      setAdjusterContact(currentCase.adjusterContact || "")
+      setInvestigationDetails(currentCase.investigationDetails || "")
+      setRecordOnly(currentCase.recordOnly || "")
+      setDaysAway(currentCase.daysAway || "")
+      setDaysRestricted(currentCase.daysRestricted || "")
     }
   }, [currentCase])
 
@@ -1693,6 +1705,112 @@ export function CaseTab() {
             onChange={(e) => {
               setProviderInformation(e.target.value)
               handleFieldUpdate("providerInformation", e.target.value)
+            }}
+          />
+        </div>
+
+        <h4 className="text-sm font-semibold text-foreground border-b pb-2 mt-4">Work Comp Details</h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="wc-claim-number" className="text-sm text-muted-foreground">
+              Claim Number
+            </Label>
+            <Input
+              id="wc-claim-number"
+              placeholder="Enter claim number"
+              className="bg-background"
+              value={wcClaimNumber}
+              onChange={(e) => {
+                setWcClaimNumber(e.target.value)
+                handleFieldUpdate("wcClaimNumber", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="record-only" className="text-sm text-muted-foreground">
+              Record only (not a full claim)?
+            </Label>
+            <Select
+              value={recordOnly}
+              onValueChange={(val) => {
+                setRecordOnly(val)
+                handleFieldUpdate("recordOnly", val)
+              }}
+            >
+              <SelectTrigger id="record-only" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="adjuster-contact" className="text-sm text-muted-foreground">
+              Adjuster/Examiner Contact Info
+            </Label>
+            <Input
+              id="adjuster-contact"
+              placeholder="Contact information"
+              className="bg-background"
+              value={adjusterContact}
+              onChange={(e) => {
+                setAdjusterContact(e.target.value)
+                handleFieldUpdate("adjusterContact", e.target.value)
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="days-away" className="text-sm text-muted-foreground">
+              Days Away
+            </Label>
+            <Input
+              id="days-away"
+              type="number"
+              placeholder="0"
+              className="bg-background"
+              value={daysAway}
+              onChange={(e) => {
+                setDaysAway(e.target.value)
+                handleFieldUpdate("daysAway", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="days-restricted" className="text-sm text-muted-foreground">
+              Days Restricted
+            </Label>
+            <Input
+              id="days-restricted"
+              type="number"
+              placeholder="0"
+              className="bg-background"
+              value={daysRestricted}
+              onChange={(e) => {
+                setDaysRestricted(e.target.value)
+                handleFieldUpdate("daysRestricted", e.target.value)
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="investigation-details" className="text-sm text-muted-foreground">
+            Investigation Details
+          </Label>
+          <textarea
+            id="investigation-details"
+            placeholder="Enter investigation details..."
+            className="w-full min-h-[60px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            value={investigationDetails}
+            onChange={(e) => {
+              setInvestigationDetails(e.target.value)
+              handleFieldUpdate("investigationDetails", e.target.value)
             }}
           />
         </div>
