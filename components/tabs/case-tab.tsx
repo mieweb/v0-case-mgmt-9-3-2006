@@ -14,7 +14,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { useCases, type TodoItem } from "@/contexts/cases-context"
+import { useCases, type TodoItem, type Restriction } from "@/contexts/cases-context"
+import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { useAdmin } from "@/contexts/admin-context"
 import { useEmployees } from "@/contexts/employees-context"
 import { generateTodosFromTemplates } from "@/lib/todo-parser"
@@ -70,7 +72,7 @@ const adjusterData: Record<string, { name: string; phone: string; email: string 
 }
 
 export function CaseTab() {
-  const { currentCase, updateCase } = useCases()
+  const { currentCase, updateCase, restrictions, updateRestriction } = useCases()
   const { caseTypes, codes, getCaseType, caseManagers } = useAdmin()
   const { employees } = useEmployees()
 
@@ -97,6 +99,16 @@ export function CaseTab() {
   const [ddgDaysError, setDdgDaysError] = useState("")
   const [isConfidential, setIsConfidential] = useState(currentCase?.confidential || false)
   const [showConfidentialWarning, setShowConfidentialWarning] = useState(false)
+  const [showCloseCaseDialog, setShowCloseCaseDialog] = useState(false)
+  const [pendingStatus, setPendingStatus] = useState<string | null>(null)
+  const [selectedTodosToClose, setSelectedTodosToClose] = useState<string[]>([])
+  const [selectedRestrictionsToClose, setSelectedRestrictionsToClose] = useState<string[]>([])
+  
+  // Get open items for current case
+  const openTodos = currentCase?.todos?.filter((t) => !t.completed) || []
+  const openRestrictions = restrictions.filter(
+    (r) => r.caseNumber === currentCase?.caseNumber && r.isActive
+  )
   
   // Occupational Injury Information
   const [siteCaseNumber, setSiteCaseNumber] = useState("")
@@ -332,8 +344,16 @@ export function CaseTab() {
             <Select
               value={status}
               onValueChange={(val) => {
-                setStatus(val)
-                handleFieldUpdate("status", val)
+                // If closing the case and there are open items, show the dialog
+                if (val === "Closed" && (openTodos.length > 0 || openRestrictions.length > 0)) {
+                  setPendingStatus(val)
+                  setSelectedTodosToClose([])
+                  setSelectedRestrictionsToClose([])
+                  setShowCloseCaseDialog(true)
+                } else {
+                  setStatus(val)
+                  handleFieldUpdate("status", val)
+                }
               }}
             >
               <SelectTrigger id="status" className="bg-background">
@@ -1164,6 +1184,165 @@ export function CaseTab() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmConfidential} className="bg-destructive hover:bg-destructive/90">
               Mark as Confidential
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Close Case Dialog - Shows open restrictions and todos */}
+      <AlertDialog open={showCloseCaseDialog} onOpenChange={setShowCloseCaseDialog}>
+        <AlertDialogContent className="max-w-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Close Case - Review Open Items</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-4">
+                <p>
+                  This case has open items that should be reviewed before closing. 
+                  Select items to close them along with the case, or leave unchecked to keep them open.
+                </p>
+
+                {openTodos.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-foreground">Open To-Dos ({openTodos.length})</h4>
+                    <ScrollArea className="max-h-40 rounded border p-2">
+                      <div className="space-y-2">
+                        {openTodos.map((todo) => (
+                          <div key={todo.id} className="flex items-start gap-2 p-2 rounded hover:bg-muted/50">
+                            <Checkbox
+                              id={`todo-${todo.id}`}
+                              checked={selectedTodosToClose.includes(todo.id)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedTodosToClose((prev) => [...prev, todo.id])
+                                } else {
+                                  setSelectedTodosToClose((prev) => prev.filter((id) => id !== todo.id))
+                                }
+                              }}
+                            />
+                            <label htmlFor={`todo-${todo.id}`} className="text-sm cursor-pointer flex-1">
+                              <span className="font-medium">{todo.activity}</span>
+                              {todo.dateScheduled && (
+                                <span className="text-muted-foreground ml-2">
+                                  (Due: {todo.dateScheduled})
+                                </span>
+                              )}
+                              {todo.caseManager && (
+                                <span className="text-muted-foreground ml-2">
+                                  - {todo.caseManager}
+                                </span>
+                              )}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedTodosToClose(openTodos.map((t) => t.id))}
+                      >
+                        Select All To-Dos
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedTodosToClose([])}
+                      >
+                        Deselect All
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {openRestrictions.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-foreground">Active Restrictions ({openRestrictions.length})</h4>
+                    <ScrollArea className="max-h-40 rounded border p-2">
+                      <div className="space-y-2">
+                        {openRestrictions.map((restriction) => (
+                          <div key={restriction.id} className="flex items-start gap-2 p-2 rounded hover:bg-muted/50">
+                            <Checkbox
+                              id={`restriction-${restriction.id}`}
+                              checked={selectedRestrictionsToClose.includes(restriction.id)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedRestrictionsToClose((prev) => [...prev, restriction.id])
+                                } else {
+                                  setSelectedRestrictionsToClose((prev) => prev.filter((id) => id !== restriction.id))
+                                }
+                              }}
+                            />
+                            <label htmlFor={`restriction-${restriction.id}`} className="text-sm cursor-pointer flex-1">
+                              <span className="font-medium">{restriction.restriction}</span>
+                              <span className="text-muted-foreground ml-2">
+                                (Started: {restriction.startDate}
+                                {restriction.isPermanent ? " - Permanent" : restriction.endDate ? ` - Ends: ${restriction.endDate}` : ""})
+                              </span>
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedRestrictionsToClose(openRestrictions.map((r) => r.id))}
+                      >
+                        Select All Restrictions
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedRestrictionsToClose([])}
+                      >
+                        Deselect All
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPendingStatus(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                // Close selected todos
+                if (currentCase && selectedTodosToClose.length > 0) {
+                  const updatedTodos = currentCase.todos?.map((todo) => {
+                    if (selectedTodosToClose.includes(todo.id)) {
+                      return { ...todo, completed: true, dateClosed: new Date().toISOString().split("T")[0] }
+                    }
+                    return todo
+                  })
+                  updateCase(currentCase.caseNumber, { todos: updatedTodos })
+                }
+
+                // Close selected restrictions
+                selectedRestrictionsToClose.forEach((restrictionId) => {
+                  updateRestriction(restrictionId, { 
+                    isActive: false, 
+                    endDate: new Date().toISOString().split("T")[0] 
+                  })
+                })
+
+                // Update case status
+                if (pendingStatus) {
+                  setStatus(pendingStatus)
+                  handleFieldUpdate("status", pendingStatus)
+                }
+
+                setShowCloseCaseDialog(false)
+                setPendingStatus(null)
+              }}
+            >
+              Close Case
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
