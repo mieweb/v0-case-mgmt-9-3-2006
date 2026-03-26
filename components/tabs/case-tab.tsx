@@ -1006,11 +1006,11 @@ export function CaseTab() {
                 <SelectValue placeholder="Select shift..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1st Shift">1st Shift</SelectItem>
-                <SelectItem value="2nd Shift">2nd Shift</SelectItem>
-                <SelectItem value="3rd Shift">3rd Shift</SelectItem>
-                <SelectItem value="Day Shift">Day Shift</SelectItem>
-                <SelectItem value="Night Shift">Night Shift</SelectItem>
+                <SelectItem value="1st shift">1st shift</SelectItem>
+                <SelectItem value="2nd shift">2nd shift</SelectItem>
+                <SelectItem value="3rd shift">3rd shift</SelectItem>
+                <SelectItem value="Day shift">Day shift</SelectItem>
+                <SelectItem value="Night shift">Night shift</SelectItem>
                 <SelectItem value="Rotating">Rotating</SelectItem>
                 <SelectItem value="Other">Other</SelectItem>
               </SelectContent>
@@ -1085,7 +1085,7 @@ export function CaseTab() {
               <SelectContent>
                 <SelectItem value="Yes">Yes</SelectItem>
                 <SelectItem value="No">No</SelectItem>
-                <SelectItem value="Under Investigation">Under Investigation</SelectItem>
+                <SelectItem value="Under investigation">Under investigation</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -1187,12 +1187,12 @@ export function CaseTab() {
                     <SelectValue placeholder="Select..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Open">Open</SelectItem>
-                    <SelectItem value="Under Review">Under Review</SelectItem>
-                    <SelectItem value="Approved">Approved</SelectItem>
-                    <SelectItem value="Denied">Denied</SelectItem>
-                    <SelectItem value="Settled">Settled</SelectItem>
-                    <SelectItem value="Closed">Closed</SelectItem>
+<SelectItem value="Open">Open</SelectItem>
+                <SelectItem value="Under review">Under review</SelectItem>
+                <SelectItem value="Approved">Approved</SelectItem>
+                <SelectItem value="Denied">Denied</SelectItem>
+                <SelectItem value="Settled">Settled</SelectItem>
+                <SelectItem value="Closed">Closed</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1236,10 +1236,10 @@ export function CaseTab() {
                   <SelectValue placeholder="Select..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Death">Death</SelectItem>
-                  <SelectItem value="Days Away From Work">Days Away From Work</SelectItem>
-                  <SelectItem value="Job Transfer/Restriction">Job Transfer/Restriction</SelectItem>
-                  <SelectItem value="Other Recordable">Other Recordable</SelectItem>
+<SelectItem value="Death">Death</SelectItem>
+                <SelectItem value="Days away from work">Days away from work</SelectItem>
+                <SelectItem value="Job transfer/restriction">Job transfer/restriction</SelectItem>
+                <SelectItem value="Other recordable">Other recordable</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1530,14 +1530,14 @@ export function CaseTab() {
                 <SelectValue placeholder="Select..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Slip/Trip/Fall">Slip/Trip/Fall</SelectItem>
-                <SelectItem value="Struck By">Struck By</SelectItem>
-                <SelectItem value="Struck Against">Struck Against</SelectItem>
-                <SelectItem value="Caught In/Between">Caught In/Between</SelectItem>
+                <SelectItem value="Slip/trip/fall">Slip/trip/fall</SelectItem>
+                <SelectItem value="Struck by">Struck by</SelectItem>
+                <SelectItem value="Struck against">Struck against</SelectItem>
+                <SelectItem value="Caught in/between">Caught in/between</SelectItem>
                 <SelectItem value="Overexertion">Overexertion</SelectItem>
-                <SelectItem value="Repetitive Motion">Repetitive Motion</SelectItem>
+                <SelectItem value="Repetitive motion">Repetitive motion</SelectItem>
                 <SelectItem value="Exposure">Exposure</SelectItem>
-                <SelectItem value="Motor Vehicle">Motor Vehicle</SelectItem>
+                <SelectItem value="Motor vehicle">Motor vehicle</SelectItem>
                 <SelectItem value="Other">Other</SelectItem>
               </SelectContent>
             </Select>
@@ -1599,9 +1599,9 @@ export function CaseTab() {
               <SelectContent>
                 <SelectItem value="Onsite">Onsite</SelectItem>
                 <SelectItem value="Hospital">Hospital</SelectItem>
-                <SelectItem value="External Provider">External Provider</SelectItem>
-                <SelectItem value="Urgent Care">Urgent Care</SelectItem>
-                <SelectItem value="Self-Treated">Self-Treated</SelectItem>
+                <SelectItem value="External provider">External provider</SelectItem>
+                <SelectItem value="Urgent care">Urgent care</SelectItem>
+                <SelectItem value="Self-treated">Self-treated</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -1846,13 +1846,13 @@ export function CaseTab() {
                 <SelectValue placeholder="Select..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Sprain/Strain">Sprain/Strain</SelectItem>
+                <SelectItem value="Sprain/strain">Sprain/strain</SelectItem>
                 <SelectItem value="Fracture">Fracture</SelectItem>
-                <SelectItem value="Cut/Laceration">Cut/Laceration</SelectItem>
-                <SelectItem value="Contusion/Bruise">Contusion/Bruise</SelectItem>
+                <SelectItem value="Cut/laceration">Cut/laceration</SelectItem>
+                <SelectItem value="Contusion/bruise">Contusion/bruise</SelectItem>
                 <SelectItem value="Burn">Burn</SelectItem>
                 <SelectItem value="Amputation">Amputation</SelectItem>
-                <SelectItem value="Carpal Tunnel">Carpal Tunnel</SelectItem>
+                <SelectItem value="Carpal tunnel">Carpal tunnel</SelectItem>
                 <SelectItem value="Hernia">Hernia</SelectItem>
                 <SelectItem value="Hearing Loss">Hearing Loss</SelectItem>
                 <SelectItem value="Respiratory">Respiratory</SelectItem>
