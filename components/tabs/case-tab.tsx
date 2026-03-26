@@ -493,7 +493,7 @@ export function CaseTab() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-4">
+        <div className="flex items-center gap-4 pt-2">
           <div className="flex items-center space-x-2">
             <input
               type="checkbox"
