@@ -1488,21 +1488,6 @@ export function CaseTab() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="how-injury-happened" className="text-sm text-muted-foreground">
-              How the injury happened
-            </Label>
-            <Input
-              id="how-injury-happened"
-              placeholder="Describe how injury occurred..."
-              className="bg-background"
-              value={howInjuryHappened}
-              onChange={(e) => {
-                setHowInjuryHappened(e.target.value)
-                handleFieldUpdate("howInjuryHappened", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="object-substance-caused" className="text-sm text-muted-foreground">
               What object or substance caused the injury
             </Label>
@@ -1514,6 +1499,21 @@ export function CaseTab() {
               onChange={(e) => {
                 setObjectSubstanceCaused(e.target.value)
                 handleFieldUpdate("objectSubstanceCaused", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="how-injury-happened" className="text-sm text-muted-foreground">
+              How the injury happened
+            </Label>
+            <Input
+              id="how-injury-happened"
+              placeholder="Describe how injury occurred..."
+              className="bg-background"
+              value={howInjuryHappened}
+              onChange={(e) => {
+                setHowInjuryHappened(e.target.value)
+                handleFieldUpdate("howInjuryHappened", e.target.value)
               }}
             />
           </div>
