@@ -1444,7 +1444,34 @@ export function CaseTab() {
       </CollapsibleSection>
 
       <CollapsibleSection title="Incident Description" icon={<FileText className="h-4 w-4" />} defaultOpen={false}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="accident-type" className="text-sm text-muted-foreground">
+              Accident type
+            </Label>
+            <Select
+              value={accidentType}
+              onValueChange={(val) => {
+                setAccidentType(val)
+                handleFieldUpdate("accidentType", val)
+              }}
+            >
+              <SelectTrigger id="accident-type" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Slip/trip/fall">Slip/trip/fall</SelectItem>
+                <SelectItem value="Struck by">Struck by</SelectItem>
+                <SelectItem value="Struck against">Struck against</SelectItem>
+                <SelectItem value="Caught in/between">Caught in/between</SelectItem>
+                <SelectItem value="Overexertion">Overexertion</SelectItem>
+                <SelectItem value="Repetitive motion">Repetitive motion</SelectItem>
+                <SelectItem value="Exposure">Exposure</SelectItem>
+                <SelectItem value="Motor vehicle">Motor vehicle</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="employee-doing-before" className="text-sm text-muted-foreground">
               What the employee was doing before the incident
@@ -1475,9 +1502,6 @@ export function CaseTab() {
               }}
             />
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="object-substance-caused" className="text-sm text-muted-foreground">
               What object or substance caused the injury
@@ -1494,35 +1518,8 @@ export function CaseTab() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="accident-type" className="text-sm text-muted-foreground">
-              Accident Type
-            </Label>
-            <Select
-              value={accidentType}
-              onValueChange={(val) => {
-                setAccidentType(val)
-                handleFieldUpdate("accidentType", val)
-              }}
-            >
-              <SelectTrigger id="accident-type" className="bg-background">
-                <SelectValue placeholder="Select..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Slip/trip/fall">Slip/trip/fall</SelectItem>
-                <SelectItem value="Struck by">Struck by</SelectItem>
-                <SelectItem value="Struck against">Struck against</SelectItem>
-                <SelectItem value="Caught in/between">Caught in/between</SelectItem>
-                <SelectItem value="Overexertion">Overexertion</SelectItem>
-                <SelectItem value="Repetitive motion">Repetitive motion</SelectItem>
-                <SelectItem value="Exposure">Exposure</SelectItem>
-                <SelectItem value="Motor vehicle">Motor vehicle</SelectItem>
-                <SelectItem value="Other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="jsa-reference" className="text-sm text-muted-foreground">
-              Safety Risk Assessment (JSA) Reference
+              Safety risk assessment (JSA) reference
             </Label>
             <Input
               id="jsa-reference"
