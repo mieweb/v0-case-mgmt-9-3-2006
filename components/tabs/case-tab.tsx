@@ -411,7 +411,7 @@ export function CaseTab() {
 
   return (
     <div className="case-tab-container phi-data space-y-4">
-      <CollapsibleSection title="Case Information" icon={<FolderOpen className="h-4 w-4" />} defaultOpen={true}>
+      <CollapsibleSection title="Case Information" icon={<FolderOpen className="h-4 w-4" />} defaultOpen={false}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="status" className="text-sm text-muted-foreground">
@@ -528,7 +528,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Case Dates" icon={<Calendar className="h-4 w-4" />} defaultOpen={true}>
+      <CollapsibleSection title="Case Dates" icon={<Calendar className="h-4 w-4" />} defaultOpen={false}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="date-disability" className="text-sm text-muted-foreground">
@@ -608,7 +608,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Maternity Information" icon={<Baby className="h-4 w-4" />} defaultOpen={!!(expectedConfinementDate || deliveryDate)}>
+      <CollapsibleSection title="Maternity Information" icon={<Baby className="h-4 w-4" />} defaultOpen={false}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="expected-confinement" className="text-sm text-muted-foreground">
@@ -643,7 +643,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Short-Term Disability (STD)" icon={<Clock className="h-4 w-4" />} defaultOpen={!!(stdPlan || stdStartDate)}>
+      <CollapsibleSection title="Short-Term Disability (STD)" icon={<Clock className="h-4 w-4" />} defaultOpen={false}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="std-plan" className="text-sm text-muted-foreground">
@@ -773,7 +773,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Duration of Disability Guidelines (DDG)" icon={<BarChart3 className="h-4 w-4" />} defaultOpen={!!(ddgDays || ddgReturnDate)}>
+      <CollapsibleSection title="Duration of Disability Guidelines (DDG)" icon={<BarChart3 className="h-4 w-4" />} defaultOpen={false}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="ddg-days" className="text-sm text-muted-foreground">
@@ -827,7 +827,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Return to Work" icon={<RotateCcw className="h-4 w-4" />} defaultOpen={!!actualReturnDate}>
+      <CollapsibleSection title="Return to Work" icon={<RotateCcw className="h-4 w-4" />} defaultOpen={false}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="expected-return" className="text-sm text-muted-foreground">
@@ -879,7 +879,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Pay Information" icon={<DollarSign className="h-4 w-4" />} defaultOpen={!!payStartDate}>
+      <CollapsibleSection title="Pay Information" icon={<DollarSign className="h-4 w-4" />} defaultOpen={false}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="pay-start" className="text-sm text-muted-foreground">
@@ -925,7 +925,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Occupational Injury Information" icon={<HardHat className="h-4 w-4" />} defaultOpen={true}>
+      <CollapsibleSection title="Occupational Injury Information" icon={<HardHat className="h-4 w-4" />} defaultOpen={false}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="site-case-number" className="text-sm text-muted-foreground">
@@ -1066,7 +1066,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Work Related Details" icon={<Briefcase className="h-4 w-4" />} defaultOpen={true}>
+      <CollapsibleSection title="Work Related Details" icon={<Briefcase className="h-4 w-4" />} defaultOpen={false}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="is-case-work-related" className="text-sm text-muted-foreground">
@@ -1329,7 +1329,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Location Information" icon={<MapPin className="h-4 w-4" />} defaultOpen={true}>
+      <CollapsibleSection title="Location Information" icon={<MapPin className="h-4 w-4" />} defaultOpen={false}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="incident-onsite-offsite" className="text-sm text-muted-foreground">
@@ -1465,7 +1465,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Incident Description" icon={<FileText className="h-4 w-4" />} defaultOpen={true}>
+      <CollapsibleSection title="Incident Description" icon={<FileText className="h-4 w-4" />} defaultOpen={false}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="employee-doing-before" className="text-sm text-muted-foreground">
@@ -1560,7 +1560,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Treatment Information" icon={<Stethoscope className="h-4 w-4" />} defaultOpen={true}>
+      <CollapsibleSection title="Treatment Information" icon={<Stethoscope className="h-4 w-4" />} defaultOpen={false}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="medical-treatment-provided" className="text-sm text-muted-foreground">
@@ -1708,7 +1708,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Work Comp Details" icon={<Shield className="h-4 w-4" />} defaultOpen={true}>
+      <CollapsibleSection title="Work Comp Details" icon={<Shield className="h-4 w-4" />} defaultOpen={false}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="wc-claim-number" className="text-sm text-muted-foreground">
@@ -1814,7 +1814,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Injury Details" icon={<Activity className="h-4 w-4" />} defaultOpen={true}>
+      <CollapsibleSection title="Injury Details" icon={<Activity className="h-4 w-4" />} defaultOpen={false}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="body-part" className="text-sm text-muted-foreground">
