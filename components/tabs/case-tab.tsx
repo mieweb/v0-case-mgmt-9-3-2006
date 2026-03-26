@@ -493,19 +493,19 @@ export function CaseTab() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 pt-2">
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="confidential-case"
-              checked={isConfidential}
-              onChange={(e) => handleConfidentialChange(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300"
-            />
-            <Label htmlFor="confidential-case" className="text-sm font-medium cursor-pointer">
-              Mark as Confidential Case
-            </Label>
-          </div>
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="confidential-case"
+            checked={isConfidential}
+            onChange={(e) => handleConfidentialChange(e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+          <Label htmlFor="confidential-case" className="text-sm font-medium cursor-pointer">
+            Mark as Confidential Case
+          </Label>
+        </div>
+        <div className="flex justify-center">
           <Button
             type="button"
             variant={status === "Closed" ? "secondary" : "destructive"}

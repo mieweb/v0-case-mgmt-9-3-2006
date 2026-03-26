@@ -48,7 +48,7 @@ export function CollapsibleSection({
           </button>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <CardContent className="pt-0 pb-4 space-y-4">
+          <CardContent className="pt-0 pb-4 space-y-3">
             {children}
           </CardContent>
         </CollapsibleContent>
