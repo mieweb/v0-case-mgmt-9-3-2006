@@ -1314,7 +1314,7 @@ export function CaseTab() {
       </CollapsibleSection>
 
       <CollapsibleSection title="Location Information" icon={<MapPin className="h-4 w-4" />} defaultOpen={false}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="incident-onsite-offsite" className="text-sm text-muted-foreground">
               Where the incident happened
@@ -1350,12 +1350,24 @@ export function CaseTab() {
               }}
             />
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="space-y-2 md:col-span-2">
+          <div className="space-y-2">
+            <Label htmlFor="location-description" className="text-sm text-muted-foreground">
+              Description of where event occurred
+            </Label>
+            <Input
+              id="location-description"
+              placeholder="e.g., loading dock, north end"
+              className="bg-background"
+              value={locationDescription}
+              onChange={(e) => {
+                setLocationDescription(e.target.value)
+                handleFieldUpdate("locationDescription", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2 md:col-span-3">
             <Label htmlFor="location-address" className="text-sm text-muted-foreground">
-              Address
+              Street address
             </Label>
             <Input
               id="location-address"
@@ -1398,12 +1410,9 @@ export function CaseTab() {
               }}
             />
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-2">
             <Label htmlFor="location-zip" className="text-sm text-muted-foreground">
-              Zip Code
+              Zip code
             </Label>
             <Input
               id="location-zip"
@@ -1428,21 +1437,6 @@ export function CaseTab() {
               onChange={(e) => {
                 setLocationCountry(e.target.value)
                 handleFieldUpdate("locationCountry", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="location-description" className="text-sm text-muted-foreground">
-              Description of where the event occurred
-            </Label>
-            <Input
-              id="location-description"
-              placeholder="e.g., loading dock, north end"
-              className="bg-background"
-              value={locationDescription}
-              onChange={(e) => {
-                setLocationDescription(e.target.value)
-                handleFieldUpdate("locationDescription", e.target.value)
               }}
             />
           </div>
