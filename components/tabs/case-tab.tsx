@@ -506,9 +506,6 @@ export function CaseTab() {
               Mark as Confidential Case
             </Label>
           </div>
-        </div>
-
-        <div className="flex justify-center pt-4">
           <Button
             type="button"
             variant={status === "Closed" ? "secondary" : "destructive"}
