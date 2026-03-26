@@ -412,8 +412,8 @@ export function CaseTab() {
   return (
     <div className="case-tab-container phi-data space-y-4">
       <CollapsibleSection title="Case Information" icon={<FolderOpen className="h-4 w-4" />} defaultOpen={false}>
-        <div className="flex flex-col md:flex-row md:items-end md:justify-center gap-4">
-          <div className="md:w-1/4 space-y-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
             <Label htmlFor="status" className="text-sm text-muted-foreground">
               Status
             </Label>
@@ -438,7 +438,7 @@ export function CaseTab() {
               </SelectContent>
             </Select>
           </div>
-          <div className="md:w-1/4 space-y-2">
+          <div className="space-y-2">
             <Label htmlFor="case-type" className="text-sm text-muted-foreground">
               Case type
             </Label>
@@ -464,7 +464,7 @@ export function CaseTab() {
               </SelectContent>
             </Select>
           </div>
-          <div className="md:w-1/4 space-y-2">
+          <div className="space-y-2">
             <Label htmlFor="case-manager" className="text-sm text-muted-foreground">
               Case manager
             </Label>
