@@ -22,7 +22,8 @@ import { useEmployees } from "@/contexts/employees-context"
 import { generateTodosFromTemplates } from "@/lib/todo-parser"
 import { useState, useEffect } from "react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle } from "lucide-react"
+import { AlertCircle, Briefcase, MapPin, FileText, Stethoscope, Shield, Activity, Info, FolderOpen, Calendar, Baby, Clock, BarChart3, DollarSign, HardHat, RotateCcw } from "lucide-react"
+import { CollapsibleSection } from "@/components/ui/collapsible-section"
 
 const adjusterData: Record<string, { name: string; phone: string; email: string }> = {
   ALLENA: { name: "Ashley Allen", phone: "763-416-8905", email: "ashley_allen@gbtpa.com" },
