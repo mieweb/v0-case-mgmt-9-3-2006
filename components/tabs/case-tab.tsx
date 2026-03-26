@@ -144,6 +144,9 @@ export function CaseTab() {
   const [typeOfInjuryOrIllness, setTypeOfInjuryOrIllness] = useState("")
   const [significantInjuryIllness, setSignificantInjuryIllness] = useState("")
   const [injuryDescription, setInjuryDescription] = useState("")
+  const [whatEmployeeDoing, setWhatEmployeeDoing] = useState("")
+  const [whatHappened, setWhatHappened] = useState("")
+  const [whatObjectHarmed, setWhatObjectHarmed] = useState("")
   const [bodyPartAffected, setBodyPartAffected] = useState("")
   const [injuryNature, setInjuryNature] = useState("")
   const [injuryCause, setInjuryCause] = useState("")
@@ -220,6 +223,9 @@ export function CaseTab() {
       setTypeOfInjuryOrIllness(currentCase.typeOfInjuryOrIllness || "")
       setSignificantInjuryIllness(currentCase.significantInjuryIllness || "")
       setInjuryDescription(currentCase.injuryDescription || "")
+      setWhatEmployeeDoing(currentCase.whatEmployeeDoing || "")
+      setWhatHappened(currentCase.whatHappened || "")
+      setWhatObjectHarmed(currentCase.whatObjectHarmed || "")
       setBodyPartAffected(currentCase.bodyPartAffected || "")
       setInjuryNature(currentCase.injuryNature || "")
       setInjuryCause(currentCase.injuryCause || "")
@@ -1910,7 +1916,55 @@ export function CaseTab() {
             }}
           />
         </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="what-employee-doing" className="text-sm text-muted-foreground">
+            What was the employee doing just before the incident occurred?
+          </Label>
+          <textarea
+            id="what-employee-doing"
+            placeholder="Describe the activity or task the employee was performing..."
+            className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            value={whatEmployeeDoing}
+            onChange={(e) => {
+              setWhatEmployeeDoing(e.target.value)
+              handleFieldUpdate("whatEmployeeDoing", e.target.value)
+            }}
+          />
         </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="what-happened" className="text-sm text-muted-foreground">
+            What happened?
+          </Label>
+          <textarea
+            id="what-happened"
+            placeholder="Describe the sequence of events that led to the injury..."
+            className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            value={whatHappened}
+            onChange={(e) => {
+              setWhatHappened(e.target.value)
+              handleFieldUpdate("whatHappened", e.target.value)
+            }}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="what-object-harmed" className="text-sm text-muted-foreground">
+            What object or substance directly harmed the employee?
+          </Label>
+          <textarea
+            id="what-object-harmed"
+            placeholder="Identify the specific object, equipment, substance, or condition..."
+            className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            value={whatObjectHarmed}
+            onChange={(e) => {
+              setWhatObjectHarmed(e.target.value)
+              handleFieldUpdate("whatObjectHarmed", e.target.value)
+            }}
+          />
+        </div>
+      </CollapsibleSection>
 
       <AlertDialog open={showConfidentialWarning} onOpenChange={setShowConfidentialWarning}>
         <AlertDialogContent>
