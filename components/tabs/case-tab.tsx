@@ -1792,21 +1792,6 @@ export function CaseTab() {
       <CollapsibleSection title="Injury Details" icon={<Activity className="h-4 w-4" />} defaultOpen={false}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="body-part" className="text-sm text-muted-foreground">
-              Body part affected
-            </Label>
-            <Input
-              id="body-part"
-              placeholder="e.g., Lower back, Right hand"
-              className="bg-background"
-              value={bodyPartAffected}
-              onChange={(e) => {
-                setBodyPartAffected(e.target.value)
-                handleFieldUpdate("bodyPartAffected", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="injury-nature" className="text-sm text-muted-foreground">
               Nature of injury
             </Label>
@@ -1829,12 +1814,27 @@ export function CaseTab() {
                 <SelectItem value="Amputation">Amputation</SelectItem>
                 <SelectItem value="Carpal tunnel">Carpal tunnel</SelectItem>
                 <SelectItem value="Hernia">Hernia</SelectItem>
-                <SelectItem value="Hearing Loss">Hearing Loss</SelectItem>
+                <SelectItem value="Hearing loss">Hearing loss</SelectItem>
                 <SelectItem value="Respiratory">Respiratory</SelectItem>
                 <SelectItem value="Dermatitis">Dermatitis</SelectItem>
                 <SelectItem value="Other">Other</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="body-part" className="text-sm text-muted-foreground">
+              Body part affected
+            </Label>
+            <Input
+              id="body-part"
+              placeholder="e.g., Lower back, Right hand"
+              className="bg-background"
+              value={bodyPartAffected}
+              onChange={(e) => {
+                setBodyPartAffected(e.target.value)
+                handleFieldUpdate("bodyPartAffected", e.target.value)
+              }}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="injury-cause" className="text-sm text-muted-foreground">
