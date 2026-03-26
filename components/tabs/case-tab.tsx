@@ -1473,17 +1473,17 @@ export function CaseTab() {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="employee-doing-before" className="text-sm text-muted-foreground">
-              What the employee was doing before the incident
+            <Label htmlFor="jsa-reference" className="text-sm text-muted-foreground">
+              Safety risk assessment (JSA) reference
             </Label>
             <Input
-              id="employee-doing-before"
-              placeholder="Describe activity before incident..."
+              id="jsa-reference"
+              placeholder="JSA reference number..."
               className="bg-background"
-              value={employeeDoingBefore}
+              value={jsaReference}
               onChange={(e) => {
-                setEmployeeDoingBefore(e.target.value)
-                handleFieldUpdate("employeeDoingBefore", e.target.value)
+                setJsaReference(e.target.value)
+                handleFieldUpdate("jsaReference", e.target.value)
               }}
             />
           </div>
@@ -1518,17 +1518,17 @@ export function CaseTab() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="jsa-reference" className="text-sm text-muted-foreground">
-              Safety risk assessment (JSA) reference
+            <Label htmlFor="employee-doing-before" className="text-sm text-muted-foreground">
+              What the employee was doing before the incident
             </Label>
             <Input
-              id="jsa-reference"
-              placeholder="JSA reference number..."
+              id="employee-doing-before"
+              placeholder="Describe activity before incident..."
               className="bg-background"
-              value={jsaReference}
+              value={employeeDoingBefore}
               onChange={(e) => {
-                setJsaReference(e.target.value)
-                handleFieldUpdate("jsaReference", e.target.value)
+                setEmployeeDoingBefore(e.target.value)
+                handleFieldUpdate("employeeDoingBefore", e.target.value)
               }}
             />
           </div>
