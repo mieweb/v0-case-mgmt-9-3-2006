@@ -429,10 +429,10 @@ export function CaseTab() {
               </SelectTrigger>
               <SelectContent>
                 {codes.caseStatus
-                  .filter((s) => s.active && s.code !== "Closed")
+                  .filter((s) => s.active && s.description !== "Closed")
                   .map((statusCode) => (
-                    <SelectItem key={statusCode.id} value={statusCode.code}>
-                      {statusCode.code}
+                    <SelectItem key={statusCode.id} value={statusCode.description}>
+                      {statusCode.description}
                     </SelectItem>
                   ))}
               </SelectContent>
@@ -942,8 +942,6 @@ export function CaseTab() {
               }}
             />
           </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="injury-date" className="text-sm text-muted-foreground">
               Date of injury
@@ -989,8 +987,6 @@ export function CaseTab() {
               }}
             />
           </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="injury-shift" className="text-sm text-muted-foreground">
               Shift
@@ -1018,7 +1014,7 @@ export function CaseTab() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="shift-start-time" className="text-sm text-muted-foreground">
-              Shift Start Time
+              Shift start time
             </Label>
             <Input
               id="shift-start-time"
@@ -1046,8 +1042,6 @@ export function CaseTab() {
               }}
             />
           </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="supervisor-notified-date" className="text-sm text-muted-foreground">
               When was the supervisor notified?
