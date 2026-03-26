@@ -412,7 +412,7 @@ export function CaseTab() {
   return (
     <div className="case-tab-container phi-data space-y-4">
       <CollapsibleSection title="Case Information" icon={<FolderOpen className="h-4 w-4" />} defaultOpen={false}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-2">
             <Label htmlFor="status" className="text-sm text-muted-foreground">
               Status
@@ -437,27 +437,6 @@ export function CaseTab() {
                   ))}
               </SelectContent>
             </Select>
-          </div>
-          <div className="space-y-2 flex items-end">
-            <Button
-              type="button"
-              variant={status === "Closed" ? "secondary" : "destructive"}
-              size="sm"
-              disabled={status === "Closed"}
-              onClick={() => {
-                if (openTodos.length > 0 || openRestrictions.length > 0) {
-                  setPendingStatus("Closed")
-                  setSelectedTodosToClose([])
-                  setSelectedRestrictionsToClose([])
-                  setShowCloseCaseDialog(true)
-                } else {
-                  setStatus("Closed")
-                  handleFieldUpdate("status", "Closed")
-                }
-              }}
-            >
-              {status === "Closed" ? "Case Closed" : "Close Case"}
-            </Button>
           </div>
           <div className="space-y-2">
             <Label htmlFor="case-type" className="text-sm text-muted-foreground">
@@ -512,19 +491,40 @@ export function CaseTab() {
               </SelectContent>
             </Select>
           </div>
+          <div className="space-y-2 flex items-center pt-6">
+            <input
+              type="checkbox"
+              id="confidential-case"
+              checked={isConfidential}
+              onChange={(e) => handleConfidentialChange(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300"
+            />
+            <Label htmlFor="confidential-case" className="text-sm font-medium cursor-pointer ml-2">
+              Mark as Confidential
+            </Label>
+          </div>
         </div>
 
-        <div className="flex items-center space-x-2 pt-2">
-          <input
-            type="checkbox"
-            id="confidential-case"
-            checked={isConfidential}
-            onChange={(e) => handleConfidentialChange(e.target.checked)}
-            className="h-4 w-4 rounded border-gray-300"
-          />
-          <Label htmlFor="confidential-case" className="text-sm font-medium cursor-pointer">
-            Mark as Confidential Case
-          </Label>
+        <div className="flex justify-center pt-4">
+          <Button
+            type="button"
+            variant={status === "Closed" ? "secondary" : "destructive"}
+            size="sm"
+            disabled={status === "Closed"}
+            onClick={() => {
+              if (openTodos.length > 0 || openRestrictions.length > 0) {
+                setPendingStatus("Closed")
+                setSelectedTodosToClose([])
+                setSelectedRestrictionsToClose([])
+                setShowCloseCaseDialog(true)
+              } else {
+                setStatus("Closed")
+                handleFieldUpdate("status", "Closed")
+              }
+            }}
+          >
+            {status === "Closed" ? "Case Closed" : "Close Case"}
+          </Button>
         </div>
       </CollapsibleSection>
 
