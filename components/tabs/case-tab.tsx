@@ -151,7 +151,7 @@ export function CaseTab() {
   const [bodyPartAffected, setBodyPartAffected] = useState("")
   const [injuryNature, setInjuryNature] = useState("")
   const [injuryCause, setInjuryCause] = useState("")
-  const [oshaRecordable, setOshaRecordable] = useState(false)
+  const [oshaRecordable, setOshaRecordable] = useState("")
   const [oshaClassification, setOshaClassification] = useState("")
   const [recordabilityRationale, setRecordabilityRationale] = useState("")
   const [psmIncident, setPsmIncident] = useState("")
@@ -230,7 +230,7 @@ export function CaseTab() {
       setBodyPartAffected(currentCase.bodyPartAffected || "")
       setInjuryNature(currentCase.injuryNature || "")
       setInjuryCause(currentCase.injuryCause || "")
-      setOshaRecordable(currentCase.oshaRecordable || false)
+      setOshaRecordable(currentCase.oshaRecordable || "")
       setOshaClassification(currentCase.oshaClassification || "")
       setRecordabilityRationale(currentCase.recordabilityRationale || "")
       setPsmIncident(currentCase.psmIncident || "")
@@ -1254,11 +1254,10 @@ export function CaseTab() {
           <div className="space-y-2">
             <Label className="text-sm text-muted-foreground">OSHA recordable?</Label>
             <Select
-              value={oshaRecordable ? "Yes" : "No"}
+              value={oshaRecordable}
               onValueChange={(val) => {
-                const isRecordable = val === "Yes"
-                setOshaRecordable(isRecordable)
-                handleFieldUpdate("oshaRecordable", isRecordable)
+                setOshaRecordable(val)
+                handleFieldUpdate("oshaRecordable", val)
               }}
             >
               <SelectTrigger className="bg-background">
@@ -1270,7 +1269,7 @@ export function CaseTab() {
               </SelectContent>
             </Select>
           </div>
-          {oshaRecordable && (
+          {oshaRecordable === "Yes" && (
             <>
               <div className="space-y-2">
                 <Label htmlFor="osha-classification" className="text-sm text-muted-foreground">
