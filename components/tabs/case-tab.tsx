@@ -1124,12 +1124,71 @@ export function CaseTab() {
               </SelectContent>
             </Select>
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="case-extent" className="text-sm text-muted-foreground">
+              Case extent
+            </Label>
+            <Select
+              value={caseExtent}
+              onValueChange={(val) => {
+                setCaseExtent(val)
+                handleFieldUpdate("caseExtent", val)
+              }}
+            >
+              <SelectTrigger id="case-extent" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Minor">Minor</SelectItem>
+                <SelectItem value="Moderate">Moderate</SelectItem>
+                <SelectItem value="Severe">Severe</SelectItem>
+                <SelectItem value="Critical">Critical</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="psm-incident" className="text-sm text-muted-foreground">
+              PSM incident
+            </Label>
+            <Select
+              value={psmIncident}
+              onValueChange={(val) => {
+                setPsmIncident(val)
+                handleFieldUpdate("psmIncident", val)
+              }}
+            >
+              <SelectTrigger id="psm-incident" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="sharps-case" className="text-sm text-muted-foreground">
+              Sharps case
+            </Label>
+            <Select
+              value={sharpsCase}
+              onValueChange={(val) => {
+                setSharpsCase(val)
+                handleFieldUpdate("sharpsCase", val)
+              }}
+            >
+              <SelectTrigger id="sharps-case" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="wc-claim" className="text-sm text-muted-foreground">
-              Workers&apos; Comp claim filed?
+              Workers&apos; comp claim filed?
             </Label>
             <Select
               value={workersCompClaim}
@@ -1153,7 +1212,7 @@ export function CaseTab() {
             <>
               <div className="space-y-2">
                 <Label htmlFor="wc-claim-number" className="text-sm text-muted-foreground">
-                  Workers&apos; Comp claim number
+                  Workers&apos; comp claim number
                 </Label>
                 <Input
                   id="wc-claim-number"
@@ -1181,95 +1240,28 @@ export function CaseTab() {
                     <SelectValue placeholder="Select..." />
                   </SelectTrigger>
                   <SelectContent>
-<SelectItem value="Open">Open</SelectItem>
-                <SelectItem value="Under review">Under review</SelectItem>
-                <SelectItem value="Approved">Approved</SelectItem>
-                <SelectItem value="Denied">Denied</SelectItem>
-                <SelectItem value="Settled">Settled</SelectItem>
-                <SelectItem value="Closed">Closed</SelectItem>
+                    <SelectItem value="Open">Open</SelectItem>
+                    <SelectItem value="Under review">Under review</SelectItem>
+                    <SelectItem value="Approved">Approved</SelectItem>
+                    <SelectItem value="Denied">Denied</SelectItem>
+                    <SelectItem value="Settled">Settled</SelectItem>
+                    <SelectItem value="Closed">Closed</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </>
           )}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label className="text-sm text-muted-foreground">OSHA recordable?</Label>
-            <div className="flex items-center space-x-2 pt-2">
-              <Checkbox
-                id="osha-recordable"
-                checked={oshaRecordable}
-                onCheckedChange={(checked) => {
-                  setOshaRecordable(checked as boolean)
-                  handleFieldUpdate("oshaRecordable", checked)
-                }}
-              />
-              <label
-                htmlFor="osha-recordable"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Yes, this is an OSHA recordable injury
-              </label>
-            </div>
-          </div>
-          {oshaRecordable && (
-            <div className="space-y-2">
-              <Label htmlFor="osha-classification" className="text-sm text-muted-foreground">
-                OSHA classification
-              </Label>
-              <Select
-                value={oshaClassification}
-                onValueChange={(val) => {
-                  setOshaClassification(val)
-                  handleFieldUpdate("oshaClassification", val)
-                }}
-              >
-                <SelectTrigger id="osha-classification" className="bg-background">
-                  <SelectValue placeholder="Select..." />
-                </SelectTrigger>
-                <SelectContent>
-<SelectItem value="Death">Death</SelectItem>
-                <SelectItem value="Days away from work">Days away from work</SelectItem>
-                <SelectItem value="Job transfer/restriction">Job transfer/restriction</SelectItem>
-                <SelectItem value="Other recordable">Other recordable</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-          {oshaRecordable && (
-            <div className="space-y-2">
-              <Label htmlFor="recordability-rationale" className="text-sm text-muted-foreground">
-                Recordability Rationale
-              </Label>
-              <Input
-                id="recordability-rationale"
-                placeholder="Enter rationale..."
-                className="bg-background"
-                value={recordabilityRationale}
-                onChange={(e) => {
-                  setRecordabilityRationale(e.target.value)
-                  handleFieldUpdate("recordabilityRationale", e.target.value)
-                }}
-              />
-            </div>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="psm-incident" className="text-sm text-muted-foreground">
-              PSM Incident
-            </Label>
             <Select
-              value={psmIncident}
+              value={oshaRecordable ? "Yes" : "No"}
               onValueChange={(val) => {
-                setPsmIncident(val)
-                handleFieldUpdate("psmIncident", val)
+                const isRecordable = val === "Yes"
+                setOshaRecordable(isRecordable)
+                handleFieldUpdate("oshaRecordable", isRecordable)
               }}
             >
-              <SelectTrigger id="psm-incident" className="bg-background">
+              <SelectTrigger className="bg-background">
                 <SelectValue placeholder="Select..." />
               </SelectTrigger>
               <SelectContent>
@@ -1278,48 +1270,47 @@ export function CaseTab() {
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="sharps-case" className="text-sm text-muted-foreground">
-              Sharps Case
-            </Label>
-            <Select
-              value={sharpsCase}
-              onValueChange={(val) => {
-                setSharpsCase(val)
-                handleFieldUpdate("sharpsCase", val)
-              }}
-            >
-              <SelectTrigger id="sharps-case" className="bg-background">
-                <SelectValue placeholder="Select..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Yes">Yes</SelectItem>
-                <SelectItem value="No">No</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="case-extent" className="text-sm text-muted-foreground">
-              Case Extent
-            </Label>
-            <Select
-              value={caseExtent}
-              onValueChange={(val) => {
-                setCaseExtent(val)
-                handleFieldUpdate("caseExtent", val)
-              }}
-            >
-              <SelectTrigger id="case-extent" className="bg-background">
-                <SelectValue placeholder="Select..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Minor">Minor</SelectItem>
-                <SelectItem value="Moderate">Moderate</SelectItem>
-                <SelectItem value="Severe">Severe</SelectItem>
-                <SelectItem value="Critical">Critical</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {oshaRecordable && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="osha-classification" className="text-sm text-muted-foreground">
+                  OSHA classification
+                </Label>
+                <Select
+                  value={oshaClassification}
+                  onValueChange={(val) => {
+                    setOshaClassification(val)
+                    handleFieldUpdate("oshaClassification", val)
+                  }}
+                >
+                  <SelectTrigger id="osha-classification" className="bg-background">
+                    <SelectValue placeholder="Select..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Death">Death</SelectItem>
+                    <SelectItem value="Days away from work">Days away from work</SelectItem>
+                    <SelectItem value="Job transfer/restriction">Job transfer/restriction</SelectItem>
+                    <SelectItem value="Other recordable">Other recordable</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="recordability-rationale" className="text-sm text-muted-foreground">
+                  Recordability rationale
+                </Label>
+                <Input
+                  id="recordability-rationale"
+                  placeholder="Enter rationale..."
+                  className="bg-background"
+                  value={recordabilityRationale}
+                  onChange={(e) => {
+                    setRecordabilityRationale(e.target.value)
+                    handleFieldUpdate("recordabilityRationale", e.target.value)
+                  }}
+                />
+              </div>
+            </>
+          )}
         </div>
       </CollapsibleSection>
 
