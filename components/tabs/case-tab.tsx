@@ -1822,21 +1822,6 @@ export function CaseTab() {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="body-part" className="text-sm text-muted-foreground">
-              Body part affected
-            </Label>
-            <Input
-              id="body-part"
-              placeholder="e.g., Lower back, Right hand"
-              className="bg-background"
-              value={bodyPartAffected}
-              onChange={(e) => {
-                setBodyPartAffected(e.target.value)
-                handleFieldUpdate("bodyPartAffected", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="injury-cause" className="text-sm text-muted-foreground">
               Cause of injury
             </Label>
@@ -1852,19 +1837,34 @@ export function CaseTab() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Overexertion">Overexertion</SelectItem>
-                <SelectItem value="Fall - Same Level">Fall - Same Level</SelectItem>
-                <SelectItem value="Fall - Different Level">Fall - Different Level</SelectItem>
-                <SelectItem value="Struck By Object">Struck By Object</SelectItem>
-                <SelectItem value="Struck Against Object">Struck Against Object</SelectItem>
-                <SelectItem value="Caught In/Between">Caught In/Between</SelectItem>
-                <SelectItem value="Repetitive Motion">Repetitive Motion</SelectItem>
-                <SelectItem value="Motor Vehicle">Motor Vehicle</SelectItem>
-                <SelectItem value="Exposure - Chemical">Exposure - Chemical</SelectItem>
-                <SelectItem value="Exposure - Temperature">Exposure - Temperature</SelectItem>
+                <SelectItem value="Fall - same level">Fall - same level</SelectItem>
+                <SelectItem value="Fall - different level">Fall - different level</SelectItem>
+                <SelectItem value="Struck by object">Struck by object</SelectItem>
+                <SelectItem value="Struck against object">Struck against object</SelectItem>
+                <SelectItem value="Caught in/between">Caught in/between</SelectItem>
+                <SelectItem value="Repetitive motion">Repetitive motion</SelectItem>
+                <SelectItem value="Motor vehicle">Motor vehicle</SelectItem>
+                <SelectItem value="Exposure - chemical">Exposure - chemical</SelectItem>
+                <SelectItem value="Exposure - temperature">Exposure - temperature</SelectItem>
                 <SelectItem value="Violence">Violence</SelectItem>
                 <SelectItem value="Other">Other</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="body-part" className="text-sm text-muted-foreground">
+              Body part affected
+            </Label>
+            <Input
+              id="body-part"
+              placeholder="e.g., Lower back, Right hand"
+              className="bg-background"
+              value={bodyPartAffected}
+              onChange={(e) => {
+                setBodyPartAffected(e.target.value)
+                handleFieldUpdate("bodyPartAffected", e.target.value)
+              }}
+            />
           </div>
         </div>
 
