@@ -137,6 +137,8 @@ export function CaseTab() {
   const [hospitalPhone, setHospitalPhone] = useState("")
   const [providerInformation, setProviderInformation] = useState("")
   const [treatedInEmergencyRoom, setTreatedInEmergencyRoom] = useState("")
+  const [hospitalizedOvernight, setHospitalizedOvernight] = useState("")
+  const [emergencyTransportationUsed, setEmergencyTransportationUsed] = useState("")
   const [injuryShift, setInjuryShift] = useState("")
   const [shiftStartTime, setShiftStartTime] = useState("")
   const [injurySupervisor, setInjurySupervisor] = useState("")
@@ -217,6 +219,8 @@ export function CaseTab() {
       setHospitalPhone(currentCase.hospitalPhone || "")
       setProviderInformation(currentCase.providerInformation || "")
       setTreatedInEmergencyRoom(currentCase.treatedInEmergencyRoom || "")
+      setHospitalizedOvernight(currentCase.hospitalizedOvernight || "")
+      setEmergencyTransportationUsed(currentCase.emergencyTransportationUsed || "")
       setInjuryShift(currentCase.injuryShift || "")
       setShiftStartTime(currentCase.shiftStartTime || "")
       setInjurySupervisor(currentCase.injurySupervisor || "")
@@ -1609,6 +1613,46 @@ export function CaseTab() {
               }}
             >
               <SelectTrigger id="treated-emergency-room" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="hospitalized-overnight" className="text-sm text-muted-foreground">
+              Was the employee hospitalized overnight?
+            </Label>
+            <Select
+              value={hospitalizedOvernight}
+              onValueChange={(val) => {
+                setHospitalizedOvernight(val)
+                handleFieldUpdate("hospitalizedOvernight", val)
+              }}
+            >
+              <SelectTrigger id="hospitalized-overnight" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="emergency-transportation" className="text-sm text-muted-foreground">
+              Was emergency transportation used?
+            </Label>
+            <Select
+              value={emergencyTransportationUsed}
+              onValueChange={(val) => {
+                setEmergencyTransportationUsed(val)
+                handleFieldUpdate("emergencyTransportationUsed", val)
+              }}
+            >
+              <SelectTrigger id="emergency-transportation" className="bg-background">
                 <SelectValue placeholder="Select..." />
               </SelectTrigger>
               <SelectContent>
