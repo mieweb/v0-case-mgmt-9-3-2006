@@ -95,6 +95,9 @@ export function CaseTab() {
   const [expectedReturnDate, setExpectedReturnDate] = useState("")
   const [actualReturnDate, setActualReturnDate] = useState("")
   const [payStartDate, setPayStartDate] = useState("")
+  const [maximumMedicalImprovement, setMaximumMedicalImprovement] = useState("")
+  const [permanentPartialImpairment, setPermanentPartialImpairment] = useState("")
+  const [percentageImpaired, setPercentageImpaired] = useState("")
   const [payEndDate, setPayEndDate] = useState("")
   const [ficaDate, setFicaDate] = useState("")
   const [ddgDaysError, setDdgDaysError] = useState("")
@@ -191,6 +194,9 @@ export function CaseTab() {
       setExpectedReturnDate(currentCase.expectedReturnDate || "")
       setActualReturnDate(currentCase.actualReturnDate || "")
       setPayStartDate(currentCase.payStartDate || "")
+      setMaximumMedicalImprovement(currentCase.maximumMedicalImprovement || "")
+      setPermanentPartialImpairment(currentCase.permanentPartialImpairment || "")
+      setPercentageImpaired(currentCase.percentageImpaired || "")
       setPayEndDate(currentCase.payEndDate || "")
       setFicaDate(currentCase.ficaDate || "")
       // Occupational Injury Information
@@ -869,7 +875,7 @@ export function CaseTab() {
       </CollapsibleSection>
 
       <CollapsibleSection title="Work Status Metrics" icon={<BarChart3 className="h-4 w-4" />} defaultOpen={false}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="days-lost" className="text-sm text-muted-foreground">
               Days lost <span className="text-xs italic">(calculated)</span>
@@ -881,6 +887,51 @@ export function CaseTab() {
               Days restricted <span className="text-xs italic">(calculated)</span>
             </Label>
             <Input id="days-restricted" className="bg-muted/50" readOnly />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="mmi" className="text-sm text-muted-foreground">
+              Maximum medical improvement (MMI)
+            </Label>
+            <Input
+              id="mmi"
+              placeholder="Enter MMI..."
+              className="bg-background"
+              value={maximumMedicalImprovement}
+              onChange={(e) => {
+                setMaximumMedicalImprovement(e.target.value)
+                handleFieldUpdate("maximumMedicalImprovement", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="ppi" className="text-sm text-muted-foreground">
+              Permanent partial impairment (PPI)
+            </Label>
+            <Input
+              id="ppi"
+              placeholder="Enter PPI..."
+              className="bg-background"
+              value={permanentPartialImpairment}
+              onChange={(e) => {
+                setPermanentPartialImpairment(e.target.value)
+                handleFieldUpdate("permanentPartialImpairment", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="percentage-impaired" className="text-sm text-muted-foreground">
+              Percentage impaired
+            </Label>
+            <Input
+              id="percentage-impaired"
+              placeholder="Enter percentage..."
+              className="bg-background"
+              value={percentageImpaired}
+              onChange={(e) => {
+                setPercentageImpaired(e.target.value)
+                handleFieldUpdate("percentageImpaired", e.target.value)
+              }}
+            />
           </div>
         </div>
       </CollapsibleSection>
