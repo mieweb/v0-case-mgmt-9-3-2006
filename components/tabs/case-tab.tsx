@@ -1446,6 +1446,21 @@ export function CaseTab() {
       <CollapsibleSection title="Incident Description" icon={<FileText className="h-4 w-4" />} defaultOpen={false}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
+            <Label htmlFor="incident-site-case-number" className="text-sm text-muted-foreground">
+              Site case number
+            </Label>
+            <Input
+              id="incident-site-case-number"
+              placeholder="Enter site case number..."
+              className="bg-background"
+              value={siteCaseNumber}
+              onChange={(e) => {
+                setSiteCaseNumber(e.target.value)
+                handleFieldUpdate("siteCaseNumber", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="accident-type" className="text-sm text-muted-foreground">
               Accident type
             </Label>
