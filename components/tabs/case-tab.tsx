@@ -151,6 +151,7 @@ export function CaseTab() {
   const [bodyPartAffected, setBodyPartAffected] = useState("")
   const [injuryNature, setInjuryNature] = useState("")
   const [injuryCause, setInjuryCause] = useState("")
+  const [dateOfDeath, setDateOfDeath] = useState("")
   const [oshaRecordable, setOshaRecordable] = useState("")
   const [oshaClassification, setOshaClassification] = useState("")
   const [recordabilityRationale, setRecordabilityRationale] = useState("")
@@ -230,6 +231,7 @@ export function CaseTab() {
       setBodyPartAffected(currentCase.bodyPartAffected || "")
       setInjuryNature(currentCase.injuryNature || "")
       setInjuryCause(currentCase.injuryCause || "")
+      setDateOfDeath(currentCase.dateOfDeath || "")
       setOshaRecordable(currentCase.oshaRecordable || "")
       setOshaClassification(currentCase.oshaClassification || "")
       setRecordabilityRationale(currentCase.recordabilityRationale || "")
@@ -1878,6 +1880,21 @@ export function CaseTab() {
               onChange={(e) => {
                 setBodyPartAffected(e.target.value)
                 handleFieldUpdate("bodyPartAffected", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="date-of-death" className="text-sm text-muted-foreground">
+              Date of death
+            </Label>
+            <Input
+              id="date-of-death"
+              type="date"
+              className="bg-background"
+              value={dateOfDeath}
+              onChange={(e) => {
+                setDateOfDeath(e.target.value)
+                handleFieldUpdate("dateOfDeath", e.target.value)
               }}
             />
           </div>
