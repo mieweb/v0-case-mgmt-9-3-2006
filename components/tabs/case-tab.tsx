@@ -267,14 +267,6 @@ export function CaseTab() {
   }
 
   // Helper functions to check if sections have data
-  const hasCaseInformationData = () => Boolean(status || caseType || caseManager || isConfidential)
-  const hasCaseDatesData = () => Boolean(disabilityDate || returnToWorkDate || caseClosedDate)
-  const hasMaternityData = () => Boolean(deliveryDate || returnFromMaternityDate)
-  const hasSTDData = () => Boolean(stdEligible || stdPercentage || stdStartDate || stdEndDate || stdDuration)
-  const hasDDGData = () => Boolean(ddgMin || ddgMid || ddgMax)
-  const hasReturnToWorkData = () => Boolean(returnToWorkType || anticipatedReturnDate || actualReturnDate || releaseToWork)
-  const hasWorkStatusMetricsData = () => Boolean(maximumMedicalImprovement || permanentPartialImpairment || percentageImpaired)
-  const hasPayInfoData = () => Boolean(payStartDate || payEndDate)
   const hasOccupationalInjuryData = () => Boolean(siteCaseNumber || injuryDate || injuryTime || injuryLocation || injuryShift || shiftStartTime || injurySupervisor || supervisorNotifiedDate)
   const hasWorkRelatedData = () => Boolean(isCaseWorkRelated || typeOfInjuryOrIllness || significantInjuryIllness || workersCompClaim || oshaRecordable || psmIncident || sharpsCase || caseExtent)
   const hasLocationData = () => Boolean(incidentOnsiteOffsite || workstation || locationAddress || locationCity || locationState || locationZip || locationCountry || locationDescription)
