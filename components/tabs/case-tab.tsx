@@ -266,6 +266,23 @@ export function CaseTab() {
     }
   }
 
+  // Helper functions to check if sections have data
+  const hasCaseInformationData = () => Boolean(status || caseType || caseManager || isConfidential)
+  const hasCaseDatesData = () => Boolean(disabilityDate || returnToWorkDate || caseClosedDate)
+  const hasMaternityData = () => Boolean(deliveryDate || returnFromMaternityDate)
+  const hasSTDData = () => Boolean(stdEligible || stdPercentage || stdStartDate || stdEndDate || stdDuration)
+  const hasDDGData = () => Boolean(ddgMin || ddgMid || ddgMax)
+  const hasReturnToWorkData = () => Boolean(returnToWorkType || anticipatedReturnDate || actualReturnDate || releaseToWork)
+  const hasWorkStatusMetricsData = () => Boolean(maximumMedicalImprovement || permanentPartialImpairment || percentageImpaired)
+  const hasPayInfoData = () => Boolean(payStartDate || payEndDate)
+  const hasOccupationalInjuryData = () => Boolean(siteCaseNumber || injuryDate || injuryTime || injuryLocation || injuryShift || shiftStartTime || injurySupervisor || supervisorNotifiedDate)
+  const hasWorkRelatedData = () => Boolean(isCaseWorkRelated || typeOfInjuryOrIllness || significantInjuryIllness || workersCompClaim || oshaRecordable || psmIncident || sharpsCase || caseExtent)
+  const hasLocationData = () => Boolean(incidentOnsiteOffsite || workstation || locationAddress || locationCity || locationState || locationZip || locationCountry || locationDescription)
+  const hasIncidentDescriptionData = () => Boolean(siteCaseNumber || accidentType || jsaReference || objectSubstanceCaused || howInjuryHappened || employeeDoingBefore)
+  const hasTreatmentData = () => Boolean(treatmentLocation || treatedBy || treatingPhysician || treatedInEmergencyRoom || hospitalizedOvernight || emergencyTransportationUsed)
+  const hasWorkCompData = () => Boolean(workCompClaimNumber || workCompCarrier || workCompAdjuster || workCompPhone)
+  const hasInjuryDetailsData = () => Boolean(injuryNature || injuryCause || bodyPartAffected || dateOfDeath || injuryDescription)
+
   const generateTodosFromDisabilityDate = (disabilityDate: string) => {
     if (!currentCase || !disabilityDate || !currentCase.caseType) return
 
@@ -423,7 +440,7 @@ export function CaseTab() {
 
   return (
     <div className="case-tab-container phi-data space-y-4">
-      <CollapsibleSection title="Case Information" icon={<FolderOpen className="h-4 w-4" />} defaultOpen={false}>
+      <CollapsibleSection title="Case Information" icon={<FolderOpen className="h-4 w-4" />} defaultOpen={hasCaseInformationData()}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="status" className="text-sm text-muted-foreground">
@@ -540,7 +557,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Case Dates" icon={<Calendar className="h-4 w-4" />} defaultOpen={false}>
+      <CollapsibleSection title="Case Dates" icon={<Calendar className="h-4 w-4" />} defaultOpen={hasCaseDatesData()}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="date-disability" className="text-sm text-muted-foreground">
@@ -620,7 +637,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Maternity Information" icon={<Baby className="h-4 w-4" />} defaultOpen={false}>
+      <CollapsibleSection title="Maternity Information" icon={<Baby className="h-4 w-4" />} defaultOpen={hasMaternityData()}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="expected-confinement" className="text-sm text-muted-foreground">
@@ -655,7 +672,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Short-Term Disability (STD)" icon={<Clock className="h-4 w-4" />} defaultOpen={false}>
+      <CollapsibleSection title="Short-Term Disability (STD)" icon={<Clock className="h-4 w-4" />} defaultOpen={hasSTDData()}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="std-plan" className="text-sm text-muted-foreground">
@@ -785,7 +802,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Duration of Disability Guidelines (DDG)" icon={<BarChart3 className="h-4 w-4" />} defaultOpen={false}>
+      <CollapsibleSection title="Duration of Disability Guidelines (DDG)" icon={<BarChart3 className="h-4 w-4" />} defaultOpen={hasDDGData()}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="ddg-days" className="text-sm text-muted-foreground">
@@ -839,7 +856,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Return to Work" icon={<RotateCcw className="h-4 w-4" />} defaultOpen={false}>
+      <CollapsibleSection title="Return to Work" icon={<RotateCcw className="h-4 w-4" />} defaultOpen={hasReturnToWorkData()}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="expected-return" className="text-sm text-muted-foreground">
@@ -874,7 +891,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Work Status Metrics" icon={<BarChart3 className="h-4 w-4" />} defaultOpen={false}>
+      <CollapsibleSection title="Work Status Metrics" icon={<BarChart3 className="h-4 w-4" />} defaultOpen={hasWorkStatusMetricsData()}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="days-lost" className="text-sm text-muted-foreground">
@@ -936,7 +953,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Pay Information" icon={<DollarSign className="h-4 w-4" />} defaultOpen={false}>
+      <CollapsibleSection title="Pay Information" icon={<DollarSign className="h-4 w-4" />} defaultOpen={hasPayInfoData()}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="pay-start" className="text-sm text-muted-foreground">
@@ -982,7 +999,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Occupational Injury Information" icon={<HardHat className="h-4 w-4" />} defaultOpen={false}>
+      <CollapsibleSection title="Occupational Injury Information" icon={<HardHat className="h-4 w-4" />} defaultOpen={hasOccupationalInjuryData()}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="site-case-number" className="text-sm text-muted-foreground">
@@ -1117,7 +1134,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Work Related Details" icon={<Briefcase className="h-4 w-4" />} defaultOpen={false}>
+      <CollapsibleSection title="Work Related Details" icon={<Briefcase className="h-4 w-4" />} defaultOpen={hasWorkRelatedData()}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="is-case-work-related" className="text-sm text-muted-foreground">
@@ -1370,7 +1387,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Location Information" icon={<MapPin className="h-4 w-4" />} defaultOpen={false}>
+      <CollapsibleSection title="Location Information" icon={<MapPin className="h-4 w-4" />} defaultOpen={hasLocationData()}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="incident-onsite-offsite" className="text-sm text-muted-foreground">
@@ -1500,7 +1517,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Incident Description" icon={<FileText className="h-4 w-4" />} defaultOpen={false}>
+      <CollapsibleSection title="Incident Description" icon={<FileText className="h-4 w-4" />} defaultOpen={hasIncidentDescriptionData()}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="incident-site-case-number" className="text-sm text-muted-foreground">
@@ -1607,7 +1624,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Treatment Information" icon={<Stethoscope className="h-4 w-4" />} defaultOpen={false}>
+      <CollapsibleSection title="Treatment Information" icon={<Stethoscope className="h-4 w-4" />} defaultOpen={hasTreatmentData()}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="medical-treatment-provided" className="text-sm text-muted-foreground">
@@ -1795,7 +1812,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Work Comp Details" icon={<Shield className="h-4 w-4" />} defaultOpen={false}>
+      <CollapsibleSection title="Work Comp Details" icon={<Shield className="h-4 w-4" />} defaultOpen={hasWorkCompData()}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="wc-claim-number" className="text-sm text-muted-foreground">
@@ -1901,7 +1918,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Injury Details" icon={<Activity className="h-4 w-4" />} defaultOpen={false}>
+      <CollapsibleSection title="Injury Details" icon={<Activity className="h-4 w-4" />} defaultOpen={hasInjuryDetailsData()}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="injury-nature" className="text-sm text-muted-foreground">

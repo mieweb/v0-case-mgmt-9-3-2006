@@ -22,9 +22,22 @@ export function CollapsibleSection({
   className,
 }: CollapsibleSectionProps) {
   const [isOpen, setIsOpen] = React.useState(defaultOpen)
+  const [hasUserToggled, setHasUserToggled] = React.useState(false)
+
+  // Sync with defaultOpen when it changes (e.g., when data loads), but only if user hasn't manually toggled
+  React.useEffect(() => {
+    if (!hasUserToggled) {
+      setIsOpen(defaultOpen)
+    }
+  }, [defaultOpen, hasUserToggled])
+
+  const handleOpenChange = (open: boolean) => {
+    setHasUserToggled(true)
+    setIsOpen(open)
+  }
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className={cn("w-full", className)}>
+    <Collapsible open={isOpen} onOpenChange={handleOpenChange} className={cn("w-full", className)}>
       <Card className="py-0 gap-0">
         <CollapsibleTrigger asChild>
           <button
