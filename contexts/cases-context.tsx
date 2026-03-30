@@ -48,6 +48,8 @@ export interface CaseNote {
   dateEntered: string
   lineout: boolean
   lineoutDate?: string
+  deletedBy?: string
+  deletedAt?: string
   isLocked: boolean
   lockedBy?: string
   lockedAt?: string
