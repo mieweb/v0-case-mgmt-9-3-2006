@@ -271,8 +271,8 @@ export function CaseTab() {
   const hasWorkRelatedData = () => Boolean(isCaseWorkRelated || typeOfInjuryOrIllness || significantInjuryIllness || workersCompClaim || oshaRecordable || psmIncident || sharpsCase || caseExtent)
   const hasLocationData = () => Boolean(incidentOnsiteOffsite || workstation || locationAddress || locationCity || locationState || locationZip || locationCountry || locationDescription)
   const hasIncidentDescriptionData = () => Boolean(siteCaseNumber || accidentType || jsaReference || objectSubstanceCaused || howInjuryHappened || employeeDoingBefore)
-  const hasTreatmentData = () => Boolean(treatmentLocation || treatedBy || treatingPhysician || treatedInEmergencyRoom || hospitalizedOvernight || emergencyTransportationUsed)
-  const hasWorkCompData = () => Boolean(workCompClaimNumber || workCompCarrier || workCompAdjuster || workCompPhone)
+  const hasTreatmentData = () => Boolean(treatmentDescription || treatedInEmergencyRoom || hospitalizedOvernight || emergencyTransportationUsed)
+  const hasWorkCompData = () => Boolean(currentCase?.workCompClaimNumber || currentCase?.workCompCarrier || currentCase?.workCompAdjuster || currentCase?.workCompPhone)
   const hasInjuryDetailsData = () => Boolean(injuryNature || injuryCause || bodyPartAffected || dateOfDeath || injuryDescription)
 
   const generateTodosFromDisabilityDate = (disabilityDate: string) => {
