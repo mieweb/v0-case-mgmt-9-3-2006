@@ -29,6 +29,8 @@ const initialUsers: User[] = [
   { id: "2", name: "John Smith", email: "john.smith@company.com", role: "case-manager", active: true },
   { id: "3", name: "Sarah Johnson", email: "sarah.johnson@company.com", role: "case-manager", active: true },
   { id: "4", name: "Mike Davis", email: "mike.davis@company.com", role: "viewer", active: true },
+  { id: "5", name: "Ikenna Amanfo", email: "ikenna.amanfo@company.com", role: "case-manager", active: true },
+  { id: "6", name: "Tricia Fletcher", email: "tricia.fletcher@company.com", role: "case-manager", active: true },
 ]
 
 export function UserProvider({ children }: { children: ReactNode }) {
