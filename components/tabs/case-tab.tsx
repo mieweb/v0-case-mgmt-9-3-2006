@@ -174,6 +174,7 @@ export function CaseTab() {
   const [wcClaimNumber, setWcClaimNumber] = useState("")
   const [adjusterContact, setAdjusterContact] = useState("")
   const [investigationDetails, setInvestigationDetails] = useState("")
+  const [seriousInjuryFatality, setSeriousInjuryFatality] = useState("")
   const [recordOnly, setRecordOnly] = useState("")
   const [daysAway, setDaysAway] = useState("")
   const [daysRestricted, setDaysRestricted] = useState("")
@@ -264,6 +265,7 @@ export function CaseTab() {
       setWcClaimNumber(currentCase.wcClaimNumber || "")
       setAdjusterContact(currentCase.adjusterContact || "")
       setInvestigationDetails(currentCase.investigationDetails || "")
+      setSeriousInjuryFatality(currentCase.seriousInjuryFatality || "")
       setRecordOnly(currentCase.recordOnly || "")
       setDaysAway(currentCase.daysAway || "")
       setDaysRestricted(currentCase.daysRestricted || "")
@@ -1587,6 +1589,27 @@ export function CaseTab() {
                 <SelectItem value="Exposure">Exposure</SelectItem>
                 <SelectItem value="Motor vehicle">Motor vehicle</SelectItem>
                 <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="serious-injury-fatality" className="text-sm text-muted-foreground">
+              Serious injury and fatality (SIF)
+            </Label>
+            <Select
+              value={seriousInjuryFatality}
+              onValueChange={(val) => {
+                setSeriousInjuryFatality(val)
+                handleFieldUpdate("seriousInjuryFatality", val)
+              }}
+            >
+              <SelectTrigger id="serious-injury-fatality" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Actual">Actual</SelectItem>
+                <SelectItem value="Potential">Potential</SelectItem>
+                <SelectItem value="None">None</SelectItem>
               </SelectContent>
             </Select>
           </div>
