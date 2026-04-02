@@ -177,6 +177,7 @@ export function CaseTab() {
   const [investigationDetails, setInvestigationDetails] = useState("")
   const [seriousInjuryFatality, setSeriousInjuryFatality] = useState("")
   const [hsProgram, setHsProgram] = useState("")
+  const [processCondition, setProcessCondition] = useState("")
   const [recordOnly, setRecordOnly] = useState("")
   const [daysAway, setDaysAway] = useState("")
   const [daysRestricted, setDaysRestricted] = useState("")
@@ -270,6 +271,7 @@ export function CaseTab() {
       setInvestigationDetails(currentCase.investigationDetails || "")
       setSeriousInjuryFatality(currentCase.seriousInjuryFatality || "")
       setHsProgram(currentCase.hsProgram || "")
+      setProcessCondition(currentCase.processCondition || "")
       setRecordOnly(currentCase.recordOnly || "")
       setDaysAway(currentCase.daysAway || "")
       setDaysRestricted(currentCase.daysRestricted || "")
@@ -2306,6 +2308,36 @@ export function CaseTab() {
                 <SelectItem value="Training">Training</SelectItem>
                 <SelectItem value="Walking Working Surfaces">Walking Working Surfaces</SelectItem>
                 <SelectItem value="Working from Heights">Working from Heights</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="process-condition" className="text-sm text-muted-foreground">
+              Process condition
+            </Label>
+            <Select
+              value={processCondition}
+              onValueChange={(val) => {
+                setProcessCondition(val)
+                handleFieldUpdate("processCondition", val)
+              }}
+            >
+              <SelectTrigger id="process-condition" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Normal (Stable) Operations">Normal (Stable) Operations</SelectItem>
+                <SelectItem value="Start-up">Start-up</SelectItem>
+                <SelectItem value="Upset (abnormal)">Upset (abnormal)</SelectItem>
+                <SelectItem value="Maint downtime (planned)">Maint downtime (planned)</SelectItem>
+                <SelectItem value="Maint downtime (unplanned)">Maint downtime (unplanned)</SelectItem>
+                <SelectItem value="Shutdown (planned)">Shutdown (planned)</SelectItem>
+                <SelectItem value="Shutdown (unplanned)">Shutdown (unplanned)</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+                <SelectItem value="Incident not related to Process Condition">Incident not related to Process Condition</SelectItem>
               </SelectContent>
             </Select>
           </div>
