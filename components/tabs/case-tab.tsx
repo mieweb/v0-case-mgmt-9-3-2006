@@ -176,6 +176,7 @@ export function CaseTab() {
   const [adjusterContact, setAdjusterContact] = useState("")
   const [investigationDetails, setInvestigationDetails] = useState("")
   const [seriousInjuryFatality, setSeriousInjuryFatality] = useState("")
+  const [hsProgram, setHsProgram] = useState("")
   const [recordOnly, setRecordOnly] = useState("")
   const [daysAway, setDaysAway] = useState("")
   const [daysRestricted, setDaysRestricted] = useState("")
@@ -268,6 +269,7 @@ export function CaseTab() {
       setAdjusterContact(currentCase.adjusterContact || "")
       setInvestigationDetails(currentCase.investigationDetails || "")
       setSeriousInjuryFatality(currentCase.seriousInjuryFatality || "")
+      setHsProgram(currentCase.hsProgram || "")
       setRecordOnly(currentCase.recordOnly || "")
       setDaysAway(currentCase.daysAway || "")
       setDaysRestricted(currentCase.daysRestricted || "")
@@ -2063,6 +2065,59 @@ export function CaseTab() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="hs-program" className="text-sm text-muted-foreground">
+              H&amp;S Program
+            </Label>
+            <Select
+              value={hsProgram}
+              onValueChange={(val) => {
+                setHsProgram(val)
+                handleFieldUpdate("hsProgram", val)
+              }}
+            >
+              <SelectTrigger id="hs-program" className="bg-background">
+                <SelectValue placeholder="Select program..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Asbestos">Asbestos</SelectItem>
+                <SelectItem value="Automobile Safety">Automobile Safety</SelectItem>
+                <SelectItem value="Bloodborne Pathogens">Bloodborne Pathogens</SelectItem>
+                <SelectItem value="Chemical management">Chemical management</SelectItem>
+                <SelectItem value="Confined Space">Confined Space</SelectItem>
+                <SelectItem value="Contractor Safety">Contractor Safety</SelectItem>
+                <SelectItem value="Cranes, Hoists, Lifting">Cranes, Hoists, Lifting</SelectItem>
+                <SelectItem value="Electrical Safety">Electrical Safety</SelectItem>
+                <SelectItem value="Emergency Preparedness and Fire Prevention">Emergency Preparedness and Fire Prevention</SelectItem>
+                <SelectItem value="Ergonomics">Ergonomics</SelectItem>
+                <SelectItem value="Expectations and Performance Appraisals">Expectations and Performance Appraisals</SelectItem>
+                <SelectItem value="Hazard Analysis and Regulatory Compliance">Hazard Analysis and Regulatory Compliance</SelectItem>
+                <SelectItem value="Hazard Communication">Hazard Communication</SelectItem>
+                <SelectItem value="High Risk Operations">High Risk Operations</SelectItem>
+                <SelectItem value="Hot Work">Hot Work</SelectItem>
+                <SelectItem value="Housekeeping and Inspections">Housekeeping and Inspections</SelectItem>
+                <SelectItem value="Incident Reporting, Investigation & Follow-up">Incident Reporting, Investigation &amp; Follow-up</SelectItem>
+                <SelectItem value="Industrial Hygiene">Industrial Hygiene</SelectItem>
+                <SelectItem value="Line Breaking">Line Breaking</SelectItem>
+                <SelectItem value="Lockout Tagout">Lockout Tagout</SelectItem>
+                <SelectItem value="Machine Guarding">Machine Guarding</SelectItem>
+                <SelectItem value="Management of Change">Management of Change</SelectItem>
+                <SelectItem value="Medical Services">Medical Services</SelectItem>
+                <SelectItem value="Motor Vehicle Safety">Motor Vehicle Safety</SelectItem>
+                <SelectItem value="Occupational Hygiene">Occupational Hygiene</SelectItem>
+                <SelectItem value="Personal Protective Equipment">Personal Protective Equipment</SelectItem>
+                <SelectItem value="Powered Industrial Vehicles">Powered Industrial Vehicles</SelectItem>
+                <SelectItem value="Preventative Maintenance">Preventative Maintenance</SelectItem>
+                <SelectItem value="Process Safety Management">Process Safety Management</SelectItem>
+                <SelectItem value="Program Evaluation">Program Evaluation</SelectItem>
+                <SelectItem value="Safety Risk Assessment (JSA)">Safety Risk Assessment (JSA)</SelectItem>
+                <SelectItem value="Site Health and Safety Policy">Site Health and Safety Policy</SelectItem>
+                <SelectItem value="Training">Training</SelectItem>
+                <SelectItem value="Walking Working Surfaces">Walking Working Surfaces</SelectItem>
+                <SelectItem value="Working from Heights">Working from Heights</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="days-away" className="text-sm text-muted-foreground">
               Days Away
