@@ -144,6 +144,7 @@ export function CaseTab() {
   const [hospitalizedOvernight, setHospitalizedOvernight] = useState("")
   const [emergencyTransportationUsed, setEmergencyTransportationUsed] = useState("")
   const [firstAidTreatments, setFirstAidTreatments] = useState<string[]>([])
+  const [treatmentsBeyondFirstAid, setTreatmentsBeyondFirstAid] = useState<string[]>([])
   const [caseTransferredTo3rdParty, setCaseTransferredTo3rdParty] = useState("")
   const [employeeRequestedTreatment, setEmployeeRequestedTreatment] = useState("")
   const [injuryShift, setInjuryShift] = useState("")
@@ -233,6 +234,7 @@ export function CaseTab() {
       setHospitalizedOvernight(currentCase.hospitalizedOvernight || "")
       setEmergencyTransportationUsed(currentCase.emergencyTransportationUsed || "")
       setFirstAidTreatments(currentCase.firstAidTreatments || [])
+      setTreatmentsBeyondFirstAid(currentCase.treatmentsBeyondFirstAid || [])
       setCaseTransferredTo3rdParty(currentCase.caseTransferredTo3rdParty || "")
       setEmployeeRequestedTreatment(currentCase.employeeRequestedTreatment || "")
       setInjuryShift(currentCase.injuryShift || "")
@@ -1842,6 +1844,45 @@ export function CaseTab() {
                 <SelectItem value="No">No</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+        </div>
+
+        <div className="space-y-3 mt-4">
+          <Label className="text-sm text-muted-foreground">
+            Treatments beyond first aid
+          </Label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-4 border rounded-md bg-muted/20">
+            {[
+              "Prescription medication, or OTC medication used at prescription strength",
+              "Wound Closure (surgical glue, sutures, staples)",
+              "Immobilization",
+              "Physical Therapy/Specialized Care",
+              "Medical Procedures",
+              "Diagnostics",
+              "Respiratory Care",
+              "Vaccines",
+              "Eye Treatment",
+            ].map((treatment) => (
+              <div key={treatment} className="flex items-start space-x-2">
+                <Checkbox
+                  id={`beyond-first-aid-${treatment.slice(0, 20).replace(/\s/g, "-")}`}
+                  checked={treatmentsBeyondFirstAid.includes(treatment)}
+                  onCheckedChange={(checked) => {
+                    const newTreatments = checked
+                      ? [...treatmentsBeyondFirstAid, treatment]
+                      : treatmentsBeyondFirstAid.filter((t) => t !== treatment)
+                    setTreatmentsBeyondFirstAid(newTreatments)
+                    handleFieldUpdate("treatmentsBeyondFirstAid", newTreatments)
+                  }}
+                />
+                <label
+                  htmlFor={`beyond-first-aid-${treatment.slice(0, 20).replace(/\s/g, "-")}`}
+                  className="text-sm leading-tight cursor-pointer"
+                >
+                  {treatment}
+                </label>
+              </div>
+            ))}
           </div>
         </div>
 
