@@ -2175,7 +2175,7 @@ export function CaseTab() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-2">
             <Label htmlFor="wc-claim-number" className="text-sm text-muted-foreground">
-              Claim Number
+              Claim #
             </Label>
             <Input
               id="wc-claim-number"
