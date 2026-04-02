@@ -143,6 +143,7 @@ export function CaseTab() {
   const [treatedInEmergencyRoom, setTreatedInEmergencyRoom] = useState("")
   const [hospitalizedOvernight, setHospitalizedOvernight] = useState("")
   const [emergencyTransportationUsed, setEmergencyTransportationUsed] = useState("")
+  const [firstAidTreatments, setFirstAidTreatments] = useState<string[]>([])
   const [injuryShift, setInjuryShift] = useState("")
   const [shiftStartTime, setShiftStartTime] = useState("")
   const [injurySupervisor, setInjurySupervisor] = useState("")
@@ -229,6 +230,7 @@ export function CaseTab() {
       setTreatedInEmergencyRoom(currentCase.treatedInEmergencyRoom || "")
       setHospitalizedOvernight(currentCase.hospitalizedOvernight || "")
       setEmergencyTransportationUsed(currentCase.emergencyTransportationUsed || "")
+      setFirstAidTreatments(currentCase.firstAidTreatments || [])
       setInjuryShift(currentCase.injuryShift || "")
       setShiftStartTime(currentCase.shiftStartTime || "")
       setInjurySupervisor(currentCase.injurySupervisor || "")
@@ -1749,6 +1751,50 @@ export function CaseTab() {
                 <SelectItem value="No">No</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+        </div>
+
+        <div className="space-y-3 mt-4">
+          <Label className="text-sm text-muted-foreground">
+            First aid treatments provided
+          </Label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-4 border rounded-md bg-muted/20">
+            {[
+              "Non-prescription (OTC) medication at non-prescription strength",
+              "Tetanus immunizations",
+              "Cleaning, flushing or soaking wounds on the surface of the skin",
+              "Wound coverings such as BandAids; or using butterfly bandages or Steri-Strips",
+              "Hot or cold therapy",
+              "Non-rigid means of support",
+              "Temporary immobilization devices while transporting an accident victim",
+              "Drilling of a finger or toenail to relieve pressure, or draining fluid from a blister",
+              "Using eye patches",
+              "Removing foreign bodies from the eye using only irrigation or a cotton swab",
+              "Removing splinters or foreign material from areas other than the eye by irrigation, tweezers, cotton swabs or other simple means",
+              "Using finger guards",
+              "Massage (including ART)",
+              "Drinking fluids for relief of heat stress",
+            ].map((treatment) => (
+              <div key={treatment} className="flex items-start space-x-2">
+                <Checkbox
+                  id={`treatment-${treatment.slice(0, 20).replace(/\s/g, "-")}`}
+                  checked={firstAidTreatments.includes(treatment)}
+                  onCheckedChange={(checked) => {
+                    const newTreatments = checked
+                      ? [...firstAidTreatments, treatment]
+                      : firstAidTreatments.filter((t) => t !== treatment)
+                    setFirstAidTreatments(newTreatments)
+                    handleFieldUpdate("firstAidTreatments", newTreatments)
+                  }}
+                />
+                <label
+                  htmlFor={`treatment-${treatment.slice(0, 20).replace(/\s/g, "-")}`}
+                  className="text-sm leading-tight cursor-pointer"
+                >
+                  {treatment}
+                </label>
+              </div>
+            ))}
           </div>
         </div>
 
