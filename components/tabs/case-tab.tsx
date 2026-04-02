@@ -2066,6 +2066,38 @@ export function CaseTab() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
+            <Label htmlFor="days-away" className="text-sm text-muted-foreground">
+              Days Away
+            </Label>
+            <Input
+              id="days-away"
+              type="number"
+              placeholder="0"
+              className="bg-background"
+              value={daysAway}
+              onChange={(e) => {
+                setDaysAway(e.target.value)
+                handleFieldUpdate("daysAway", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="days-restricted" className="text-sm text-muted-foreground">
+              Days Restricted
+            </Label>
+            <Input
+              id="days-restricted"
+              type="number"
+              placeholder="0"
+              className="bg-background"
+              value={daysRestricted}
+              onChange={(e) => {
+                setDaysRestricted(e.target.value)
+                handleFieldUpdate("daysRestricted", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="hs-program" className="text-sm text-muted-foreground">
               H&amp;S Program
             </Label>
@@ -2117,38 +2149,6 @@ export function CaseTab() {
                 <SelectItem value="Working from Heights">Working from Heights</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="days-away" className="text-sm text-muted-foreground">
-              Days Away
-            </Label>
-            <Input
-              id="days-away"
-              type="number"
-              placeholder="0"
-              className="bg-background"
-              value={daysAway}
-              onChange={(e) => {
-                setDaysAway(e.target.value)
-                handleFieldUpdate("daysAway", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="days-restricted" className="text-sm text-muted-foreground">
-              Days Restricted
-            </Label>
-            <Input
-              id="days-restricted"
-              type="number"
-              placeholder="0"
-              className="bg-background"
-              value={daysRestricted}
-              onChange={(e) => {
-                setDaysRestricted(e.target.value)
-                handleFieldUpdate("daysRestricted", e.target.value)
-              }}
-            />
           </div>
         </div>
 
