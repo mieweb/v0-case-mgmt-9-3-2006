@@ -2028,6 +2028,21 @@ export function CaseTab() {
             />
           </div>
           <div className="space-y-2">
+            <Label htmlFor="adjuster-contact" className="text-sm text-muted-foreground">
+              Adjuster/Examiner Contact Info
+            </Label>
+            <Input
+              id="adjuster-contact"
+              placeholder="Contact information"
+              className="bg-background"
+              value={adjusterContact}
+              onChange={(e) => {
+                setAdjusterContact(e.target.value)
+                handleFieldUpdate("adjusterContact", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="record-only" className="text-sm text-muted-foreground">
               Record only (not a full claim)?
             </Label>
@@ -2046,21 +2061,6 @@ export function CaseTab() {
                 <SelectItem value="No">No</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="adjuster-contact" className="text-sm text-muted-foreground">
-              Adjuster/Examiner Contact Info
-            </Label>
-            <Input
-              id="adjuster-contact"
-              placeholder="Contact information"
-              className="bg-background"
-              value={adjusterContact}
-              onChange={(e) => {
-                setAdjusterContact(e.target.value)
-                handleFieldUpdate("adjusterContact", e.target.value)
-              }}
-            />
           </div>
         </div>
 
