@@ -147,6 +147,7 @@ export function CaseTab() {
   const [treatmentsBeyondFirstAid, setTreatmentsBeyondFirstAid] = useState<string[]>([])
   const [caseTransferredTo3rdParty, setCaseTransferredTo3rdParty] = useState("")
   const [employeeRequestedTreatment, setEmployeeRequestedTreatment] = useState("")
+  const [prescriptionsPhysicalTherapy, setPrescriptionsPhysicalTherapy] = useState("")
   const [injuryShift, setInjuryShift] = useState("")
   const [shiftStartTime, setShiftStartTime] = useState("")
   const [injurySupervisor, setInjurySupervisor] = useState("")
@@ -238,6 +239,7 @@ export function CaseTab() {
       setTreatmentsBeyondFirstAid(currentCase.treatmentsBeyondFirstAid || [])
       setCaseTransferredTo3rdParty(currentCase.caseTransferredTo3rdParty || "")
       setEmployeeRequestedTreatment(currentCase.employeeRequestedTreatment || "")
+      setPrescriptionsPhysicalTherapy(currentCase.prescriptionsPhysicalTherapy || "")
       setInjuryShift(currentCase.injuryShift || "")
       setShiftStartTime(currentCase.shiftStartTime || "")
       setInjurySupervisor(currentCase.injurySupervisor || "")
@@ -1907,6 +1909,22 @@ export function CaseTab() {
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="space-y-2 mt-4">
+          <Label htmlFor="prescriptions-physical-therapy" className="text-sm text-muted-foreground">
+            Prescriptions issues &amp; physical therapy prescribed
+          </Label>
+          <textarea
+            id="prescriptions-physical-therapy"
+            placeholder="Enter prescription and physical therapy details..."
+            className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            value={prescriptionsPhysicalTherapy}
+            onChange={(e) => {
+              setPrescriptionsPhysicalTherapy(e.target.value)
+              handleFieldUpdate("prescriptionsPhysicalTherapy", e.target.value)
+            }}
+          />
         </div>
 
         <div className="space-y-2">
