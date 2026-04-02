@@ -1785,6 +1785,49 @@ export function CaseTab() {
           </div>
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div className="space-y-2">
+            <Label htmlFor="case-transferred-3rd-party" className="text-sm text-muted-foreground">
+              Was case transferred to 3rd Party Resource/Plant Nurse/Other?
+            </Label>
+            <Select
+              value={caseTransferredTo3rdParty}
+              onValueChange={(val) => {
+                setCaseTransferredTo3rdParty(val)
+                handleFieldUpdate("caseTransferredTo3rdParty", val)
+              }}
+            >
+              <SelectTrigger id="case-transferred-3rd-party" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="employee-requested-treatment" className="text-sm text-muted-foreground">
+              Did the employee request treatment or external evaluation?
+            </Label>
+            <Select
+              value={employeeRequestedTreatment}
+              onValueChange={(val) => {
+                setEmployeeRequestedTreatment(val)
+                handleFieldUpdate("employeeRequestedTreatment", val)
+              }}
+            >
+              <SelectTrigger id="employee-requested-treatment" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         <div className="space-y-3 mt-4">
           <Label className="text-sm text-muted-foreground">
             First aid treatments provided
@@ -1826,49 +1869,6 @@ export function CaseTab() {
                 </label>
               </div>
             ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <div className="space-y-2">
-            <Label htmlFor="case-transferred-3rd-party" className="text-sm text-muted-foreground">
-              Was case transferred to 3rd Party Resource/Plant Nurse/Other?
-            </Label>
-            <Select
-              value={caseTransferredTo3rdParty}
-              onValueChange={(val) => {
-                setCaseTransferredTo3rdParty(val)
-                handleFieldUpdate("caseTransferredTo3rdParty", val)
-              }}
-            >
-              <SelectTrigger id="case-transferred-3rd-party" className="bg-background">
-                <SelectValue placeholder="Select..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Yes">Yes</SelectItem>
-                <SelectItem value="No">No</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="employee-requested-treatment" className="text-sm text-muted-foreground">
-              Did the employee request treatment or external evaluation?
-            </Label>
-            <Select
-              value={employeeRequestedTreatment}
-              onValueChange={(val) => {
-                setEmployeeRequestedTreatment(val)
-                handleFieldUpdate("employeeRequestedTreatment", val)
-              }}
-            >
-              <SelectTrigger id="employee-requested-treatment" className="bg-background">
-                <SelectValue placeholder="Select..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Yes">Yes</SelectItem>
-                <SelectItem value="No">No</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
 
