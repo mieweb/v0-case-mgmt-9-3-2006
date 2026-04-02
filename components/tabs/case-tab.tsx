@@ -1680,6 +1680,165 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
+      <CollapsibleSection title="Injury Details" icon={<Activity className="h-4 w-4" />} defaultOpen={hasInjuryDetailsData()}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="injury-nature" className="text-sm text-muted-foreground">
+              Nature of injury
+            </Label>
+            <Select
+              value={injuryNature}
+              onValueChange={(val) => {
+                setInjuryNature(val)
+                handleFieldUpdate("injuryNature", val)
+              }}
+            >
+              <SelectTrigger id="injury-nature" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Sprain/strain">Sprain/strain</SelectItem>
+                <SelectItem value="Fracture">Fracture</SelectItem>
+                <SelectItem value="Cut/laceration">Cut/laceration</SelectItem>
+                <SelectItem value="Contusion/bruise">Contusion/bruise</SelectItem>
+                <SelectItem value="Burn">Burn</SelectItem>
+                <SelectItem value="Amputation">Amputation</SelectItem>
+                <SelectItem value="Carpal tunnel">Carpal tunnel</SelectItem>
+                <SelectItem value="Hernia">Hernia</SelectItem>
+                <SelectItem value="Hearing loss">Hearing loss</SelectItem>
+                <SelectItem value="Respiratory">Respiratory</SelectItem>
+                <SelectItem value="Dermatitis">Dermatitis</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="injury-cause" className="text-sm text-muted-foreground">
+              Cause of injury
+            </Label>
+            <Select
+              value={injuryCause}
+              onValueChange={(val) => {
+                setInjuryCause(val)
+                handleFieldUpdate("injuryCause", val)
+              }}
+            >
+              <SelectTrigger id="injury-cause" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Overexertion">Overexertion</SelectItem>
+                <SelectItem value="Fall - same level">Fall - same level</SelectItem>
+                <SelectItem value="Fall - different level">Fall - different level</SelectItem>
+                <SelectItem value="Struck by object">Struck by object</SelectItem>
+                <SelectItem value="Struck against object">Struck against object</SelectItem>
+                <SelectItem value="Caught in/between">Caught in/between</SelectItem>
+                <SelectItem value="Repetitive motion">Repetitive motion</SelectItem>
+                <SelectItem value="Motor vehicle">Motor vehicle</SelectItem>
+                <SelectItem value="Exposure - chemical">Exposure - chemical</SelectItem>
+                <SelectItem value="Exposure - temperature">Exposure - temperature</SelectItem>
+                <SelectItem value="Violence">Violence</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="body-part" className="text-sm text-muted-foreground">
+              Body part affected
+            </Label>
+            <Input
+              id="body-part"
+              placeholder="e.g., Lower back, Right hand"
+              className="bg-background"
+              value={bodyPartAffected}
+              onChange={(e) => {
+                setBodyPartAffected(e.target.value)
+                handleFieldUpdate("bodyPartAffected", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="date-of-death" className="text-sm text-muted-foreground">
+              Date of death
+            </Label>
+            <Input
+              id="date-of-death"
+              type="date"
+              className="bg-background"
+              value={dateOfDeath}
+              onChange={(e) => {
+                setDateOfDeath(e.target.value)
+                handleFieldUpdate("dateOfDeath", e.target.value)
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="injury-description" className="text-sm text-muted-foreground">
+            Description of injury/illness
+          </Label>
+          <textarea
+            id="injury-description"
+            placeholder="Describe how the injury occurred..."
+            className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            value={injuryDescription}
+            onChange={(e) => {
+              setInjuryDescription(e.target.value)
+              handleFieldUpdate("injuryDescription", e.target.value)
+            }}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="what-employee-doing" className="text-sm text-muted-foreground">
+            What was the employee doing just before the incident occurred?
+          </Label>
+          <textarea
+            id="what-employee-doing"
+            placeholder="Describe the activity or task the employee was performing..."
+            className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            value={whatEmployeeDoing}
+            onChange={(e) => {
+              setWhatEmployeeDoing(e.target.value)
+              handleFieldUpdate("whatEmployeeDoing", e.target.value)
+            }}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="what-happened" className="text-sm text-muted-foreground">
+            What happened?
+          </Label>
+          <textarea
+            id="what-happened"
+            placeholder="Describe the sequence of events that led to the injury..."
+            className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            value={whatHappened}
+            onChange={(e) => {
+              setWhatHappened(e.target.value)
+              handleFieldUpdate("whatHappened", e.target.value)
+            }}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="what-object-harmed" className="text-sm text-muted-foreground">
+            What object or substance directly harmed the employee?
+          </Label>
+          <textarea
+            id="what-object-harmed"
+            placeholder="Identify the specific object, equipment, substance, or condition..."
+            className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            value={whatObjectHarmed}
+            onChange={(e) => {
+              setWhatObjectHarmed(e.target.value)
+              handleFieldUpdate("whatObjectHarmed", e.target.value)
+            }}
+          />
+        </div>
+      </CollapsibleSection>
+
       <CollapsibleSection title="Treatment Information" icon={<Stethoscope className="h-4 w-4" />} defaultOpen={hasTreatmentData()}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
@@ -2164,165 +2323,6 @@ export function CaseTab() {
             onChange={(e) => {
               setInvestigationDetails(e.target.value)
               handleFieldUpdate("investigationDetails", e.target.value)
-            }}
-          />
-        </div>
-      </CollapsibleSection>
-
-      <CollapsibleSection title="Injury Details" icon={<Activity className="h-4 w-4" />} defaultOpen={hasInjuryDetailsData()}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="injury-nature" className="text-sm text-muted-foreground">
-              Nature of injury
-            </Label>
-            <Select
-              value={injuryNature}
-              onValueChange={(val) => {
-                setInjuryNature(val)
-                handleFieldUpdate("injuryNature", val)
-              }}
-            >
-              <SelectTrigger id="injury-nature" className="bg-background">
-                <SelectValue placeholder="Select..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Sprain/strain">Sprain/strain</SelectItem>
-                <SelectItem value="Fracture">Fracture</SelectItem>
-                <SelectItem value="Cut/laceration">Cut/laceration</SelectItem>
-                <SelectItem value="Contusion/bruise">Contusion/bruise</SelectItem>
-                <SelectItem value="Burn">Burn</SelectItem>
-                <SelectItem value="Amputation">Amputation</SelectItem>
-                <SelectItem value="Carpal tunnel">Carpal tunnel</SelectItem>
-                <SelectItem value="Hernia">Hernia</SelectItem>
-                <SelectItem value="Hearing loss">Hearing loss</SelectItem>
-                <SelectItem value="Respiratory">Respiratory</SelectItem>
-                <SelectItem value="Dermatitis">Dermatitis</SelectItem>
-                <SelectItem value="Other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="injury-cause" className="text-sm text-muted-foreground">
-              Cause of injury
-            </Label>
-            <Select
-              value={injuryCause}
-              onValueChange={(val) => {
-                setInjuryCause(val)
-                handleFieldUpdate("injuryCause", val)
-              }}
-            >
-              <SelectTrigger id="injury-cause" className="bg-background">
-                <SelectValue placeholder="Select..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Overexertion">Overexertion</SelectItem>
-                <SelectItem value="Fall - same level">Fall - same level</SelectItem>
-                <SelectItem value="Fall - different level">Fall - different level</SelectItem>
-                <SelectItem value="Struck by object">Struck by object</SelectItem>
-                <SelectItem value="Struck against object">Struck against object</SelectItem>
-                <SelectItem value="Caught in/between">Caught in/between</SelectItem>
-                <SelectItem value="Repetitive motion">Repetitive motion</SelectItem>
-                <SelectItem value="Motor vehicle">Motor vehicle</SelectItem>
-                <SelectItem value="Exposure - chemical">Exposure - chemical</SelectItem>
-                <SelectItem value="Exposure - temperature">Exposure - temperature</SelectItem>
-                <SelectItem value="Violence">Violence</SelectItem>
-                <SelectItem value="Other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="body-part" className="text-sm text-muted-foreground">
-              Body part affected
-            </Label>
-            <Input
-              id="body-part"
-              placeholder="e.g., Lower back, Right hand"
-              className="bg-background"
-              value={bodyPartAffected}
-              onChange={(e) => {
-                setBodyPartAffected(e.target.value)
-                handleFieldUpdate("bodyPartAffected", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="date-of-death" className="text-sm text-muted-foreground">
-              Date of death
-            </Label>
-            <Input
-              id="date-of-death"
-              type="date"
-              className="bg-background"
-              value={dateOfDeath}
-              onChange={(e) => {
-                setDateOfDeath(e.target.value)
-                handleFieldUpdate("dateOfDeath", e.target.value)
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="injury-description" className="text-sm text-muted-foreground">
-            Description of injury/illness
-          </Label>
-          <textarea
-            id="injury-description"
-            placeholder="Describe how the injury occurred..."
-            className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            value={injuryDescription}
-            onChange={(e) => {
-              setInjuryDescription(e.target.value)
-              handleFieldUpdate("injuryDescription", e.target.value)
-            }}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="what-employee-doing" className="text-sm text-muted-foreground">
-            What was the employee doing just before the incident occurred?
-          </Label>
-          <textarea
-            id="what-employee-doing"
-            placeholder="Describe the activity or task the employee was performing..."
-            className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            value={whatEmployeeDoing}
-            onChange={(e) => {
-              setWhatEmployeeDoing(e.target.value)
-              handleFieldUpdate("whatEmployeeDoing", e.target.value)
-            }}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="what-happened" className="text-sm text-muted-foreground">
-            What happened?
-          </Label>
-          <textarea
-            id="what-happened"
-            placeholder="Describe the sequence of events that led to the injury..."
-            className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            value={whatHappened}
-            onChange={(e) => {
-              setWhatHappened(e.target.value)
-              handleFieldUpdate("whatHappened", e.target.value)
-            }}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="what-object-harmed" className="text-sm text-muted-foreground">
-            What object or substance directly harmed the employee?
-          </Label>
-          <textarea
-            id="what-object-harmed"
-            placeholder="Identify the specific object, equipment, substance, or condition..."
-            className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            value={whatObjectHarmed}
-            onChange={(e) => {
-              setWhatObjectHarmed(e.target.value)
-              handleFieldUpdate("whatObjectHarmed", e.target.value)
             }}
           />
         </div>
