@@ -558,10 +558,7 @@ export function CaseTab() {
               </SelectContent>
             </Select>
           </div>
-        </div>
-
-        <div className="flex items-center justify-between pt-2">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 pt-6">
             <input
               type="checkbox"
               id="confidential-case"
@@ -573,6 +570,9 @@ export function CaseTab() {
               Mark as Confidential Case
             </Label>
           </div>
+        </div>
+
+        <div className="flex items-center justify-end pt-2">
           <Button
             type="button"
             variant={status === "Closed" ? "secondary" : "destructive"}
