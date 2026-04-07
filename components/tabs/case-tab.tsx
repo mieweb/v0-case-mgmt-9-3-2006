@@ -570,28 +570,27 @@ export function CaseTab() {
               Mark as Confidential Case
             </Label>
           </div>
-        </div>
-
-        <div className="flex items-center justify-end pt-2">
-          <Button
-            type="button"
-            variant={status === "Closed" ? "secondary" : "destructive"}
-            size="sm"
-            disabled={status === "Closed"}
-            onClick={() => {
-              if (openTodos.length > 0 || openRestrictions.length > 0) {
-                setPendingStatus("Closed")
-                setSelectedTodosToClose([])
-                setSelectedRestrictionsToClose([])
-                setShowCloseCaseDialog(true)
-              } else {
-                setStatus("Closed")
-                handleFieldUpdate("status", "Closed")
-              }
-            }}
-          >
-            {status === "Closed" ? "Case Closed" : "Close Case"}
-          </Button>
+          <div className="flex items-center pt-6">
+            <Button
+              type="button"
+              variant={status === "Closed" ? "secondary" : "destructive"}
+              size="sm"
+              disabled={status === "Closed"}
+              onClick={() => {
+                if (openTodos.length > 0 || openRestrictions.length > 0) {
+                  setPendingStatus("Closed")
+                  setSelectedTodosToClose([])
+                  setSelectedRestrictionsToClose([])
+                  setShowCloseCaseDialog(true)
+                } else {
+                  setStatus("Closed")
+                  handleFieldUpdate("status", "Closed")
+                }
+              }}
+            >
+              {status === "Closed" ? "Case Closed" : "Close Case"}
+            </Button>
+          </div>
         </div>
       </CollapsibleSection>
 
