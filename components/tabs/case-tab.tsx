@@ -159,6 +159,7 @@ export function CaseTab() {
   const [supervisorNotifiedDate, setSupervisorNotifiedDate] = useState("")
   const [isCaseWorkRelated, setIsCaseWorkRelated] = useState("")
   const [employeeOccupation, setEmployeeOccupation] = useState("")
+  const [contingentWork, setContingentWork] = useState("")
   const [typeOfInjuryOrIllness, setTypeOfInjuryOrIllness] = useState("")
   const [significantInjuryIllness, setSignificantInjuryIllness] = useState("")
   const [injuryDescription, setInjuryDescription] = useState("")
@@ -259,6 +260,7 @@ export function CaseTab() {
       setSupervisorNotifiedDate(currentCase.supervisorNotifiedDate || "")
       setIsCaseWorkRelated(currentCase.isCaseWorkRelated || "")
       setEmployeeOccupation(currentCase.employeeOccupation || "")
+      setContingentWork(currentCase.contingentWork || "")
       setTypeOfInjuryOrIllness(currentCase.typeOfInjuryOrIllness || "")
       setSignificantInjuryIllness(currentCase.significantInjuryIllness || "")
       setInjuryDescription(currentCase.injuryDescription || "")
@@ -1299,6 +1301,26 @@ export function CaseTab() {
                 handleFieldUpdate("employeeOccupation", e.target.value)
               }}
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="contingent-work" className="text-sm text-muted-foreground">
+              Contingent work
+            </Label>
+            <Select
+              value={contingentWork}
+              onValueChange={(val) => {
+                setContingentWork(val)
+                handleFieldUpdate("contingentWork", val)
+              }}
+            >
+              <SelectTrigger id="contingent-work" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="type-of-injury-illness" className="text-sm text-muted-foreground">
