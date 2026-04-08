@@ -185,6 +185,8 @@ export function CaseTab() {
   const [seriousInjuryFatality, setSeriousInjuryFatality] = useState("")
   const [hsProgram, setHsProgram] = useState("")
   const [processCondition, setProcessCondition] = useState("")
+  const [associatedIICases, setAssociatedIICases] = useState("")
+  const [notifyCaseManagementTPA, setNotifyCaseManagementTPA] = useState("")
   const [recordOnly, setRecordOnly] = useState("")
   const [daysAway, setDaysAway] = useState("")
   const [daysRestricted, setDaysRestricted] = useState("")
@@ -286,6 +288,8 @@ export function CaseTab() {
       setSeriousInjuryFatality(currentCase.seriousInjuryFatality || "")
       setHsProgram(currentCase.hsProgram || "")
       setProcessCondition(currentCase.processCondition || "")
+      setAssociatedIICases(currentCase.associatedIICases || "")
+      setNotifyCaseManagementTPA(currentCase.notifyCaseManagementTPA || "")
       setRecordOnly(currentCase.recordOnly || "")
       setDaysAway(currentCase.daysAway || "")
       setDaysRestricted(currentCase.daysRestricted || "")
@@ -2458,6 +2462,44 @@ export function CaseTab() {
               }}
             >
               <SelectTrigger id="record-only" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="associated-ii-cases" className="text-sm text-muted-foreground">
+              Associated I&amp;I Case(s)
+            </Label>
+            <Input
+              id="associated-ii-cases"
+              placeholder="Enter associated case(s)..."
+              className="bg-background"
+              value={associatedIICases}
+              onChange={(e) => {
+                setAssociatedIICases(e.target.value)
+                handleFieldUpdate("associatedIICases", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="notify-case-management-tpa" className="text-sm text-muted-foreground">
+              Notify Case Management and TPA?
+            </Label>
+            <Select
+              value={notifyCaseManagementTPA}
+              onValueChange={(val) => {
+                setNotifyCaseManagementTPA(val)
+                handleFieldUpdate("notifyCaseManagementTPA", val)
+              }}
+            >
+              <SelectTrigger id="notify-case-management-tpa" className="bg-background">
                 <SelectValue placeholder="Select..." />
               </SelectTrigger>
               <SelectContent>
