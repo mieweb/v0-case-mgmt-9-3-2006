@@ -185,6 +185,7 @@ export function CaseTab() {
   const [seriousInjuryFatality, setSeriousInjuryFatality] = useState("")
   const [hsProgram, setHsProgram] = useState("")
   const [processCondition, setProcessCondition] = useState("")
+  const [processDetails, setProcessDetails] = useState("")
   const [associatedIICases, setAssociatedIICases] = useState("")
   const [notifyCaseManagementTPA, setNotifyCaseManagementTPA] = useState("")
   const [recordOnly, setRecordOnly] = useState("")
@@ -288,6 +289,7 @@ export function CaseTab() {
       setSeriousInjuryFatality(currentCase.seriousInjuryFatality || "")
       setHsProgram(currentCase.hsProgram || "")
       setProcessCondition(currentCase.processCondition || "")
+      setProcessDetails(currentCase.processDetails || "")
       setAssociatedIICases(currentCase.associatedIICases || "")
       setNotifyCaseManagementTPA(currentCase.notifyCaseManagementTPA || "")
       setRecordOnly(currentCase.recordOnly || "")
@@ -2470,6 +2472,22 @@ export function CaseTab() {
               </SelectContent>
             </Select>
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="process-details" className="text-sm text-muted-foreground">
+            Process details
+          </Label>
+          <textarea
+            id="process-details"
+            placeholder="Enter process details..."
+            className="w-full min-h-[60px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            value={processDetails}
+            onChange={(e) => {
+              setProcessDetails(e.target.value)
+              handleFieldUpdate("processDetails", e.target.value)
+            }}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
