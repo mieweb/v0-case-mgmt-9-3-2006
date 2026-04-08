@@ -131,6 +131,7 @@ export function CaseTab() {
   const [locationState, setLocationState] = useState("")
   const [locationZip, setLocationZip] = useState("")
   const [locationCountry, setLocationCountry] = useState("")
+  const [gpsCoordinates, setGpsCoordinates] = useState("")
   const [locationDescription, setLocationDescription] = useState("")
   const [workstation, setWorkstation] = useState("")
   const [employeeDoingBefore, setEmployeeDoingBefore] = useState("")
@@ -235,6 +236,7 @@ export function CaseTab() {
       setLocationState(currentCase.locationState || "")
       setLocationZip(currentCase.locationZip || "")
       setLocationCountry(currentCase.locationCountry || "")
+      setGpsCoordinates(currentCase.gpsCoordinates || "")
       setLocationDescription(currentCase.locationDescription || "")
       setWorkstation(currentCase.workstation || "")
       setEmployeeDoingBefore(currentCase.employeeDoingBefore || "")
@@ -1682,6 +1684,21 @@ export function CaseTab() {
               onChange={(e) => {
                 setLocationCountry(e.target.value)
                 handleFieldUpdate("locationCountry", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="gps-coordinates" className="text-sm text-muted-foreground">
+              GPS coordinates
+            </Label>
+            <Input
+              id="gps-coordinates"
+              placeholder="e.g., 40.7128, -74.0060"
+              className="bg-background"
+              value={gpsCoordinates}
+              onChange={(e) => {
+                setGpsCoordinates(e.target.value)
+                handleFieldUpdate("gpsCoordinates", e.target.value)
               }}
             />
           </div>
