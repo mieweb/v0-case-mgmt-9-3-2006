@@ -514,8 +514,8 @@ export function CaseNotesTab() {
               <TableRow>
                 <TableHead>Date</TableHead>
                 <TableHead>Activity</TableHead>
-                <TableHead>Case Manager</TableHead>
                 <TableHead>Notes Preview</TableHead>
+                <TableHead>Case Manager</TableHead>
                 <TableHead>Version</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -542,14 +542,14 @@ export function CaseNotesTab() {
                         {note.lineout && <Badge variant="destructive" className="text-xs">Deleted</Badge>}
                       </div>
                     </TableCell>
-                    <TableCell className={`pii-data ${note.lineout ? "line-through" : ""}`}>
-                      {note.caseManager}
-                    </TableCell>
                     <TableCell className="max-w-md">
                       <div 
                         className={`truncate ${note.lineout ? "line-through" : ""}`} 
                         dangerouslySetInnerHTML={{ __html: note.notes.substring(0, 100) }} 
                       />
+                    </TableCell>
+                    <TableCell className={`pii-data ${note.lineout ? "line-through" : ""}`}>
+                      {note.caseManager}
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary" className="font-mono text-xs">
