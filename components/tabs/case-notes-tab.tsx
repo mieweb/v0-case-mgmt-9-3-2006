@@ -316,9 +316,19 @@ export function CaseNotesTab() {
       return
     }
 
-    const updatedNotes = notes.filter((n) => n.id !== id)
+    if (!note) return
+
+    // Soft delete - mark as lineout instead of removing
+    const updatedNote: CaseNote = {
+      ...note,
+      lineout: true,
+      deletedBy: currentUser?.name || currentCase?.caseManager,
+      deletedAt: new Date().toISOString(),
+    }
+
+    const updatedNotes = notes.map((n) => (n.id === id ? updatedNote : n))
     setNotes(updatedNotes)
-    if (currentCase && note) {
+    if (currentCase) {
       updateCase(
         currentCase.caseNumber,
         { caseNotes: updatedNotes },
@@ -504,8 +514,8 @@ export function CaseNotesTab() {
               <TableRow>
                 <TableHead>Date</TableHead>
                 <TableHead>Activity</TableHead>
-                <TableHead>Case Manager</TableHead>
                 <TableHead>Notes Preview</TableHead>
+                <TableHead>Case Manager</TableHead>
                 <TableHead>Version</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -519,17 +529,27 @@ export function CaseNotesTab() {
                 </TableRow>
               ) : (
                 notes.map((note) => (
-                  <TableRow key={note.id}>
-                    <TableCell className="font-medium">{new Date(note.noteDate).toLocaleDateString()}</TableCell>
+                  <TableRow key={note.id} className={note.lineout ? "opacity-60" : ""}>
+                    <TableCell className={`font-medium ${note.lineout ? "line-through" : ""}`}>
+                      {new Date(note.noteDate).toLocaleDateString()}
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline">{note.activity}</Badge>
+                        <Badge variant="outline" className={note.lineout ? "line-through" : ""}>
+                          {note.activity}
+                        </Badge>
                         {note.isLocked && <Lock className="h-3 w-3 text-muted-foreground" />}
+                        {note.lineout && <Badge variant="destructive" className="text-xs">Deleted</Badge>}
                       </div>
                     </TableCell>
-                    <TableCell className="pii-data">{note.caseManager}</TableCell>
                     <TableCell className="max-w-md">
-                      <div className="truncate" dangerouslySetInnerHTML={{ __html: note.notes.substring(0, 100) }} />
+                      <div 
+                        className={`truncate ${note.lineout ? "line-through" : ""}`} 
+                        dangerouslySetInnerHTML={{ __html: note.notes.substring(0, 100) }} 
+                      />
+                    </TableCell>
+                    <TableCell className={`pii-data ${note.lineout ? "line-through" : ""}`}>
+                      {note.caseManager}
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary" className="font-mono text-xs">
@@ -562,7 +582,7 @@ export function CaseNotesTab() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleEditNote(note)}
-                          disabled={note.isLocked && !isAdmin}
+                          disabled={note.isLocked && !isAdmin || note.lineout}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
@@ -570,7 +590,7 @@ export function CaseNotesTab() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteNote(note.id)}
-                          disabled={note.isLocked && !isAdmin}
+                          disabled={note.isLocked && !isAdmin || note.lineout}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -590,28 +610,33 @@ export function CaseNotesTab() {
             </div>
           ) : (
             notes.map((note) => (
-              <div key={note.id} className="note-detail-item border rounded-lg overflow-hidden">
+              <div key={note.id} className={`note-detail-item border rounded-lg overflow-hidden ${note.lineout ? "opacity-60" : ""}`}>
                 <div className="note-header bg-muted/30 p-4 flex items-center justify-between border-b">
                   <div className="flex items-center gap-6">
                     <div>
                       <div className="text-xs text-muted-foreground mb-1">Date</div>
-                      <div className="font-medium">{new Date(note.noteDate).toLocaleDateString()}</div>
+                      <div className={`font-medium ${note.lineout ? "line-through" : ""}`}>
+                        {new Date(note.noteDate).toLocaleDateString()}
+                      </div>
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground mb-1">Activity</div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline">{note.activity}</Badge>
+                        <Badge variant="outline" className={note.lineout ? "line-through" : ""}>
+                          {note.activity}
+                        </Badge>
                         {note.isLocked && (
                           <Badge variant="secondary" className="gap-1">
                             <Lock className="h-3 w-3" />
                             Locked
                           </Badge>
                         )}
+                        {note.lineout && <Badge variant="destructive">Deleted</Badge>}
                       </div>
                     </div>
                     <div className="pii-data">
                       <div className="text-xs text-muted-foreground mb-1">Case Manager</div>
-                      <div>{note.caseManager}</div>
+                      <div className={note.lineout ? "line-through" : ""}>{note.caseManager}</div>
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground mb-1">Version</div>
@@ -632,7 +657,7 @@ export function CaseNotesTab() {
                       </Button>
                     )}
                     {isAdmin && (
-                      <Button variant="outline" size="sm" onClick={() => handleToggleLock(note)}>
+                      <Button variant="outline" size="sm" onClick={() => handleToggleLock(note)} disabled={note.lineout}>
                         {note.isLocked ? (
                           <>
                             <Lock className="h-4 w-4 mr-1" />
@@ -650,7 +675,7 @@ export function CaseNotesTab() {
                       variant="outline"
                       size="sm"
                       onClick={() => handleEditNote(note)}
-                      disabled={note.isLocked && !isAdmin}
+                      disabled={note.isLocked && !isAdmin || note.lineout}
                     >
                       <Pencil className="h-4 w-4 mr-1" />
                       Edit
@@ -659,7 +684,7 @@ export function CaseNotesTab() {
                       variant="outline"
                       size="sm"
                       onClick={() => handleDeleteNote(note.id)}
-                      disabled={note.isLocked && !isAdmin}
+                      disabled={note.isLocked && !isAdmin || note.lineout}
                     >
                       <Trash2 className="h-4 w-4 mr-1" />
                       Delete
@@ -669,7 +694,7 @@ export function CaseNotesTab() {
                 <div className="note-content p-6 bg-background phi-data">
                   <div className="text-xs text-muted-foreground mb-2 font-medium">NOTE CONTENT</div>
                   <div
-                    className="prose prose-sm max-w-none"
+                    className={`prose prose-sm max-w-none ${note.lineout ? "line-through" : ""}`}
                     dangerouslySetInnerHTML={{
                       __html: note.notes || "<p class='text-muted-foreground italic'>No content</p>",
                     }}

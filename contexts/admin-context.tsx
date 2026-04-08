@@ -58,13 +58,13 @@ const AdminContext = createContext<AdminContextType | undefined>(undefined)
 const initialCaseTypes: CaseType[] = [
   {
     id: "7",
-    name: "CONF — Confidential Type Case",
+    name: "Confidential Type Case",
     defaultTodos: [],
     confidential: true,
   },
   {
     id: "2",
-    name: "MAT — Maternity",
+    name: "Maternity",
     defaultTodos: [
       `Update Call; offset=0 Week; rrule=FREQ=WEEKLY;INTERVAL=2`,
       `C-SEC 6 weeks drop pay to D60; anchor=surgeryDate; offset=6 Week`,
@@ -86,7 +86,7 @@ const initialCaseTypes: CaseType[] = [
   },
   {
     id: "3",
-    name: "MHSA — Mental Health Substance Abuse",
+    name: "Mental Health Substance Abuse",
     defaultTodos: [
       "Gather complete medical records",
       "Review policy coverage and waiting period",
@@ -99,7 +99,7 @@ const initialCaseTypes: CaseType[] = [
   },
   {
     id: "4",
-    name: "NLT — No Lost Time Non-Occupational",
+    name: "No Lost Time Non-Occupational",
     defaultTodos: [
       "Document injury/illness details",
       "Review restrictions and accommodations",
@@ -111,7 +111,7 @@ const initialCaseTypes: CaseType[] = [
   },
   {
     id: "5",
-    name: "NON — Non-occupational injury / illness",
+    name: "Non-occupational injury / illness",
     defaultTodos: [
       "Request medical documentation from employee",
       "Review claim eligibility",
@@ -123,7 +123,7 @@ const initialCaseTypes: CaseType[] = [
   },
   {
     id: "6",
-    name: "OCC — Occupational injury / illness",
+    name: "Occupational injury / illness",
     defaultTodos: [
       "File incident report",
       "Document accident details",
@@ -625,14 +625,16 @@ Case Management Team`,
 const initialCaseManagers: CaseManager[] = [
   { id: "1", name: "Arlene Rosario, CPDM", active: true },
   { id: "2", name: "Debbie Swann, RN, CCM", active: true },
-  { id: "3", name: "Kate Gilligan, BSN, RN, CCM", active: true },
-  { id: "4", name: "Mariana Diaz, BA, CPDM", active: true },
-  { id: "5", name: "Nicole Kunde, CPDM", active: true },
-  { id: "6", name: "Nicole Milburn, RN, CCM", active: true },
-  { id: "7", name: "Sean Beaber, RN", active: true },
-  { id: "8", name: "Sheila Roy, RN, BSN, COHN-S", active: true },
-  { id: "9", name: "Stacey Burton, M.ED, CRC, CDMS", active: true },
-  { id: "10", name: "Stacey Hartman, MS, CCM", active: true },
+  { id: "3", name: "Ikenna Amanfo", active: true },
+  { id: "4", name: "Kate Gilligan, BSN, RN, CCM", active: true },
+  { id: "5", name: "Mariana Diaz, BA, CPDM", active: true },
+  { id: "6", name: "Nicole Kunde, CPDM", active: true },
+  { id: "7", name: "Nicole Milburn, RN, CCM", active: true },
+  { id: "8", name: "Sean Beaber, RN", active: true },
+  { id: "9", name: "Sheila Roy, RN, BSN, COHN-S", active: true },
+  { id: "10", name: "Stacey Burton, M.ED, CRC, CDMS", active: true },
+  { id: "11", name: "Stacey Hartman, MS, CCM", active: true },
+  { id: "12", name: "Tricia Fletcher", active: true },
 ]
 
 export function AdminProvider({ children }: { children: ReactNode }) {
