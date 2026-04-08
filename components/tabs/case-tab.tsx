@@ -158,6 +158,7 @@ export function CaseTab() {
   const [injurySupervisor, setInjurySupervisor] = useState("")
   const [supervisorNotifiedDate, setSupervisorNotifiedDate] = useState("")
   const [isCaseWorkRelated, setIsCaseWorkRelated] = useState("")
+  const [employeeOccupation, setEmployeeOccupation] = useState("")
   const [typeOfInjuryOrIllness, setTypeOfInjuryOrIllness] = useState("")
   const [significantInjuryIllness, setSignificantInjuryIllness] = useState("")
   const [injuryDescription, setInjuryDescription] = useState("")
@@ -257,6 +258,7 @@ export function CaseTab() {
       setInjurySupervisor(currentCase.injurySupervisor || "")
       setSupervisorNotifiedDate(currentCase.supervisorNotifiedDate || "")
       setIsCaseWorkRelated(currentCase.isCaseWorkRelated || "")
+      setEmployeeOccupation(currentCase.employeeOccupation || "")
       setTypeOfInjuryOrIllness(currentCase.typeOfInjuryOrIllness || "")
       setSignificantInjuryIllness(currentCase.significantInjuryIllness || "")
       setInjuryDescription(currentCase.injuryDescription || "")
@@ -1261,7 +1263,7 @@ export function CaseTab() {
       </CollapsibleSection>
 
       <CollapsibleSection title="Work Related Details" icon={<Briefcase className="h-4 w-4" />} defaultOpen={hasWorkRelatedData()}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-2">
             <Label htmlFor="is-case-work-related" className="text-sm text-muted-foreground">
               Is the case work related?
@@ -1282,6 +1284,21 @@ export function CaseTab() {
                 <SelectItem value="Under investigation">Under investigation</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="employee-occupation" className="text-sm text-muted-foreground">
+              Employee occupation
+            </Label>
+            <Input
+              id="employee-occupation"
+              placeholder="Enter occupation..."
+              className="bg-background"
+              value={employeeOccupation}
+              onChange={(e) => {
+                setEmployeeOccupation(e.target.value)
+                handleFieldUpdate("employeeOccupation", e.target.value)
+              }}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="type-of-injury-illness" className="text-sm text-muted-foreground">
