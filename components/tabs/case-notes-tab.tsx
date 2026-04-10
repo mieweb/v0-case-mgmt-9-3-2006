@@ -917,12 +917,6 @@ export function CaseNotesTab() {
               </Select>
             </div>
             <div className="space-y-1">
-              <Label className="text-xs">Case Manager</Label>
-              <div className="bg-muted/50 rounded-md px-3 py-1.5 text-sm h-8 flex items-center">
-                {currentCase?.caseManager || "Auto-assigned"}
-              </div>
-            </div>
-            <div className="space-y-1">
               <Label htmlFor="case-note-template" className="text-xs">
                 Case Note Template
               </Label>
@@ -949,6 +943,12 @@ export function CaseNotesTab() {
                     ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Case Manager</Label>
+              <div className="bg-muted/50 rounded-md px-3 py-1.5 text-sm h-8 flex items-center">
+                {currentCase?.caseManager || "Auto-assigned"}
+              </div>
             </div>
           </div>
 
