@@ -936,7 +936,7 @@ export function CaseNotesTab() {
                 <SelectTrigger id="case-note-template" className="bg-background h-8 text-sm">
                   <SelectValue placeholder="Select template..." />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" sideOffset={4} className="z-[100]">
                   {codes.caseNoteTemplates
                     .filter((template) => template.active)
                     .map((template) => (
@@ -956,7 +956,7 @@ export function CaseNotesTab() {
                 <SelectTrigger id="note-case-manager" className="bg-background h-8 text-sm">
                   <SelectValue placeholder="Select case manager..." />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" sideOffset={4} className="z-[100]">
                   {caseManagers
                     .filter((cm) => cm.active)
                     .sort((a, b) => a.name.localeCompare(b.name))
