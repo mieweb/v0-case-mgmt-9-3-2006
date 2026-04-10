@@ -146,6 +146,7 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
           <TabsTrigger value="case-managers">Case Managers</TabsTrigger>
           <TabsTrigger value="case-types">Case Types</TabsTrigger>
           <TabsTrigger value="letter-templates">Letter Templates</TabsTrigger>
+          <TabsTrigger value="case-note-templates">Case Note Templates</TabsTrigger>
           <TabsTrigger value="case-status-codes">Case Status</TabsTrigger>
           <TabsTrigger value="case-category-codes">Case Category</TabsTrigger>
           <TabsTrigger value="case-closure-reason-codes">Closure Reason</TabsTrigger>
@@ -393,6 +394,18 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
             onUpdate={(id, updates) => updateCode("letterTemplates", id, updates)}
             onDelete={(id) => deleteCode("letterTemplates", id)}
           />
+        </TabsContent>
+
+        <TabsContent value="case-note-templates" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Case Note Templates</CardTitle>
+              <CardDescription>Create and manage reusable templates for case notes</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">Case note templates functionality coming soon.</p>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="case-status-codes" className="space-y-6">
