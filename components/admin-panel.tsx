@@ -19,6 +19,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { generateTodosFromTemplates, type ParsedTodo } from "@/lib/todo-parser"
 import { TodoTemplateBuilder, TodoTemplateHelp } from "@/components/todo-template-builder"
 import { LetterTemplateManager } from "@/components/letter-template-manager"
+import { CaseNoteTemplateManager } from "@/components/case-note-template-manager"
 import {
   Dialog,
   DialogContent,
@@ -397,15 +398,12 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
         </TabsContent>
 
         <TabsContent value="case-note-templates" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Case Note Templates</CardTitle>
-              <CardDescription>Create and manage reusable templates for case notes</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Case note templates functionality coming soon.</p>
-            </CardContent>
-          </Card>
+          <CaseNoteTemplateManager
+            templates={codes.caseNoteTemplates}
+            onAdd={(template) => addCode("caseNoteTemplates", template)}
+            onUpdate={(id, updates) => updateCode("caseNoteTemplates", id, updates)}
+            onDelete={(id) => deleteCode("caseNoteTemplates", id)}
+          />
         </TabsContent>
 
         <TabsContent value="case-status-codes" className="space-y-6">
