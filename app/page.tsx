@@ -175,6 +175,9 @@ export default function Page() {
                     <DropdownMenuItem onClick={() => openAdminSection("letter-templates")}>
                       Letter Templates
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openAdminSection("case-note-templates")}>
+                      Case Note Templates
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => openAdminSection("case-status-codes")}>
                       Case Status Codes
                     </DropdownMenuItem>
