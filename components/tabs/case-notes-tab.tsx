@@ -54,6 +54,7 @@ export function CaseNotesTab() {
   const [noteDate, setNoteDate] = useState(() => new Date().toISOString().split("T")[0])
   const [activity, setActivity] = useState("")
   const [content, setContent] = useState("")
+  const [selectedTemplate, setSelectedTemplate] = useState("")
   const [validationError, setValidationError] = useState<string>("")
 
   const isAdmin = currentUser?.role === "admin"
@@ -874,7 +875,7 @@ export function CaseNotesTab() {
             </Alert>
           )}
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-4 gap-3">
             <div className="space-y-1">
               <Label htmlFor="note-date" className="text-xs">
                 Note Date
@@ -920,6 +921,34 @@ export function CaseNotesTab() {
               <div className="bg-muted/50 rounded-md px-3 py-1.5 text-sm h-8 flex items-center">
                 {currentCase?.caseManager || "Auto-assigned"}
               </div>
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="case-note-template" className="text-xs">
+                Case Note Template
+              </Label>
+              <Select
+                value={selectedTemplate}
+                onValueChange={(value) => {
+                  setSelectedTemplate(value)
+                  const template = codes.caseNoteTemplates.find((t) => t.code === value)
+                  if (template?.content) {
+                    setContent(template.content)
+                  }
+                }}
+              >
+                <SelectTrigger id="case-note-template" className="bg-background h-8 text-sm">
+                  <SelectValue placeholder="Select template..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {codes.caseNoteTemplates
+                    .filter((template) => template.active)
+                    .map((template) => (
+                      <SelectItem key={template.id} value={template.code}>
+                        {template.name || template.code}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

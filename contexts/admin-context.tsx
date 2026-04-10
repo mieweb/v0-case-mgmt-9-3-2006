@@ -26,6 +26,7 @@ export interface CaseManager {
 
 interface CodeTables {
   letterTemplates: Code[]
+  caseNoteTemplates: Code[]
   caseStatus: Code[]
   caseCategory: Code[]
   caseClosureReason: Code[]
@@ -210,6 +211,32 @@ You have the right to appeal this decision within 30 days. Please contact {{case
 
 Sincerely,
 Case Management Team`,
+    },
+  ],
+  caseNoteTemplates: [
+    {
+      id: "1",
+      code: "initial-call",
+      name: "Initial Call",
+      description: "Template for initial call documentation",
+      active: true,
+      content: `Initial call with employee. Discussed claim details and next steps. Employee confirmed understanding of process.`,
+    },
+    {
+      id: "2",
+      code: "follow-up",
+      name: "Follow-up Call",
+      description: "Template for follow-up call documentation",
+      active: true,
+      content: `Follow-up call with employee. Reviewed current status and any changes to condition. No new concerns reported.`,
+    },
+    {
+      id: "3",
+      code: "medical-update",
+      name: "Medical Update",
+      description: "Template for medical update documentation",
+      active: true,
+      content: `Received medical update from provider. Reviewed documentation and updated case file accordingly.`,
     },
   ],
   caseStatus: [
