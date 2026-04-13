@@ -1,17 +1,29 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { useCases } from "@/contexts/cases-context"
 import { useAdmin } from "@/contexts/admin-context"
+import { useUser } from "@/contexts/user-context"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Download, CheckCircle2, Circle, AlertCircle, Printer, CheckSquare, Square, Edit2, Trash2, X } from "lucide-react"
+import { ArrowLeft, Download, CheckCircle2, Circle, AlertCircle, Printer, CheckSquare, Square, Edit2, Trash2, X, Bookmark, BookmarkCheck } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
+interface SavedSearch {
+  id: string
+  name: string
+  searchTerm: string
+  filterStatus: string
+  filterCaseManager: string
+  filterCaseType: string
+  userId: string
+  createdAt: string
+}
 
 interface TodoBacklogProps {
   onBack: () => void
@@ -21,6 +33,7 @@ interface TodoBacklogProps {
 export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
   const { cases, setCurrentCase } = useCases()
   const { getCaseType, caseManagers: adminCaseManagers, caseTypes: adminCaseTypes, codes } = useAdmin()
+  const { currentUser } = useUser()
   const [filterStatus, setFilterStatus] = useState<string>("all")
   const [filterCaseManager, setFilterCaseManager] = useState<string>("all")
   const [filterCaseType, setFilterCaseType] = useState<string>("all")
@@ -30,6 +43,93 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
   const [bulkEditMode, setBulkEditMode] = useState(false)
   const [bulkCaseManager, setBulkCaseManager] = useState<string>("")
   const [bulkCompleted, setBulkCompleted] = useState<string>("")
+  const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([])
+  const [activeSavedSearch, setActiveSavedSearch] = useState<string | null>(null)
+  const [showSaveDialog, setShowSaveDialog] = useState(false)
+  const [newSearchName, setNewSearchName] = useState("")
+
+  // Load saved searches from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("todoBacklogSavedSearches")
+    if (stored) {
+      try {
+        const allSearches: SavedSearch[] = JSON.parse(stored)
+        // Filter to only show current user's saved searches
+        const userSearches = allSearches.filter((s) => s.userId === currentUser?.id)
+        setSavedSearches(userSearches)
+      } catch (e) {
+        console.error("Failed to load saved searches:", e)
+      }
+    }
+  }, [currentUser?.id])
+
+  // Save a new search
+  const saveCurrentSearch = () => {
+    if (!newSearchName.trim() || !currentUser?.id) return
+
+    const newSearch: SavedSearch = {
+      id: `search-${Date.now()}`,
+      name: newSearchName.trim(),
+      searchTerm,
+      filterStatus,
+      filterCaseManager,
+      filterCaseType,
+      userId: currentUser.id,
+      createdAt: new Date().toISOString(),
+    }
+
+    // Get all searches from localStorage (including other users)
+    const stored = localStorage.getItem("todoBacklogSavedSearches")
+    const allSearches: SavedSearch[] = stored ? JSON.parse(stored) : []
+    
+    // Add new search
+    allSearches.push(newSearch)
+    localStorage.setItem("todoBacklogSavedSearches", JSON.stringify(allSearches))
+
+    // Update local state with user's searches
+    setSavedSearches((prev) => [...prev, newSearch])
+    setNewSearchName("")
+    setShowSaveDialog(false)
+  }
+
+  // Apply a saved search
+  const applySavedSearch = (search: SavedSearch) => {
+    if (activeSavedSearch === search.id) {
+      // Toggle off - reset filters
+      setSearchTerm("")
+      setFilterStatus("all")
+      setFilterCaseManager("all")
+      setFilterCaseType("all")
+      setActiveSavedSearch(null)
+    } else {
+      setSearchTerm(search.searchTerm)
+      setFilterStatus(search.filterStatus)
+      setFilterCaseManager(search.filterCaseManager)
+      setFilterCaseType(search.filterCaseType)
+      setFilterDraftLetters(false) // Clear draft letters filter when applying saved search
+      setActiveSavedSearch(search.id)
+    }
+  }
+
+  // Delete a saved search
+  const deleteSavedSearch = (searchId: string) => {
+    // Get all searches from localStorage
+    const stored = localStorage.getItem("todoBacklogSavedSearches")
+    const allSearches: SavedSearch[] = stored ? JSON.parse(stored) : []
+    
+    // Remove the search
+    const updated = allSearches.filter((s) => s.id !== searchId)
+    localStorage.setItem("todoBacklogSavedSearches", JSON.stringify(updated))
+
+    // Update local state
+    setSavedSearches((prev) => prev.filter((s) => s.id !== searchId))
+    if (activeSavedSearch === searchId) {
+      setActiveSavedSearch(null)
+    }
+  }
+
+  // Check if current filters match any criteria worth saving
+  const hasActiveFilters = searchTerm || filterStatus !== "all" || filterCaseManager !== "all" || filterCaseType !== "all"
 
   // Collect all todos from all cases
   const allTodos = useMemo(() => {
@@ -505,6 +605,35 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
         </Card>
       </div>
 
+      {/* Saved Searches - Only visible to the user who created them */}
+      {savedSearches.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm text-muted-foreground">My Saved Searches:</span>
+          {savedSearches.map((search) => (
+            <div key={search.id} className="flex items-center gap-1">
+              <Button
+                variant={activeSavedSearch === search.id ? "default" : "outline"}
+                size="sm"
+                className={`h-8 ${activeSavedSearch === search.id ? "bg-purple-600 hover:bg-purple-700" : "hover:border-purple-400"}`}
+                onClick={() => applySavedSearch(search)}
+              >
+                <BookmarkCheck className="h-3.5 w-3.5 mr-1.5" />
+                {search.name}
+                {activeSavedSearch === search.id && <span className="ml-1.5 text-xs">(active)</span>}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                onClick={() => deleteSavedSearch(search.id)}
+              >
+                <X className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Bulk Edit Toolbar */}
       {someSelected && (
         <Card className="border-primary">
@@ -653,6 +782,50 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
                 </SelectContent>
               </Select>
             </div>
+            {/* Save Search Button */}
+            {hasActiveFilters && !showSaveDialog && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9"
+                onClick={() => setShowSaveDialog(true)}
+              >
+                <Bookmark className="h-4 w-4 mr-2" />
+                Save Search
+              </Button>
+            )}
+            {showSaveDialog && (
+              <div className="flex items-center gap-2">
+                <Input
+                  placeholder="Enter search name..."
+                  value={newSearchName}
+                  onChange={(e) => setNewSearchName(e.target.value)}
+                  className="w-[180px] h-9"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") saveCurrentSearch()
+                    if (e.key === "Escape") {
+                      setShowSaveDialog(false)
+                      setNewSearchName("")
+                    }
+                  }}
+                  autoFocus
+                />
+                <Button size="sm" className="h-9" onClick={saveCurrentSearch} disabled={!newSearchName.trim()}>
+                  Save
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-9"
+                  onClick={() => {
+                    setShowSaveDialog(false)
+                    setNewSearchName("")
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            )}
             <div className="ml-auto text-sm text-muted-foreground">
               Showing {filteredTodos.length} of {allTodos.length} todos
             </div>
