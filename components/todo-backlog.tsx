@@ -24,6 +24,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
   const [filterStatus, setFilterStatus] = useState<string>("all")
   const [filterCaseManager, setFilterCaseManager] = useState<string>("all")
   const [filterCaseType, setFilterCaseType] = useState<string>("all")
+  const [filterDraftLetters, setFilterDraftLetters] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedTodos, setSelectedTodos] = useState<Set<string>>(new Set())
   const [bulkEditMode, setBulkEditMode] = useState(false)
@@ -125,6 +126,13 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
         return false
       }
 
+      // Draft letter filter
+      if (filterDraftLetters) {
+        if (!item.todo.activity.toLowerCase().includes("complete draft letter")) {
+          return false
+        }
+      }
+
       // Search filter
       if (searchTerm) {
         const search = searchTerm.toLowerCase()
@@ -139,7 +147,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
 
       return true
     })
-  }, [allTodos, filterStatus, filterCaseManager, filterCaseType, searchTerm])
+  }, [allTodos, filterStatus, filterCaseManager, filterCaseType, filterDraftLetters, searchTerm])
 
   // Stats
   const stats = useMemo(() => {
@@ -153,8 +161,11 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
       if (t.todo.completed || !t.todo.dateScheduled) return false
       return new Date(t.todo.dateScheduled) < today
     }).length
+    const draftLetters = allTodos.filter((t) => 
+      !t.todo.completed && t.todo.activity.toLowerCase().includes("complete draft letter")
+    ).length
 
-    return { total, completed, active, overdue }
+    return { total, completed, active, overdue, draftLetters }
   }, [allTodos])
 
   const handleViewCase = (caseNumber: string) => {
@@ -455,7 +466,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <Card>
           <CardHeader className="py-3">
             <CardDescription>Total</CardDescription>
@@ -478,6 +489,18 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
           <CardHeader className="py-3">
             <CardDescription>Overdue</CardDescription>
             <CardTitle className="text-2xl text-red-600">{stats.overdue}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card 
+          className={`cursor-pointer transition-colors hover:border-orange-400 ${filterDraftLetters ? "border-orange-500 bg-orange-50 dark:bg-orange-950/20" : ""}`}
+          onClick={() => setFilterDraftLetters(!filterDraftLetters)}
+        >
+          <CardHeader className="py-3">
+            <CardDescription className="flex items-center justify-between">
+              Draft Letters
+              {filterDraftLetters && <span className="text-xs text-orange-600">(filtered)</span>}
+            </CardDescription>
+            <CardTitle className="text-2xl text-orange-600">{stats.draftLetters}</CardTitle>
           </CardHeader>
         </Card>
       </div>
