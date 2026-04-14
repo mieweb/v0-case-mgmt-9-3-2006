@@ -762,7 +762,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
                 onClick={() => setShowSaveDialog(true)}
               >
                 <Bookmark className="h-4 w-4 mr-2" />
-                Save Search
+                Bookmark Search
               </Button>
             )}
             {showSaveDialog && (
