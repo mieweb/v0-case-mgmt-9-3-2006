@@ -603,37 +603,6 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
             <CardTitle className="text-2xl text-orange-600">{stats.draftLetters}</CardTitle>
           </CardHeader>
         </Card>
-        {/* Saved Searches - Only visible to the user who created them */}
-        {savedSearches.map((search) => (
-          <Card
-            key={search.id}
-            className={`min-w-[120px] cursor-pointer transition-colors hover:border-purple-400 ${activeSavedSearch === search.id ? "border-purple-500 bg-purple-50 dark:bg-purple-950/20" : ""}`}
-            onClick={() => applySavedSearch(search)}
-          >
-            <CardHeader className="py-3">
-              <CardDescription className="flex items-center justify-between">
-                <span className="flex items-center gap-1">
-                  <BookmarkCheck className="h-3.5 w-3.5" />
-                  {search.name}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-5 w-5 p-0 text-muted-foreground hover:text-destructive"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    deleteSavedSearch(search.id)
-                  }}
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </CardDescription>
-              <CardTitle className="text-sm text-purple-600">
-                {activeSavedSearch === search.id ? "(active)" : "Saved Search"}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-        ))}
       </div>
 
       {/* Bulk Edit Toolbar */}
@@ -826,6 +795,33 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
                 >
                   Cancel
                 </Button>
+              </div>
+            )}
+            {/* Saved Searches - Only visible to the user who created them */}
+            {savedSearches.length > 0 && (
+              <div className="flex items-center gap-2">
+                {savedSearches.map((search) => (
+                  <div key={search.id} className="flex items-center">
+                    <Button
+                      variant={activeSavedSearch === search.id ? "default" : "outline"}
+                      size="sm"
+                      className={`h-9 ${activeSavedSearch === search.id ? "bg-purple-600 hover:bg-purple-700" : "hover:border-purple-400"}`}
+                      onClick={() => applySavedSearch(search)}
+                    >
+                      <BookmarkCheck className="h-4 w-4 mr-1.5" />
+                      {search.name}
+                      {activeSavedSearch === search.id && <span className="ml-1.5 text-xs">(active)</span>}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-9 w-9 p-0 ml-1 text-muted-foreground hover:text-destructive"
+                      onClick={() => deleteSavedSearch(search.id)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
               </div>
             )}
             <div className="ml-auto text-sm text-muted-foreground">
