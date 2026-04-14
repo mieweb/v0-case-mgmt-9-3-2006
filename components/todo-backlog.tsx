@@ -659,8 +659,8 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
       {/* Bookmarked Searches Banner - Only visible to the user who created them */}
       {savedSearches.length > 0 && (
         <Card className="border-purple-200 bg-purple-50/50 dark:bg-purple-950/10 dark:border-purple-900">
-          <CardContent className="py-3">
-            <div className="flex flex-wrap items-center gap-3">
+          <CardContent className="py-2 px-4">
+            <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-2 text-purple-700 dark:text-purple-400">
                 <Bookmark className="h-4 w-4" />
                 <span className="text-sm font-medium">Bookmarked Searches:</span>
