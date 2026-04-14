@@ -800,6 +800,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
             {/* Saved Searches - Only visible to the user who created them */}
             {savedSearches.length > 0 && (
               <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Saved Search:</span>
                 {savedSearches.map((search) => (
                   <div key={search.id} className="flex items-center">
                     <Button
