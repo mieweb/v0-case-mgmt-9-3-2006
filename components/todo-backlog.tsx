@@ -23,6 +23,7 @@ interface SavedSearch {
   filterCaseType: string
   userId: string
   createdAt: string
+  resultCount?: number
 }
 
 interface TodoBacklogProps {
@@ -130,6 +131,56 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
 
   // Check if current filters match any criteria worth saving
   const hasActiveFilters = searchTerm || filterStatus !== "all" || filterCaseManager !== "all" || filterCaseType !== "all"
+
+  // Calculate result count for a saved search
+  const getSearchResultCount = (search: SavedSearch): number => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    return allTodos.filter((item) => {
+      // Status filter
+      if (search.filterStatus !== "all") {
+        const isOverdue = !item.todo.completed && item.todo.dateScheduled && new Date(item.todo.dateScheduled) < today
+        
+        if (search.filterStatus === "active" && item.todo.completed) return false
+        if (search.filterStatus === "comp" && !item.todo.completed) return false
+        if (search.filterStatus === "over") {
+          if (item.todo.completed) return false
+          if (!isOverdue) return false
+        }
+        if (search.filterStatus === "open" && item.todo.completed) return false
+        if (search.filterStatus === "closed" && !item.todo.completed) return false
+        if (search.filterStatus === "pend" && item.todo.completed) return false
+        if (search.filterStatus === "reopen" && item.todo.completed) return false
+      }
+
+      // Case manager filter
+      if (search.filterCaseManager !== "all") {
+        if (item.todo.caseManager !== search.filterCaseManager && item.caseCaseManager !== search.filterCaseManager) {
+          return false
+        }
+      }
+
+      // Case type filter
+      if (search.filterCaseType !== "all" && item.caseType !== search.filterCaseType) {
+        return false
+      }
+
+      // Search filter
+      if (search.searchTerm) {
+        const searchLower = search.searchTerm.toLowerCase()
+        if (
+          !item.todo.activity.toLowerCase().includes(searchLower) &&
+          !item.employeeName.toLowerCase().includes(searchLower) &&
+          !item.caseNumber.toLowerCase().includes(searchLower)
+        ) {
+          return false
+        }
+      }
+
+      return true
+    }).length
+  }
 
   // Collect all todos from all cases
   const allTodos = useMemo(() => {
@@ -605,6 +656,45 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
         </Card>
       </div>
 
+      {/* Bookmarked Searches Banner - Only visible to the user who created them */}
+      {savedSearches.length > 0 && (
+        <Card className="border-purple-200 bg-purple-50/50 dark:bg-purple-950/10 dark:border-purple-900">
+          <CardContent className="py-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 text-purple-700 dark:text-purple-400">
+                <Bookmark className="h-4 w-4" />
+                <span className="text-sm font-medium">Bookmarked Searches:</span>
+              </div>
+              {savedSearches.map((search) => (
+                <div key={search.id} className="flex items-center">
+                  <Button
+                    variant={activeSavedSearch === search.id ? "default" : "outline"}
+                    size="sm"
+                    className={`h-8 ${activeSavedSearch === search.id ? "bg-purple-600 hover:bg-purple-700" : "border-purple-300 hover:border-purple-500 hover:bg-purple-100 dark:hover:bg-purple-900/30"}`}
+                    onClick={() => applySavedSearch(search)}
+                  >
+                    <BookmarkCheck className="h-3.5 w-3.5 mr-1.5" />
+                    {search.name}
+                    <Badge variant="secondary" className="ml-2 h-5 px-1.5 text-xs bg-purple-200 text-purple-800 dark:bg-purple-800 dark:text-purple-200">
+                      {getSearchResultCount(search)}
+                    </Badge>
+                    {activeSavedSearch === search.id && <span className="ml-1.5 text-xs">(active)</span>}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 ml-1 text-muted-foreground hover:text-destructive"
+                    onClick={() => deleteSavedSearch(search.id)}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Bulk Edit Toolbar */}
       {someSelected && (
         <Card className="border-primary">
@@ -795,34 +885,6 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
                 >
                   Cancel
                 </Button>
-              </div>
-            )}
-            {/* Saved Searches - Only visible to the user who created them */}
-            {savedSearches.length > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Saved Search:</span>
-                {savedSearches.map((search) => (
-                  <div key={search.id} className="flex items-center">
-                    <Button
-                      variant={activeSavedSearch === search.id ? "default" : "outline"}
-                      size="sm"
-                      className={`h-9 ${activeSavedSearch === search.id ? "bg-purple-600 hover:bg-purple-700" : "hover:border-purple-400"}`}
-                      onClick={() => applySavedSearch(search)}
-                    >
-                      <BookmarkCheck className="h-4 w-4 mr-1.5" />
-                      {search.name}
-                      {activeSavedSearch === search.id && <span className="ml-1.5 text-xs">(active)</span>}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-9 w-9 p-0 ml-1 text-muted-foreground hover:text-destructive"
-                      onClick={() => deleteSavedSearch(search.id)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
               </div>
             )}
             <div className="ml-auto text-sm text-muted-foreground">
