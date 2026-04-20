@@ -10,10 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { CaseTab } from "@/components/tabs/case-tab"
-import { ContactTab } from "@/components/tabs/contact-tab"
 import { AbsenceRestrictionsTab } from "@/components/tabs/absence-restrictions-tab"
 import { DiagnosisTab } from "@/components/tabs/diagnosis-tab"
-import { TodosTab } from "@/components/tabs/todos-tab"
 import { CaseNotesTab } from "@/components/tabs/case-notes-tab"
 import { LettersTab } from "@/components/tabs/letters-tab"
 import { DocumentsTab } from "@/components/tabs/documents-tab"
@@ -25,14 +23,12 @@ import { Button } from "@/components/ui/button"
 import { NoteWindow, MinimizedNoteWindow } from "@/components/note-window"
 import { RichTextEditor } from "@/components/rich-text-editor"
 
-const TAB_ORDER = ["case", "contact", "absence-restrictions", "diagnosis", "todos", "case-notes", "letters", "documents", "activity"]
+const TAB_ORDER = ["case", "absence-restrictions", "diagnosis", "case-notes", "letters", "documents", "activity"]
 
 const TAB_LABELS: Record<string, string> = {
   "case": "Case",
-  "contact": "Contact", 
   "absence-restrictions": "Absence & Restrictions",
   "diagnosis": "Diagnosis",
-  "todos": "To-Dos",
   "case-notes": "Case Notes",
   "letters": "Letters",
   "documents": "Documents",
@@ -444,12 +440,7 @@ export function CaseManager() {
             >
               Case
             </TabsTrigger>
-            <TabsTrigger
-              value="contact"
-              className="rounded-t-lg rounded-b-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2.5 font-medium"
-            >
-              Contact
-            </TabsTrigger>
+
             <TabsTrigger
               value="absence-restrictions"
               className="rounded-t-lg rounded-b-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2.5 font-medium"
@@ -462,12 +453,7 @@ export function CaseManager() {
             >
               Diagnosis
             </TabsTrigger>
-            <TabsTrigger
-              value="todos"
-              className="rounded-t-lg rounded-b-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2.5 font-medium"
-            >
-              To-Dos
-            </TabsTrigger>
+
             <TabsTrigger
               value="case-notes"
               className="rounded-t-lg rounded-b-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2.5 font-medium"
@@ -499,10 +485,7 @@ export function CaseManager() {
               <CaseTab />
               <TabNavigation currentTab="case" onTabChange={setActiveTab} />
             </TabsContent>
-            <TabsContent value="contact" className="m-0">
-              <ContactTab />
-              <TabNavigation currentTab="contact" onTabChange={setActiveTab} />
-            </TabsContent>
+
             <TabsContent value="absence-restrictions" className="m-0">
               <AbsenceRestrictionsTab />
               <TabNavigation currentTab="absence-restrictions" onTabChange={setActiveTab} />
@@ -511,10 +494,7 @@ export function CaseManager() {
               <DiagnosisTab />
               <TabNavigation currentTab="diagnosis" onTabChange={setActiveTab} />
             </TabsContent>
-            <TabsContent value="todos" className="m-0">
-              <TodosTab />
-              <TabNavigation currentTab="todos" onTabChange={setActiveTab} />
-            </TabsContent>
+
             <TabsContent value="case-notes" className="m-0">
               <CaseNotesTab />
               <TabNavigation currentTab="case-notes" onTabChange={setActiveTab} />
