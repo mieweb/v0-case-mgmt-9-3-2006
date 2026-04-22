@@ -540,9 +540,6 @@ export function CaseTab() {
               }}
             />
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="case-manager" className="text-sm text-muted-foreground">
               Case manager
