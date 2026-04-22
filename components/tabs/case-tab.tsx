@@ -572,7 +572,7 @@ export function CaseTab() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="adjuster" className="text-sm text-muted-foreground">
-              Adjuster (CB adjuster)
+              Adjuster
             </Label>
             <Select
               value={adjuster}
