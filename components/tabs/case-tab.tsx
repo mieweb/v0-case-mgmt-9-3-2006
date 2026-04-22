@@ -22,7 +22,7 @@ import { useEmployees } from "@/contexts/employees-context"
 import { generateTodosFromTemplates } from "@/lib/todo-parser"
 import { useState, useEffect } from "react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Briefcase, MapPin, FileText, Stethoscope, Shield, Activity, Info, FolderOpen, Calendar, Baby, Clock, BarChart3, DollarSign, HardHat, RotateCcw } from "lucide-react"
+import { AlertCircle, Briefcase, MapPin, FileText, Stethoscope, Shield, Activity, Info, FolderOpen, Calendar, Baby, Clock, BarChart3, DollarSign, HardHat } from "lucide-react"
 import { CollapsibleSection } from "@/components/ui/collapsible-section"
 
 const adjusterData: Record<string, { name: string; phone: string; email: string }> = {
@@ -841,6 +841,36 @@ export function CaseTab() {
               </SelectContent>
             </Select>
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="expected-return" className="text-sm text-muted-foreground">
+              Expected return date
+            </Label>
+            <Input
+              id="expected-return"
+              type="date"
+              className="bg-background"
+              value={expectedReturnDate}
+              onChange={(e) => {
+                setExpectedReturnDate(e.target.value)
+                handleFieldUpdate("expectedReturnDate", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="actual-return" className="text-sm text-muted-foreground">
+              Actual return date
+            </Label>
+            <Input
+              id="actual-return"
+              type="date"
+              className="bg-background"
+              value={actualReturnDate}
+              onChange={(e) => {
+                setActualReturnDate(e.target.value)
+                handleFieldUpdate("actualReturnDate", e.target.value)
+              }}
+            />
+          </div>
         </div>
       </CollapsibleSection>
 
@@ -968,40 +998,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Return to Work" icon={<RotateCcw className="h-4 w-4" />} defaultOpen={true}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="expected-return" className="text-sm text-muted-foreground">
-              Expected return date
-            </Label>
-            <Input
-              id="expected-return"
-              type="date"
-              className="bg-background"
-              value={expectedReturnDate}
-              onChange={(e) => {
-                setExpectedReturnDate(e.target.value)
-                handleFieldUpdate("expectedReturnDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="actual-return" className="text-sm text-muted-foreground">
-              Actual return date
-            </Label>
-            <Input
-              id="actual-return"
-              type="date"
-              className="bg-background"
-              value={actualReturnDate}
-              onChange={(e) => {
-                setActualReturnDate(e.target.value)
-                handleFieldUpdate("actualReturnDate", e.target.value)
-              }}
-            />
-          </div>
-        </div>
-      </CollapsibleSection>
+      
 
       <CollapsibleSection title="Work Status Metrics" icon={<BarChart3 className="h-4 w-4" />} defaultOpen={true}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
