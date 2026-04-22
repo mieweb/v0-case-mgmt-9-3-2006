@@ -818,7 +818,7 @@ export function CaseTab() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="closure-reason" className="text-sm text-muted-foreground">
-              Closure reason
+              Plan name
             </Label>
             <Select
               value={closureReason}
