@@ -506,7 +506,7 @@ export function CaseNotesTab() {
           </div>
           <Button size="sm" onClick={handleCreateNote}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Note
+            Add Case Note
           </Button>
         </div>
       </div>
