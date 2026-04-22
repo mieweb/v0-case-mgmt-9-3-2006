@@ -604,6 +604,104 @@ export function CaseTab() {
             </Button>
           </div>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="adjuster" className="text-sm text-muted-foreground">
+              Adjuster (CB adjuster)
+            </Label>
+            <Select
+              value={adjuster}
+              onValueChange={(val) => {
+                setAdjuster(val)
+                const adjInfo = adjusterData[val]
+                if (adjInfo) {
+                  handleFieldUpdate("adjuster", val)
+                  handleFieldUpdate("adjusterPhone", adjInfo.phone)
+                  handleFieldUpdate("adjusterEmail", adjInfo.email)
+                } else {
+                  handleFieldUpdate("adjuster", val)
+                }
+              }}
+            >
+              <SelectTrigger id="adjuster" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALLENA">Ashley Allen</SelectItem>
+                <SelectItem value="ANDERSONR">Randolph Anderson</SelectItem>
+                <SelectItem value="BADALI">Derek Badali</SelectItem>
+                <SelectItem value="BENTLEY">Shuntrea Bentley</SelectItem>
+                <SelectItem value="BLUM">Michael Blum</SelectItem>
+                <SelectItem value="CAHILL">Erin Cahill</SelectItem>
+                <SelectItem value="CHINND">Donna Chinn</SelectItem>
+                <SelectItem value="CONNORD">Danielle Connor</SelectItem>
+                <SelectItem value="COPELANDC">Christie Copeland</SelectItem>
+                <SelectItem value="CRAWFORDT">Thellene Crawford</SelectItem>
+                <SelectItem value="CRUZT">Toni Cruz</SelectItem>
+                <SelectItem value="DROUARET">Tyler Drouare</SelectItem>
+                <SelectItem value="FOXC">Carol Fox</SelectItem>
+                <SelectItem value="GASTONC">Cristal Gaston</SelectItem>
+                <SelectItem value="GROTANS">Sandi Grotans</SelectItem>
+                <SelectItem value="HANDLEY">Deanna Handley</SelectItem>
+                <SelectItem value="JONESSANDY">Sandy Jones</SelectItem>
+                <SelectItem value="JONEST">Tellie Jones</SelectItem>
+                <SelectItem value="MALONE">Shemaya Malone</SelectItem>
+                <SelectItem value="MCDONALDA">Alexsis McDonald</SelectItem>
+                <SelectItem value="MCQUADE">Jennifer McQuade</SelectItem>
+                <SelectItem value="MELENDEZ">Tracy Melendez</SelectItem>
+                <SelectItem value="MORGANS">Susan Morgan</SelectItem>
+                <SelectItem value="MURPHY">Melanie Murphy</SelectItem>
+                <SelectItem value="NABORSS">Stephanie Nabors</SelectItem>
+                <SelectItem value="NEWTONM">Michelle Newton</SelectItem>
+                <SelectItem value="NORRIS">Andrew Norris</SelectItem>
+                <SelectItem value="OSBORNEL">Leslie Osborne</SelectItem>
+                <SelectItem value="OTERO">Jessie Otero</SelectItem>
+                <SelectItem value="PIKEB">Brittany Pike</SelectItem>
+                <SelectItem value="PRESLEYK">Karen Presley</SelectItem>
+                <SelectItem value="PROVENCHER">Karen Provencher</SelectItem>
+                <SelectItem value="RAINSA">April Rains</SelectItem>
+                <SelectItem value="SANCHEZJ">Jessica Sanchez</SelectItem>
+                <SelectItem value="SPANGLERB">Beth Spangler</SelectItem>
+                <SelectItem value="SPEAKER">Katrina Sepaker</SelectItem>
+                <SelectItem value="TAYLORH">Heather Taylor</SelectItem>
+                <SelectItem value="TURK">Maureen Turk</SelectItem>
+                <SelectItem value="VELEZM">Mayra Velez</SelectItem>
+                <SelectItem value="WADOODA">Aneesa Wadood</SelectItem>
+                <SelectItem value="WATSONA">Amy Watson</SelectItem>
+                <SelectItem value="WATSONL">Lisa Watson</SelectItem>
+                <SelectItem value="WHIPPLEV">Victoria Whipple</SelectItem>
+                <SelectItem value="WROBLAKH">Holly Wroblak</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="adjuster-phone" className="text-sm text-muted-foreground">
+              Adjuster Phone
+            </Label>
+            <Input
+              id="adjuster-phone"
+              type="tel"
+              className="bg-background w-40"
+              value={currentCase?.adjusterPhone || ""}
+              onChange={(e) => handleFieldUpdate("adjusterPhone", e.target.value)}
+              placeholder="(555) 123-4567"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="adjuster-email" className="text-sm text-muted-foreground">
+              Adjuster Email
+            </Label>
+            <Input
+              id="adjuster-email"
+              type="email"
+              className="bg-background w-56"
+              value={currentCase?.adjusterEmail || ""}
+              onChange={(e) => handleFieldUpdate("adjusterEmail", e.target.value)}
+              placeholder="adjuster@example.com"
+            />
+          </div>
+        </div>
       </CollapsibleSection>
 
       <CollapsibleSection title="Case Dates" icon={<Calendar className="h-4 w-4" />} defaultOpen={true}>
@@ -816,102 +914,7 @@ export function CaseTab() {
             />
           </div>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="adjuster" className="text-sm text-muted-foreground">
-            Adjuster (GB adjuster)
-          </Label>
-          <Select
-            value={adjuster}
-            onValueChange={(val) => {
-              setAdjuster(val)
-              const adjInfo = adjusterData[val]
-              if (adjInfo) {
-                handleFieldUpdate("adjuster", val)
-                handleFieldUpdate("adjusterPhone", adjInfo.phone)
-                handleFieldUpdate("adjusterEmail", adjInfo.email)
-              } else {
-                handleFieldUpdate("adjuster", val)
-              }
-            }}
-          >
-            <SelectTrigger id="adjuster" className="bg-background w-full md:w-1/2">
-              <SelectValue placeholder="Select..." />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALLENA">Ashley Allen</SelectItem>
-              <SelectItem value="ANDERSONR">Randolph Anderson</SelectItem>
-              <SelectItem value="BADALI">Derek Badali</SelectItem>
-              <SelectItem value="BENTLEY">Shuntrea Bentley</SelectItem>
-              <SelectItem value="BLUM">Michael Blum</SelectItem>
-              <SelectItem value="CAHILL">Erin Cahill</SelectItem>
-              <SelectItem value="CHINND">Donna Chinn</SelectItem>
-              <SelectItem value="CONNORD">Danielle Connor</SelectItem>
-              <SelectItem value="COPELANDC">Christie Copeland</SelectItem>
-              <SelectItem value="CRAWFORDT">Thellene Crawford</SelectItem>
-              <SelectItem value="CRUZT">Toni Cruz</SelectItem>
-              <SelectItem value="DROUARET">Tyler Drouare</SelectItem>
-              <SelectItem value="FOXC">Carol Fox</SelectItem>
-              <SelectItem value="GASTONC">Cristal Gaston</SelectItem>
-              <SelectItem value="GROTANS">Sandi Grotans</SelectItem>
-              <SelectItem value="HANDLEY">Deanna Handley</SelectItem>
-              <SelectItem value="JONESSANDY">Sandy Jones</SelectItem>
-              <SelectItem value="JONEST">Tellie Jones</SelectItem>
-              <SelectItem value="MALONE">Shemaya Malone</SelectItem>
-              <SelectItem value="MCDONALDA">Alexsis McDonald</SelectItem>
-              <SelectItem value="MCQUADE">Jennifer McQuade</SelectItem>
-              <SelectItem value="MELENDEZ">Tracy Melendez</SelectItem>
-              <SelectItem value="MORGANS">Susan Morgan</SelectItem>
-              <SelectItem value="MURPHY">Melanie Murphy</SelectItem>
-              <SelectItem value="NABORSS">Stephanie Nabors</SelectItem>
-              <SelectItem value="NEWTONM">Michelle Newton</SelectItem>
-              <SelectItem value="NORRIS">Andrew Norris</SelectItem>
-              <SelectItem value="OSBORNEL">Leslie Osborne</SelectItem>
-              <SelectItem value="OTERO">Jessie Otero</SelectItem>
-              <SelectItem value="PIKEB">Brittany Pike</SelectItem>
-              <SelectItem value="PRESLEYK">Karen Presley</SelectItem>
-              <SelectItem value="PROVENCHER">Karen Provencher</SelectItem>
-              <SelectItem value="RAINSA">April Rains</SelectItem>
-              <SelectItem value="SANCHEZJ">Jessica Sanchez</SelectItem>
-              <SelectItem value="SPANGLERB">Beth Spangler</SelectItem>
-              <SelectItem value="SPEAKER">Katrina Sepaker</SelectItem>
-              <SelectItem value="TAYLORH">Heather Taylor</SelectItem>
-              <SelectItem value="TURK">Maureen Turk</SelectItem>
-              <SelectItem value="VELEZM">Mayra Velez</SelectItem>
-              <SelectItem value="WADOODA">Aneesa Wadood</SelectItem>
-              <SelectItem value="WATSONA">Amy Watson</SelectItem>
-              <SelectItem value="WATSONL">Lisa Watson</SelectItem>
-              <SelectItem value="WHIPPLEV">Victoria Whipple</SelectItem>
-              <SelectItem value="WROBLAKH">Holly Wroblak</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="adjuster-phone" className="text-sm text-muted-foreground">
-            Adjuster Phone
-          </Label>
-          <Input
-            id="adjuster-phone"
-            type="tel"
-            className="bg-background"
-            value={currentCase?.adjusterPhone || ""}
-            onChange={(e) => handleFieldUpdate("adjusterPhone", e.target.value)}
-            placeholder="(555) 123-4567"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="adjuster-email" className="text-sm text-muted-foreground">
-            Adjuster Email
-          </Label>
-          <Input
-            id="adjuster-email"
-            type="email"
-            className="bg-background"
-            value={currentCase?.adjusterEmail || ""}
-            onChange={(e) => handleFieldUpdate("adjusterEmail", e.target.value)}
-            placeholder="adjuster@example.com"
-          />
-        </div>
-      </CollapsibleSection>
+        </CollapsibleSection>
 
       <CollapsibleSection title="Duration of Disability Guidelines (DDG)" icon={<BarChart3 className="h-4 w-4" />} defaultOpen={true}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
