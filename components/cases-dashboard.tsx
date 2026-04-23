@@ -142,7 +142,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
     const matchesLocation =
       !showMoreFilters ||
       advancedFilters.location === "all" ||
-      caseItem.employeeLocation.toLowerCase().includes(advancedFilters.location.toLowerCase())
+      caseItem.employeeLocation === advancedFilters.location
 
     const matchesDateFrom =
       !showMoreFilters ||
