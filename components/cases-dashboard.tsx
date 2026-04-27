@@ -495,27 +495,29 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="adv-location" className="text-sm">
-                  Location
-                </Label>
-                <Select
-                  value={advancedFilters.location}
-                  onValueChange={(value) => setAdvancedFilters({ ...advancedFilters, location: value })}
-                >
-                  <SelectTrigger id="adv-location">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Locations</SelectItem>
-                    {uniqueLocations.map((location) => (
-                      <SelectItem key={location} value={location}>
-                        {location}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {(searchTerm || advancedFilters.search) && (
+                <div className="space-y-2">
+                  <Label htmlFor="adv-location" className="text-sm">
+                    Location
+                  </Label>
+                  <Select
+                    value={advancedFilters.location}
+                    onValueChange={(value) => setAdvancedFilters({ ...advancedFilters, location: value })}
+                  >
+                    <SelectTrigger id="adv-location">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Locations</SelectItem>
+                      {uniqueLocations.map((location) => (
+                        <SelectItem key={location} value={location}>
+                          {location}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="adv-date-from" className="text-sm">
