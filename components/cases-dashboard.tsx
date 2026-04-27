@@ -591,7 +591,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   onClick={() => handleSort("employeeNumber")}
                   className="flex items-center hover:text-foreground transition-colors"
                 >
-                  Employee #{renderSortIcon("employeeNumber")}
+                  Employee Number{renderSortIcon("employeeNumber")}
                 </button>
               </TableHead>
               <TableHead>
