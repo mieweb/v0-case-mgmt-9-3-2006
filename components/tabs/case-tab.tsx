@@ -967,7 +967,7 @@ export function CaseTab() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="std-start" className="text-sm text-muted-foreground">
-              STD start date
+              STD (Pay) start date
             </Label>
             <Input
               id="std-start"
