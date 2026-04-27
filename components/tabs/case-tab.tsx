@@ -1045,7 +1045,7 @@ export function CaseTab() {
                 htmlFor="hcp-contacted"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                Yes (prior to DDG expiring)
+                Yes
               </label>
             </div>
           </div>
