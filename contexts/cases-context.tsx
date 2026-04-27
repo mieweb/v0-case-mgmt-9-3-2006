@@ -18,6 +18,15 @@ export interface AbsenceEntry {
   }
 }
 
+export interface ADATrackingEntry {
+  id: string
+  date: string
+  status: "Approved" | "Denied" | "Pending" | "Review Due" | "Closed"
+  description: string
+  reviewDate?: string // One year from approval for annual review
+  notes?: string
+}
+
 export interface Restriction {
   id: string
   caseNumber: string
@@ -28,6 +37,7 @@ export interface Restriction {
   isPermanent: boolean
   isActive: boolean
   notes?: string
+  isADAAccommodation?: boolean // Flag for ADA-related restrictions
 }
 
 export interface CaseNoteVersion {
@@ -141,6 +151,10 @@ export interface Case {
   caseNotes?: CaseNote[]
   activityLog?: ActivityLogEntry[]
   contacts?: CaseContact[]
+  adaTracking?: ADATrackingEntry[]
+  lastWorkDate?: string
+  returnToWorkDate?: string
+  fileDate?: string
 }
 
 export interface TodoItem {
@@ -213,6 +227,29 @@ const initialRestrictions: Restriction[] = [
     isPermanent: false,
     isActive: true,
     notes: "Back injury recovery",
+  },
+  // ADA Accommodation Restrictions for sample ADA case
+  {
+    id: "r4-ada",
+    caseNumber: "20250901-ADA1",
+    restriction: "Modified Workstation - Ergonomic Chair and Standing Desk",
+    startDate: "2025-09-06",
+    reviewDate: "2026-09-06", // Annual review date
+    isPermanent: true,
+    isActive: true,
+    notes: "ADA Approved accommodation for chronic back condition",
+    isADAAccommodation: true,
+  },
+  {
+    id: "r5-ada",
+    caseNumber: "20250901-ADA1",
+    restriction: "Flexible Break Schedule - 10 min break every 2 hours",
+    startDate: "2025-09-06",
+    reviewDate: "2026-09-06", // Annual review date
+    isPermanent: true,
+    isActive: true,
+    notes: "ADA Approved accommodation",
+    isADAAccommodation: true,
   },
 ]
 
@@ -758,6 +795,157 @@ const initialCases: Case[] = [
         newValue: "20251024-8876",
         userName: "Kate Gilligan, BSN, RN, CCM",
         description: `Case 20251024-8876 created`,
+      },
+    ],
+  },
+  // Sample ADA Tracking Case with full history
+  {
+    caseNumber: "20250901-ADA1",
+    employeeName: "Michael Rodriguez",
+    employeeNumber: "EMP-ADA01",
+    employeeLocation: "Columbus, OH",
+    status: "Open",
+    caseType: "ADA Accommodation",
+    caseCategory: "Accommodation Request",
+    caseManager: "Arlene Rosario, CPDM",
+    created: "9/1/2025",
+    lastUpdated: "9/6/2025",
+    dateOfDisability: "2025-08-15",
+    lastWorkDate: "2025-09-01",
+    returnToWorkDate: "2025-09-05",
+    fileDate: "2025-09-06",
+    absences: [],
+    diagnoses: [],
+    contacts: [],
+    employeeClass: "Full-Time",
+    dateOfBirth: "1978-03-22",
+    address: "456 Oak Avenue, Columbus, OH 43215",
+    age: 47,
+    employmentType: "Salaried",
+    callCenter: "N/A",
+    originalHireDate: "2008-06-01",
+    adjustedServiceDate: "2008-06-01",
+    cellPhone: "(614) 555-0198",
+    gender: "Male",
+    position: "Senior Analyst",
+    entryDate: "2008-06-01",
+    emergencyContact: "Maria Rodriguez",
+    emergencyRelation: "Spouse",
+    emergencyWorkPhone: "(614) 555-0199",
+    homePhone: "(614) 555-0197",
+    personalEmail: "m.rodriguez@email.com",
+    unionDescription: "Non-Union",
+    todos: [
+      { id: "todo-ada-1", dateScheduled: "2026-09-06", activity: "ADA Annual Review - Modified Workstation", caseManager: "Arlene Rosario, CPDM", completed: false },
+      { id: "todo-ada-2", dateScheduled: "2026-09-06", activity: "ADA Annual Review - Flexible Break Schedule", caseManager: "Arlene Rosario, CPDM", completed: false },
+    ],
+    caseNotes: [
+      {
+        id: "note-ada-1",
+        createdAt: "2025-09-01T09:00:00Z",
+        updatedAt: "2025-09-01T09:00:00Z",
+        content: "Employee reported chronic back condition affecting ability to sit for extended periods. Requested ADA accommodation evaluation.",
+        author: "Arlene Rosario, CPDM",
+        noteType: "General",
+        versions: [],
+      },
+      {
+        id: "note-ada-2",
+        createdAt: "2025-09-05T14:00:00Z",
+        updatedAt: "2025-09-05T14:00:00Z",
+        content: "Employee returned to work with temporary restrictions pending ADA determination.",
+        author: "Arlene Rosario, CPDM",
+        noteType: "General",
+        versions: [],
+      },
+      {
+        id: "note-ada-3",
+        createdAt: "2025-09-06T10:00:00Z",
+        updatedAt: "2025-09-06T10:00:00Z",
+        content: "ADA Accommodation APPROVED. Employee will receive ergonomic workstation modifications and flexible break schedule. Annual review scheduled for 9/6/2026.",
+        author: "Arlene Rosario, CPDM",
+        noteType: "General",
+        versions: [],
+      },
+    ],
+    adaTracking: [
+      {
+        id: "ada-1",
+        date: "2025-09-01",
+        status: "Pending",
+        description: "ADA accommodation request received - chronic back condition",
+        notes: "Employee submitted medical documentation from treating physician",
+      },
+      {
+        id: "ada-2",
+        date: "2025-09-05",
+        status: "Pending",
+        description: "Interactive process meeting completed with employee and supervisor",
+        notes: "Discussed potential accommodations including ergonomic equipment and schedule modifications",
+      },
+      {
+        id: "ada-3",
+        date: "2025-09-06",
+        status: "Approved",
+        description: "ADA Accommodation Approved - Ergonomic workstation and flexible breaks",
+        reviewDate: "2026-09-06",
+        notes: "Restrictions added to Restrictions tab. Annual review notice generated for 9/6/2026.",
+      },
+    ],
+    activityLog: [
+      {
+        id: "activity-ada-1",
+        timestamp: "2025-09-01T08:00:00Z",
+        action: "created",
+        field: "case",
+        newValue: "20250901-ADA1",
+        userName: "Arlene Rosario, CPDM",
+        description: "Case 20250901-ADA1 created - ADA Accommodation Request",
+      },
+      {
+        id: "activity-ada-2",
+        timestamp: "2025-09-01T08:00:00Z",
+        action: "updated",
+        field: "lastWorkDate",
+        newValue: "2025-09-01",
+        userName: "Arlene Rosario, CPDM",
+        description: "Last Work Date (LWD) set to 9/1/2025",
+      },
+      {
+        id: "activity-ada-3",
+        timestamp: "2025-09-05T08:00:00Z",
+        action: "updated",
+        field: "returnToWorkDate",
+        newValue: "2025-09-05",
+        userName: "Arlene Rosario, CPDM",
+        description: "Return to Work Date (RWD) set to 9/5/2025",
+      },
+      {
+        id: "activity-ada-4",
+        timestamp: "2025-09-06T10:00:00Z",
+        action: "updated",
+        field: "adaStatus",
+        newValue: "Approved",
+        userName: "Arlene Rosario, CPDM",
+        description: "ADA Accommodation Approved - Annual review scheduled for 9/6/2026",
+      },
+      {
+        id: "activity-ada-5",
+        timestamp: "2025-09-06T10:00:00Z",
+        action: "added",
+        field: "restrictions",
+        newValue: "Modified Workstation - Ergonomic Chair and Standing Desk",
+        userName: "Arlene Rosario, CPDM",
+        description: "ADA Accommodation restriction added",
+      },
+      {
+        id: "activity-ada-6",
+        timestamp: "2025-09-06T10:00:00Z",
+        action: "added",
+        field: "restrictions",
+        newValue: "Flexible Break Schedule - 10 min break every 2 hours",
+        userName: "Arlene Rosario, CPDM",
+        description: "ADA Accommodation restriction added",
       },
     ],
   },
