@@ -378,7 +378,7 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="std-start">STD Start Date</Label>
+                <Label htmlFor="std-start">STD (Pay) Start Date</Label>
                 <Input
                   id="std-start"
                   type="date"
