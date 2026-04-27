@@ -703,68 +703,6 @@ export function CaseTab() {
       </CollapsibleSection>
 
       <CollapsibleSection title="Case Dates" icon={<Calendar className="h-4 w-4" />} defaultOpen={true}>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="case-incident-date" className="text-sm text-muted-foreground">
-              Case (incident) date
-            </Label>
-            <Input
-              id="case-incident-date"
-              type="date"
-              className="bg-background"
-              value={caseIncidentDate}
-              onChange={(e) => {
-                setCaseIncidentDate(e.target.value)
-                handleFieldUpdate("caseIncidentDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="case-incident-time" className="text-sm text-muted-foreground">
-              Case (incident) time
-            </Label>
-            <Input
-              id="case-incident-time"
-              type="time"
-              className="bg-background"
-              value={caseIncidentTime}
-              onChange={(e) => {
-                setCaseIncidentTime(e.target.value)
-                handleFieldUpdate("caseIncidentTime", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="reported-date" className="text-sm text-muted-foreground">
-              Reported date
-            </Label>
-            <Input
-              id="reported-date"
-              type="date"
-              className="bg-background"
-              value={reportedDate}
-              onChange={(e) => {
-                setReportedDate(e.target.value)
-                handleFieldUpdate("reportedDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="reported-time" className="text-sm text-muted-foreground">
-              Reported time
-            </Label>
-            <Input
-              id="reported-time"
-              type="time"
-              className="bg-background"
-              value={reportedTime}
-              onChange={(e) => {
-                setReportedTime(e.target.value)
-                handleFieldUpdate("reportedTime", e.target.value)
-              }}
-            />
-          </div>
-        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="date-disability" className="text-sm text-muted-foreground">
@@ -922,6 +860,68 @@ export function CaseTab() {
               onChange={(e) => {
                 setMaximumMedicalImprovement(e.target.value)
                 handleFieldUpdate("maximumMedicalImprovement", e.target.value)
+              }}
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="case-incident-date" className="text-sm text-muted-foreground">
+              Case (incident) date
+            </Label>
+            <Input
+              id="case-incident-date"
+              type="date"
+              className="bg-background"
+              value={caseIncidentDate}
+              onChange={(e) => {
+                setCaseIncidentDate(e.target.value)
+                handleFieldUpdate("caseIncidentDate", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="case-incident-time" className="text-sm text-muted-foreground">
+              Case (incident) time
+            </Label>
+            <Input
+              id="case-incident-time"
+              type="time"
+              className="bg-background"
+              value={caseIncidentTime}
+              onChange={(e) => {
+                setCaseIncidentTime(e.target.value)
+                handleFieldUpdate("caseIncidentTime", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="reported-date" className="text-sm text-muted-foreground">
+              Reported date
+            </Label>
+            <Input
+              id="reported-date"
+              type="date"
+              className="bg-background"
+              value={reportedDate}
+              onChange={(e) => {
+                setReportedDate(e.target.value)
+                handleFieldUpdate("reportedDate", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="reported-time" className="text-sm text-muted-foreground">
+              Reported time
+            </Label>
+            <Input
+              id="reported-time"
+              type="time"
+              className="bg-background"
+              value={reportedTime}
+              onChange={(e) => {
+                setReportedTime(e.target.value)
+                handleFieldUpdate("reportedTime", e.target.value)
               }}
             />
           </div>
