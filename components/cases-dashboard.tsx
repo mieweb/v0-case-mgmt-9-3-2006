@@ -335,7 +335,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="search"
-                  placeholder="Search by name, case number, or employee ID..."
+                  placeholder="Search by name, case number, or employee number..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -423,7 +423,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="adv-search"
-                    placeholder="Search by name, case number, or employee ID..."
+                    placeholder="Search by name, case number, or employee number..."
                     value={advancedFilters.search}
                     onChange={(e) => setAdvancedFilters({ ...advancedFilters, search: e.target.value })}
                     className="pl-10"
