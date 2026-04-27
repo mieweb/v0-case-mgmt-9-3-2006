@@ -913,6 +913,41 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
+      <CollapsibleSection title="Short-Term Disability (STD)" icon={<Clock className="h-4 w-4" />} defaultOpen={true}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="std-plan" className="text-sm text-muted-foreground">
+              STD plan
+            </Label>
+            <Input
+              id="std-plan"
+              placeholder="Plan name or code"
+              className="bg-background"
+              value={stdPlan}
+              onChange={(e) => {
+                setStdPlan(e.target.value)
+                handleFieldUpdate("stdPlan", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="std-start" className="text-sm text-muted-foreground">
+              STD (Pay) start date
+            </Label>
+            <Input
+              id="std-start"
+              type="date"
+              className="bg-background"
+              value={stdStartDate}
+              onChange={(e) => {
+                setStdStartDate(e.target.value)
+                handleFieldUpdate("stdStartDate", e.target.value)
+              }}
+            />
+          </div>
+        </div>
+      </CollapsibleSection>
+
       <CollapsibleSection title="Maternity Information" icon={<Baby className="h-4 w-4" />} defaultOpen={true}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -947,41 +982,6 @@ export function CaseTab() {
           </div>
         </div>
       </CollapsibleSection>
-
-      <CollapsibleSection title="Short-Term Disability (STD)" icon={<Clock className="h-4 w-4" />} defaultOpen={true}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="std-plan" className="text-sm text-muted-foreground">
-              STD plan
-            </Label>
-            <Input
-              id="std-plan"
-              placeholder="Plan name or code"
-              className="bg-background"
-              value={stdPlan}
-              onChange={(e) => {
-                setStdPlan(e.target.value)
-                handleFieldUpdate("stdPlan", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="std-start" className="text-sm text-muted-foreground">
-              STD (Pay) start date
-            </Label>
-            <Input
-              id="std-start"
-              type="date"
-              className="bg-background"
-              value={stdStartDate}
-              onChange={(e) => {
-                setStdStartDate(e.target.value)
-                handleFieldUpdate("stdStartDate", e.target.value)
-              }}
-            />
-          </div>
-        </div>
-        </CollapsibleSection>
 
       <CollapsibleSection title="Duration of Disability Guidelines (DDG)" icon={<BarChart3 className="h-4 w-4" />} defaultOpen={true}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
