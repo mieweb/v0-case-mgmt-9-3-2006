@@ -910,6 +910,21 @@ export function CaseTab() {
               Date of disability + 6 months + first day of next month
             </p>
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="mmi" className="text-sm text-muted-foreground">
+              Maximum medical improvement (MMI)
+            </Label>
+            <Input
+              id="mmi"
+              type="date"
+              className="bg-background"
+              value={maximumMedicalImprovement}
+              onChange={(e) => {
+                setMaximumMedicalImprovement(e.target.value)
+                handleFieldUpdate("maximumMedicalImprovement", e.target.value)
+              }}
+            />
+          </div>
         </div>
       </CollapsibleSection>
 
@@ -1052,21 +1067,6 @@ export function CaseTab() {
               Days restricted <span className="text-xs italic">(calculated)</span>
             </Label>
             <Input id="days-restricted" className="bg-muted/50" readOnly />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="mmi" className="text-sm text-muted-foreground">
-              Maximum medical improvement (MMI)
-            </Label>
-            <Input
-              id="mmi"
-              placeholder="Enter MMI..."
-              className="bg-background"
-              value={maximumMedicalImprovement}
-              onChange={(e) => {
-                setMaximumMedicalImprovement(e.target.value)
-                handleFieldUpdate("maximumMedicalImprovement", e.target.value)
-              }}
-            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="ppi" className="text-sm text-muted-foreground">
