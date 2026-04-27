@@ -447,6 +447,11 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
                   <p>
                     <span className="text-muted-foreground">Case Manager:</span> {formData.caseManager || "Unassigned"}
                   </p>
+                  {formData.initialNotes && (
+                    <p>
+                      <span className="text-muted-foreground">Case Note:</span> {formData.initialNotes}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -458,12 +463,29 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
                     {formData.dateOfDisability || "[Not entered]"}
                   </p>
                   <p>
-                    <span className="text-muted-foreground">Expected Return:</span>{" "}
+                    <span className="text-muted-foreground">Initial Contact Date:</span>{" "}
+                    {formData.initialContactDate || "[Not entered]"}
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Expected Return Date:</span>{" "}
                     {formData.expectedReturnDate || "[Not entered]"}
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Actual Return Date:</span>{" "}
+                    {formData.actualReturnDate || "[Not entered]"}
                   </p>
                   <p>
                     <span className="text-muted-foreground">STD Plan:</span> {formData.stdPlan || "[Not entered]"}
                   </p>
+                  <p>
+                    <span className="text-muted-foreground">STD (Pay) Start Date:</span>{" "}
+                    {formData.stdStartDate || "[Not entered]"}
+                  </p>
+                  {formData.absenceNotes && (
+                    <p>
+                      <span className="text-muted-foreground">Notes:</span> {formData.absenceNotes}
+                    </p>
+                  )}
                 </div>
               </div>
 
