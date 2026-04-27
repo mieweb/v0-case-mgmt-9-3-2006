@@ -109,7 +109,6 @@ export function ContactAutocomplete({ onSelect, className }: ContactAutocomplete
     "External Case Manager",
     "Family Member",
     "Emergency Contact",
-    "Other",
   ]
 
   return (
