@@ -155,7 +155,7 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
                     }))
                   }}
                 />
-                <p className="text-xs text-muted-foreground">Search by name, employee number, or ID</p>
+                <p className="text-xs text-muted-foreground">Search by name or employee number</p>
               </div>
 
               <div className="space-y-2">
