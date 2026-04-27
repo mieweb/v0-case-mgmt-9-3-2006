@@ -383,7 +383,7 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
                 <Label htmlFor="std-plan">STD Plan</Label>
                 <Input
                   id="std-plan"
-                  placeholder="Enter plan name or code"
+                  placeholder="Enter plan name"
                   value={formData.stdPlan}
                   onChange={(e) => setFormData((prev) => ({ ...prev, stdPlan: e.target.value }))}
                 />
