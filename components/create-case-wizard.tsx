@@ -69,6 +69,16 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
     if (step < totalSteps) {
       setStep(step + 1)
     } else {
+      const initialCaseNote = formData.initialNotes?.trim() ? [{
+          id: `note-${Date.now()}`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          content: formData.initialNotes,
+          author: formData.caseManager || "System",
+          noteType: "General" as const,
+          versions: [],
+        }] : []
+
       addCase({
         employeeName: formData.employeeName,
         employeeNumber: formData.employeeNumber,
@@ -83,6 +93,7 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
         expectedReturnDate: formData.expectedReturnDate,
         stdPlan: formData.stdPlan,
         stdStartDate: formData.stdStartDate,
+        caseNotes: initialCaseNote,
       })
       onComplete()
     }
@@ -305,14 +316,15 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="initial-notes">Initial Notes</Label>
+                <Label htmlFor="initial-notes">Case Note</Label>
                 <Textarea
                   id="initial-notes"
-                  placeholder="Enter any initial case notes..."
+                  placeholder="Enter case note..."
                   value={formData.initialNotes}
                   onChange={(e) => setFormData((prev) => ({ ...prev, initialNotes: e.target.value }))}
                   rows={4}
                 />
+                <p className="text-xs text-muted-foreground">This note will be added to the Case Notes section of the case.</p>
               </div>
             </div>
           </div>

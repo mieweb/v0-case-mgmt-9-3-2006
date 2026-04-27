@@ -1002,7 +1002,7 @@ export function CasesProvider({ children }: { children: ReactNode }) {
       diagnoses: [],
       contacts: [],
       todos: [],
-      caseNotes: [],
+      caseNotes: caseData.caseNotes || [],
       activityLog: [
         {
           id: `activity-${Date.now()}`,
