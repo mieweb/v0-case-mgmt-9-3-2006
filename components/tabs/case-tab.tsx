@@ -998,7 +998,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Duration of Disability Guidelines (DDG)" icon={<BarChart3 className="h-4 w-4" />} defaultOpen={true}>
+      <CollapsibleSection title="Disability Duration Guidelines (DDG)" icon={<BarChart3 className="h-4 w-4" />} defaultOpen={true}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="ddg-days" className="text-sm text-muted-foreground">
