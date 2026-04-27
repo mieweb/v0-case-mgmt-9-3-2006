@@ -143,7 +143,7 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="employee-search">Employee Name or ID</Label>
+                <Label htmlFor="employee-search">Employee Name or Employee Number</Label>
                 <EmployeeAutocomplete
                   placeholder="Start typing to search..."
                   onSelect={(employee) => {
