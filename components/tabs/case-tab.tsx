@@ -22,7 +22,7 @@ import { useEmployees } from "@/contexts/employees-context"
 import { generateTodosFromTemplates } from "@/lib/todo-parser"
 import { useState, useEffect } from "react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Briefcase, MapPin, FileText, Stethoscope, Shield, Activity, Info, FolderOpen, Calendar, Baby, Clock, BarChart3, HardHat } from "lucide-react"
+import { AlertCircle, Briefcase, MapPin, FileText, Stethoscope, Shield, Activity, Info, FolderOpen, Calendar, Clock, BarChart3, HardHat } from "lucide-react"
 import { CollapsibleSection } from "@/components/ui/collapsible-section"
 
 const adjusterData: Record<string, { name: string; phone: string; email: string }> = {
@@ -926,6 +926,38 @@ export function CaseTab() {
             />
           </div>
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="expected-confinement" className="text-sm text-muted-foreground">
+              Expected Date of Confinement
+            </Label>
+            <Input
+              id="expected-confinement"
+              type="date"
+              className="bg-background"
+              value={expectedConfinementDate}
+              onChange={(e) => {
+                setExpectedConfinementDate(e.target.value)
+                handleFieldUpdate("expectedConfinementDate", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="delivery-date" className="text-sm text-muted-foreground">
+              Actual delivery date
+            </Label>
+            <Input
+              id="delivery-date"
+              type="date"
+              className="bg-background"
+              value={deliveryDate}
+              onChange={(e) => {
+                setDeliveryDate(e.target.value)
+                handleFieldUpdate("deliveryDate", e.target.value)
+              }}
+            />
+          </div>
+        </div>
       </CollapsibleSection>
 
       <CollapsibleSection title="Short-Term Disability (STD)" icon={<Clock className="h-4 w-4" />} defaultOpen={true}>
@@ -957,41 +989,6 @@ export function CaseTab() {
               onChange={(e) => {
                 setStdStartDate(e.target.value)
                 handleFieldUpdate("stdStartDate", e.target.value)
-              }}
-            />
-          </div>
-        </div>
-      </CollapsibleSection>
-
-      <CollapsibleSection title="Maternity Information" icon={<Baby className="h-4 w-4" />} defaultOpen={true}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="expected-confinement" className="text-sm text-muted-foreground">
-              Expected Date of Confinement
-            </Label>
-            <Input
-              id="expected-confinement"
-              type="date"
-              className="bg-background"
-              value={expectedConfinementDate}
-              onChange={(e) => {
-                setExpectedConfinementDate(e.target.value)
-                handleFieldUpdate("expectedConfinementDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="delivery-date" className="text-sm text-muted-foreground">
-              Actual delivery date
-            </Label>
-            <Input
-              id="delivery-date"
-              type="date"
-              className="bg-background"
-              value={deliveryDate}
-              onChange={(e) => {
-                setDeliveryDate(e.target.value)
-                handleFieldUpdate("deliveryDate", e.target.value)
               }}
             />
           </div>
