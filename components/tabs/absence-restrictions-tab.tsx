@@ -638,7 +638,11 @@ export function AbsenceRestrictionsTab() {
             </div>
             <div className="space-y-2">
               <Label className="text-sm text-muted-foreground invisible">Action</Label>
-              <Button onClick={handleAddEntry} className="w-full">Add Entry</Button>
+              <Button 
+                onClick={handleAddEntry} 
+                className="w-full"
+                disabled={!effectiveDate || !selectedStatus || (selectedStatus === "OTH" && (!otherName || !selectedReason))}
+              >Add Entry</Button>
             </div>
           </div>
 
