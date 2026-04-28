@@ -532,7 +532,7 @@ export function AbsenceRestrictionsTab() {
             <div className="flex gap-2 items-center">
               <Label className="text-sm whitespace-nowrap">Case:</Label>
               <Select value={absenceFilterCase} onValueChange={(value: any) => setAbsenceFilterCase(value)}>
-                <SelectTrigger className="w-[160px] bg-background">
+                <SelectTrigger className="w-[180px] bg-background">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
