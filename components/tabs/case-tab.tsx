@@ -1212,6 +1212,8 @@ export function CaseTab() {
                 <SelectItem value="10 Hr Fixed">10 Hr Fixed</SelectItem>
                 <SelectItem value="12 Hr Rotating">12 Hr Rotating</SelectItem>
                 <SelectItem value="12 Hr Fixed">12 Hr Fixed</SelectItem>
+                <SelectItem value="40 Hr">40 Hr</SelectItem>
+                <SelectItem value="45 Hr">45 Hr</SelectItem>
                 <SelectItem value="Non-Shift">Non-Shift</SelectItem>
                 <SelectItem value="Salary">Salary</SelectItem>
               </SelectContent>
