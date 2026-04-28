@@ -811,30 +811,28 @@ export function AbsenceRestrictionsTab() {
                     <DialogTitle>{restrictionEditingId ? "Edit" : "Add"} Restriction</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Restriction Type</Label>
-                        <Select value={formData.restriction} onValueChange={(value) => setFormData({ ...formData, restriction: value })}>
-                          <SelectTrigger className="bg-background">
-                            <SelectValue placeholder="Select restriction..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {restrictionOptions.map((opt) => (
-                              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="flex items-end space-x-2 pb-2">
-                        <Checkbox 
-                          id="is-active" 
-                          checked={formData.isActive}
-                          onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked as boolean })}
-                        />
-                        <Label htmlFor="is-active" className="font-normal">
-                          Currently Active
-                        </Label>
-                      </div>
+                    <div className="space-y-2">
+                      <Label>Restriction Type</Label>
+                      <Select value={formData.restriction} onValueChange={(value) => setFormData({ ...formData, restriction: value })}>
+                        <SelectTrigger className="bg-background">
+                          <SelectValue placeholder="Select restriction..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {restrictionOptions.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="is-active" 
+                        checked={formData.isActive}
+                        onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked as boolean })}
+                      />
+                      <Label htmlFor="is-active" className="font-normal">
+                        Currently Active
+                      </Label>
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
