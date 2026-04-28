@@ -848,21 +848,6 @@ export function CaseTab() {
               Date of disability + 6 months + first day of next month
             </p>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="mmi" className="text-sm text-muted-foreground">
-              Maximum medical improvement (MMI)
-            </Label>
-            <Input
-              id="mmi"
-              type="date"
-              className="bg-background"
-              value={maximumMedicalImprovement}
-              onChange={(e) => {
-                setMaximumMedicalImprovement(e.target.value)
-                handleFieldUpdate("maximumMedicalImprovement", e.target.value)
-              }}
-            />
-          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-2">
@@ -969,6 +954,21 @@ export function CaseTab() {
               onChange={(e) => {
                 setStdStartDate(e.target.value)
                 handleFieldUpdate("stdStartDate", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="mmi" className="text-sm text-muted-foreground">
+              Maximum medical improvement (MMI)
+            </Label>
+            <Input
+              id="mmi"
+              type="date"
+              className="bg-background"
+              value={maximumMedicalImprovement}
+              onChange={(e) => {
+                setMaximumMedicalImprovement(e.target.value)
+                handleFieldUpdate("maximumMedicalImprovement", e.target.value)
               }}
             />
           </div>
