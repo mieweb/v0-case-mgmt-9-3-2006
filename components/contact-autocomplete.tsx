@@ -207,7 +207,7 @@ export function ContactAutocomplete({ onSelect, className }: ContactAutocomplete
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="new-email">Email *</Label>
+              <Label htmlFor="new-email">Email</Label>
               <Input
                 id="new-email"
                 type="email"
@@ -251,7 +251,7 @@ export function ContactAutocomplete({ onSelect, className }: ContactAutocomplete
               </Button>
               <Button
                 onClick={handleAddNewContact}
-                disabled={!newContactName || !newContactEmail || !newContactType}
+                disabled={!newContactName || !newContactType}
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Add Contact
