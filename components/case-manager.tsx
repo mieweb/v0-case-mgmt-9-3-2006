@@ -30,7 +30,7 @@ const TAB_ORDER = ["case", "contact", "absence-restrictions", "diagnosis", "todo
 const TAB_LABELS: Record<string, string> = {
   "case": "Case",
   "contact": "Contacts", 
-  "absence-restrictions": "Absence & Restrictions",
+  "absence-restrictions": "Absences & Restrictions",
   "diagnosis": "Diagnosis",
   "todos": "To-Dos",
   "case-notes": "Case Notes",
@@ -455,7 +455,7 @@ export function CaseManager() {
               value="absence-restrictions"
               className="rounded-t-lg rounded-b-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2.5 font-medium"
             >
-              Absence & Restrictions
+Absences & Restrictions
             </TabsTrigger>
             <TabsTrigger
               value="diagnosis"
