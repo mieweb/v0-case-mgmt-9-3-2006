@@ -490,35 +490,33 @@ export function AbsenceRestrictionsTab() {
           <Calendar className="h-5 w-5 text-primary" />
           <h3 className="text-lg font-semibold">Absence Tracking</h3>
         </div>
-          <div className="flex justify-between items-center bg-muted/30 py-3 px-4 rounded-lg">
-            <div className="flex gap-6 items-center">
-              <div className="flex gap-2 items-center">
-                <Label className="text-sm">Status:</Label>
-                <Select value={absenceFilterActive} onValueChange={(value: any) => setAbsenceFilterActive(value)}>
-                  <SelectTrigger className="w-[140px] bg-background">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="active">Active Only</SelectItem>
-                    <SelectItem value="inactive">Inactive Only</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex gap-2 items-center">
-                <Label className="text-sm">Case:</Label>
-                <Select value={absenceFilterCase} onValueChange={(value: any) => setAbsenceFilterCase(value)}>
-                  <SelectTrigger className="w-[160px] bg-background">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Cases</SelectItem>
-                    <SelectItem value="current">Current Case Only</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          <div className="grid grid-cols-3 gap-4 items-center bg-muted/30 py-3 px-4 rounded-lg">
+            <div className="flex gap-2 items-center">
+              <Label className="text-sm whitespace-nowrap">Status:</Label>
+              <Select value={absenceFilterActive} onValueChange={(value: any) => setAbsenceFilterActive(value)}>
+                <SelectTrigger className="flex-1 bg-background">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="active">Active Only</SelectItem>
+                  <SelectItem value="inactive">Inactive Only</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className="flex gap-2 items-center">
+              <Label className="text-sm whitespace-nowrap">Case:</Label>
+              <Select value={absenceFilterCase} onValueChange={(value: any) => setAbsenceFilterCase(value)}>
+                <SelectTrigger className="flex-1 bg-background">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Cases</SelectItem>
+                  <SelectItem value="current">Current Case Only</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="text-sm text-muted-foreground text-right">
               Showing {filteredAbsenceEntries.length} of {entries.length} entries
             </div>
           </div>
