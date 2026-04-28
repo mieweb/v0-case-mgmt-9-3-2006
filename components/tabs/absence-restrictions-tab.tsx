@@ -279,6 +279,7 @@ export function AbsenceRestrictionsTab() {
   const handleAddEntry = () => {
     if (!effectiveDate || !selectedStatus) return
     if (selectedStatus === "OTH" && !otherName) return
+    if (selectedStatus === "OTH" && !selectedReason) return
 
     // Validate against consecutive entries
     const error = validateNewEntry(selectedStatus, effectiveDate)
@@ -592,10 +593,10 @@ export function AbsenceRestrictionsTab() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="reason" className="text-sm text-muted-foreground">
-                Reason:
+                Reason:{selectedStatus === "OTH" && <span className="text-destructive ml-1">*</span>}
               </Label>
               <Select value={selectedReason} onValueChange={setSelectedReason}>
-                <SelectTrigger id="reason" className="bg-background w-full">
+                <SelectTrigger id="reason" className={`bg-background w-full ${selectedStatus === "OTH" && !selectedReason ? "border-destructive" : ""}`}>
                   <SelectValue placeholder="Select reason..." />
                 </SelectTrigger>
                 <SelectContent>
