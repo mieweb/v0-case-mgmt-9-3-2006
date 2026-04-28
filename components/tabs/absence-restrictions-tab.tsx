@@ -624,10 +624,6 @@ export function AbsenceRestrictionsTab() {
               </div>
             )}
             <div className="space-y-2">
-              <Label className="text-sm text-muted-foreground invisible">Action</Label>
-              <Button onClick={handleAddEntry} className="w-full">Add Entry</Button>
-            </div>
-            <div className="space-y-2">
               <Label htmlFor="count-through" className="text-sm text-muted-foreground whitespace-nowrap">
                 Count last status through:
               </Label>
@@ -638,6 +634,10 @@ export function AbsenceRestrictionsTab() {
                 value={countThrough}
                 onChange={(e) => setCountThrough(e.target.value)}
               />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground invisible">Action</Label>
+              <Button onClick={handleAddEntry} className="w-full">Add Entry</Button>
             </div>
           </div>
 
