@@ -281,9 +281,6 @@ export function AbsenceRestrictionsTab() {
     if (!effectiveDate || !selectedStatus) {
       return
     }
-    if (isOther && !otherName) {
-      return
-    }
     if (isOther && !selectedReason) {
       alert("Please select a reason when using Other status")
       return
@@ -618,20 +615,7 @@ export function AbsenceRestrictionsTab() {
                 </SelectContent>
               </Select>
             </div>
-            {selectedStatus.startsWith("OTH") && (
-              <div className="space-y-2">
-                <Label htmlFor="other-name" className="text-sm text-muted-foreground">
-                  Other name:
-                </Label>
-                <Input
-                  id="other-name"
-                  className="bg-background w-full"
-                  value={otherName}
-                  onChange={(e) => setOtherName(e.target.value)}
-                  placeholder="Enter other name..."
-                />
-              </div>
-            )}
+            
             <div className="space-y-2">
               <Label htmlFor="count-through" className="text-sm text-muted-foreground whitespace-nowrap">
                 Count last status through:
@@ -649,7 +633,7 @@ export function AbsenceRestrictionsTab() {
               <Button 
                 onClick={handleAddEntry} 
                 className="w-full"
-                disabled={!effectiveDate || !selectedStatus || (selectedStatus.startsWith("OTH") && (!otherName || !selectedReason))}
+                disabled={!effectiveDate || !selectedStatus || (selectedStatus.startsWith("OTH") && !selectedReason)}
               >Add Entry</Button>
             </div>
           </div>
