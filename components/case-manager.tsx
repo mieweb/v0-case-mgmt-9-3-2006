@@ -32,7 +32,7 @@ const TAB_LABELS: Record<string, string> = {
   "contact": "Contacts", 
   "absence-restrictions": "Absences & Restrictions",
   "diagnosis": "Diagnosis",
-  "todos": "To-Dos",
+  "todos": "To Do",
   "case-notes": "Case Notes",
   "letters": "Letters",
   "documents": "Documents",
@@ -467,7 +467,7 @@ Absences & Restrictions
               value="todos"
               className="rounded-t-lg rounded-b-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2.5 font-medium"
             >
-              To-Dos
+              To Do
             </TabsTrigger>
             <TabsTrigger
               value="case-notes"
