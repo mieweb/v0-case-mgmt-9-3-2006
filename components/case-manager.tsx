@@ -29,7 +29,7 @@ const TAB_ORDER = ["case", "contact", "absence-restrictions", "diagnosis", "todo
 
 const TAB_LABELS: Record<string, string> = {
   "case": "Case",
-  "contact": "Contact", 
+  "contact": "Contacts", 
   "absence-restrictions": "Absence & Restrictions",
   "diagnosis": "Diagnosis",
   "todos": "To-Dos",
