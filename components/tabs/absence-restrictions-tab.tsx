@@ -44,6 +44,7 @@ export function AbsenceRestrictionsTab() {
   // ===== ABSENCE STATE =====
   const [entries, setEntries] = useState<AbsenceEntry[]>([])
   const [effectiveDate, setEffectiveDate] = useState("")
+  const [absenceEndDate, setAbsenceEndDate] = useState("")
   const [selectedStatus, setSelectedStatus] = useState<string>("")
   const [selectedReason, setSelectedReason] = useState<string>("")
   const [otherName, setOtherName] = useState("")
@@ -326,6 +327,7 @@ export function AbsenceRestrictionsTab() {
     }
 
     setEffectiveDate("")
+    setAbsenceEndDate("")
     setSelectedStatus("")
     setSelectedReason("")
     setOtherName("")
@@ -573,7 +575,7 @@ export function AbsenceRestrictionsTab() {
             </Alert>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
             <div className="space-y-2">
               <Label htmlFor="effective-date" className="text-sm text-muted-foreground">
                 Effective date:
@@ -584,6 +586,18 @@ export function AbsenceRestrictionsTab() {
                 className="bg-background w-full"
                 value={effectiveDate}
                 onChange={(e) => setEffectiveDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="absence-end-date" className="text-sm text-muted-foreground">
+                End date:
+              </Label>
+              <Input
+                id="absence-end-date"
+                type="date"
+                className="bg-background w-full"
+                value={absenceEndDate}
+                onChange={(e) => setAbsenceEndDate(e.target.value)}
               />
             </div>
             <div className="space-y-2">
