@@ -490,7 +490,7 @@ export function CaseTab() {
               </SelectTrigger>
               <SelectContent>
                 {codes.caseStatus
-                  .filter((s) => s.active && s.description !== "Closed")
+                  .filter((s) => s.active)
                   .map((statusCode) => (
                     <SelectItem key={statusCode.id} value={statusCode.description}>
                       {statusCode.description}
