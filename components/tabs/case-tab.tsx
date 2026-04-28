@@ -677,7 +677,7 @@ export function CaseTab() {
               className="h-4 w-4 rounded border-gray-300"
             />
             <Label htmlFor="confidential-case" className="text-sm font-medium cursor-pointer">
-              Mark as Confidential Case
+              Confidential Case
             </Label>
           </div>
           <Button
@@ -2571,7 +2571,7 @@ export function CaseTab() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmConfidential} className="bg-destructive hover:bg-destructive/90">
-              Mark as Confidential
+              Confidential
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
