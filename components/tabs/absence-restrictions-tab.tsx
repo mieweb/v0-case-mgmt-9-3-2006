@@ -20,6 +20,7 @@ import { debug } from "@/lib/debug"
 interface AbsenceEntry {
   id: string
   effectiveDate: string
+  endDate?: string
   status: "FD" | "LWD" | "RWD" | "RWDREGULARJOB" | "OTH"
   reason?: string
   otherName?: string
@@ -50,8 +51,9 @@ export function AbsenceRestrictionsTab() {
   const [otherName, setOtherName] = useState("")
   const [countThrough, setCountThrough] = useState(new Date().toISOString().split("T")[0])
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [editData, setEditData] = useState<{ effectiveDate: string; status: string; reason: string; otherName: string }>({
+  const [editData, setEditData] = useState<{ effectiveDate: string; endDate: string; status: string; reason: string; otherName: string }>({
     effectiveDate: "",
+    endDate: "",
     status: "",
     reason: "",
     otherName: "",
@@ -305,6 +307,7 @@ export function AbsenceRestrictionsTab() {
     const newEntry: AbsenceEntry = {
       id: Date.now().toString(),
       effectiveDate,
+      endDate: absenceEndDate || undefined,
       status: selectedStatus as AbsenceEntry["status"],
       reason: selectedReason || undefined,
       otherName: selectedStatus.startsWith("OTH") ? otherName : undefined,
@@ -343,6 +346,7 @@ export function AbsenceRestrictionsTab() {
         ? {
             ...e,
             effectiveDate: editData.effectiveDate,
+            endDate: editData.endDate || undefined,
             status: editData.status as AbsenceEntry["status"],
             reason: editData.reason || undefined,
             otherName: editData.otherName || undefined,
@@ -382,6 +386,7 @@ export function AbsenceRestrictionsTab() {
     setEditingId(entry.id)
     setEditData({
       effectiveDate: entry.effectiveDate,
+      endDate: entry.endDate || "",
       status: entry.status,
       reason: entry.reason || "",
       otherName: entry.otherName || "",
@@ -673,6 +678,7 @@ export function AbsenceRestrictionsTab() {
                 <TableRow>
                   <TableHead className="w-12">#</TableHead>
                   <TableHead>Effective Date</TableHead>
+                  <TableHead>End Date</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Reason</TableHead>
                   <TableHead className="text-center">FD</TableHead>
@@ -703,6 +709,18 @@ export function AbsenceRestrictionsTab() {
                         />
                       ) : (
                         entry.effectiveDate
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {editingId === entry.id ? (
+                        <Input
+                          type="date"
+                          value={editData.endDate || ""}
+                          onChange={(e) => setEditData({ ...editData, endDate: e.target.value })}
+                          className="h-8"
+                        />
+                      ) : (
+                        entry.endDate || "-"
                       )}
                     </TableCell>
                     <TableCell>
