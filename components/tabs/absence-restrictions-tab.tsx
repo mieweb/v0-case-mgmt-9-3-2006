@@ -277,9 +277,17 @@ export function AbsenceRestrictionsTab() {
   }
 
   const handleAddEntry = () => {
-    if (!effectiveDate || !selectedStatus) return
-    if (selectedStatus === "OTH" && !otherName) return
-    if (selectedStatus === "OTH" && !selectedReason) return
+    const isOther = selectedStatus.startsWith("OTH")
+    if (!effectiveDate || !selectedStatus) {
+      return
+    }
+    if (isOther && !otherName) {
+      return
+    }
+    if (isOther && !selectedReason) {
+      alert("Please select a reason when using Other status")
+      return
+    }
 
     // Validate against consecutive entries
     const error = validateNewEntry(selectedStatus, effectiveDate)
@@ -294,7 +302,7 @@ export function AbsenceRestrictionsTab() {
       effectiveDate,
       status: selectedStatus as AbsenceEntry["status"],
       reason: selectedReason || undefined,
-      otherName: selectedStatus === "OTH" ? otherName : undefined,
+      otherName: selectedStatus.startsWith("OTH") ? otherName : undefined,
       createdSeq: Math.max(...entries.map((e) => e.createdSeq), 0) + 1,
     }
 
@@ -321,7 +329,7 @@ export function AbsenceRestrictionsTab() {
 
   const handleSave = () => {
     if (!editData.effectiveDate || !editData.status) return
-    if (editData.status === "OTH" && !editData.otherName) return
+    if (editData.status.startsWith("OTH") && !editData.otherName) return
 
     const oldEntry = entries.find((e) => e.id === editingId)
     const updatedEntries = entries.map((e) =>
@@ -344,7 +352,7 @@ export function AbsenceRestrictionsTab() {
           action: "updated",
           field: "absence",
           oldValue: getStatusLabel(oldEntry),
-          newValue: `${editData.status}${editData.status === "OTH" && editData.otherName ? ` — ${editData.otherName}` : ""}`,
+          newValue: `${editData.status}${editData.status.startsWith("OTH") && editData.otherName ? ` — ${editData.otherName}` : ""}`,
           description: `Updated absence entry from ${getStatusLabel(oldEntry)} to ${editData.status}`,
         },
       )
@@ -358,7 +366,7 @@ export function AbsenceRestrictionsTab() {
 
   const getStatusLabel = (entry: AbsenceEntry) => {
     const option = statusOptions.find((o) => o.value === entry.status)
-    if (entry.status === "OTH" && entry.otherName) {
+    if (entry.status.startsWith("OTH") && entry.otherName) {
       return `OTH — ${entry.otherName}`
     }
     return option?.label || entry.status
@@ -593,10 +601,10 @@ export function AbsenceRestrictionsTab() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="reason" className="text-sm text-muted-foreground">
-                Reason:{selectedStatus === "OTH" && <span className="text-destructive ml-1">*</span>}
+                Reason:{selectedStatus.startsWith("OTH") && <span className="text-destructive ml-1">*</span>}
               </Label>
               <Select value={selectedReason} onValueChange={setSelectedReason}>
-                <SelectTrigger id="reason" className={`bg-background w-full ${selectedStatus === "OTH" && !selectedReason ? "border-destructive" : ""}`}>
+                <SelectTrigger id="reason" className={`bg-background w-full ${selectedStatus.startsWith("OTH") && !selectedReason ? "border-destructive" : ""}`}>
                   <SelectValue placeholder="Select reason..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -610,7 +618,7 @@ export function AbsenceRestrictionsTab() {
                 </SelectContent>
               </Select>
             </div>
-            {selectedStatus === "OTH" && (
+            {selectedStatus.startsWith("OTH") && (
               <div className="space-y-2">
                 <Label htmlFor="other-name" className="text-sm text-muted-foreground">
                   Other name:
@@ -641,7 +649,7 @@ export function AbsenceRestrictionsTab() {
               <Button 
                 onClick={handleAddEntry} 
                 className="w-full"
-                disabled={!effectiveDate || !selectedStatus || (selectedStatus === "OTH" && (!otherName || !selectedReason))}
+                disabled={!effectiveDate || !selectedStatus || (selectedStatus.startsWith("OTH") && (!otherName || !selectedReason))}
               >Add Entry</Button>
             </div>
           </div>
@@ -704,7 +712,7 @@ export function AbsenceRestrictionsTab() {
                               ))}
                             </SelectContent>
                           </Select>
-                          {editData.status === "OTH" && (
+                          {editData.status.startsWith("OTH") && (
                             <Input
                               value={editData.otherName}
                               onChange={(e) => setEditData({ ...editData, otherName: e.target.value })}
