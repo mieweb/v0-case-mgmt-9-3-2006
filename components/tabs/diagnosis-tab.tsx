@@ -439,9 +439,10 @@ export function DiagnosisTab() {
             </div>
 
             {/* Or enter custom code */}
+            <div className="text-center text-sm text-muted-foreground">Or</div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Or Enter Custom ICD-10 Code</Label>
+                <Label>Enter Custom ICD-10 Code</Label>
                 <Input
                   value={customCode}
                   onChange={(e) => {
