@@ -437,7 +437,7 @@ export function CaseManager() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="case-tabs w-full">
-          <div className="sticky top-0 z-40 bg-background">
+          <div className="sticky top-14 sm:top-16 z-40 bg-background shadow-sm">
             <TabsList className="case-tabs-list w-full justify-start bg-background border-b rounded-none h-auto p-0 flex-wrap">
             <TabsTrigger
               value="case"
