@@ -59,7 +59,7 @@ export function AbsenceRestrictionsTab() {
     otherName: "",
   })
   const [absenceFilterActive, setAbsenceFilterActive] = useState<"all" | "active" | "inactive">("active")
-  const [absenceFilterCase, setAbsenceFilterCase] = useState<"all" | "current">("all")
+  const [absenceFilterCase, setAbsenceFilterCase] = useState<"all" | "current">("current")
   const [validationError, setValidationError] = useState<string | null>(null)
 
   // ===== RESTRICTIONS STATE =====
@@ -75,7 +75,7 @@ export function AbsenceRestrictionsTab() {
   const [showDialog, setShowDialog] = useState(false)
   const [restrictionEditingId, setRestrictionEditingId] = useState<string | null>(null)
   const [restrictionFilterActive, setRestrictionFilterActive] = useState<"all" | "active" | "inactive">("active")
-  const [restrictionFilterCase, setRestrictionFilterCase] = useState<"all" | "current">("all")
+  const [restrictionFilterCase, setRestrictionFilterCase] = useState<"all" | "current">("current")
   const [quickEntryMode, setQuickEntryMode] = useState(false)
   const [quickEntryData, setQuickEntryData] = useState({
     restriction: "",
