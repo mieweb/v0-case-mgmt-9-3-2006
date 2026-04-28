@@ -29,6 +29,23 @@ export function ContactAutocomplete({ onSelect, className }: ContactAutocomplete
   const [newContactEmail, setNewContactEmail] = useState("")
   const [newContactPhone, setNewContactPhone] = useState("")
   const [newContactType, setNewContactType] = useState<string>("")
+  const [emailError, setEmailError] = useState("")
+
+  // Email validation helper
+  const isValidEmail = (email: string) => {
+    if (!email) return true // Empty is valid since email is optional
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  const handleEmailChange = (email: string) => {
+    setNewContactEmail(email)
+    if (email && !isValidEmail(email)) {
+      setEmailError("Please enter a valid email address")
+    } else {
+      setEmailError("")
+    }
+  }
 
   useEffect(() => {
     if (value.length > 0) {
@@ -212,10 +229,11 @@ export function ContactAutocomplete({ onSelect, className }: ContactAutocomplete
                 id="new-email"
                 type="email"
                 value={newContactEmail}
-                onChange={(e) => setNewContactEmail(e.target.value)}
+                onChange={(e) => handleEmailChange(e.target.value)}
                 placeholder="email@example.com"
-                className="bg-background"
+                className={`bg-background ${emailError ? "border-destructive" : ""}`}
               />
+              {emailError && <p className="text-xs text-destructive">{emailError}</p>}
             </div>
 
             <div className="space-y-2">
@@ -251,7 +269,7 @@ export function ContactAutocomplete({ onSelect, className }: ContactAutocomplete
               </Button>
               <Button
                 onClick={handleAddNewContact}
-                disabled={!newContactName || !newContactType}
+                disabled={!newContactName || !newContactType || (newContactEmail && !isValidEmail(newContactEmail))}
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Add Contact
