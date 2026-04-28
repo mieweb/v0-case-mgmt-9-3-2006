@@ -770,7 +770,7 @@ export function AbsenceRestrictionsTab() {
       </div>
 
       {/* Restrictions Section */}
-      <div className="space-y-6">
+      <div className="space-y-6 mt-20">
         <div className="flex items-center gap-3 border-b pb-3">
           <ShieldAlert className="h-5 w-5 text-primary" />
           <h3 className="text-lg font-semibold">Work Restrictions</h3>
