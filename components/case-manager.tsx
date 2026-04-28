@@ -437,7 +437,8 @@ export function CaseManager() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="case-tabs w-full">
-          <TabsList className="case-tabs-list w-full justify-start bg-background border-b rounded-none h-auto p-0 flex-wrap sticky top-0 z-40">
+          <div className="sticky top-0 z-40 bg-background">
+            <TabsList className="case-tabs-list w-full justify-start bg-background border-b rounded-none h-auto p-0 flex-wrap">
             <TabsTrigger
               value="case"
               className="rounded-t-lg rounded-b-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2.5 font-medium"
@@ -493,6 +494,7 @@ export function CaseManager() {
               Activity
             </TabsTrigger>
           </TabsList>
+          </div>
 
           <div className="case-tabs-content bg-card rounded-lg rounded-tl-none shadow-sm border mt-0 p-6">
             <TabsContent value="case" className="m-0">
