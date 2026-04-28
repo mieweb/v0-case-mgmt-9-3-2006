@@ -278,11 +278,18 @@ export function AbsenceRestrictionsTab() {
 
   const handleAddEntry = () => {
     const isOther = selectedStatus.startsWith("OTH")
+    const isRestricted = selectedStatus.startsWith("RWD")
+    const employeeRestrictions = currentCase ? getRestrictionsForEmployee(currentCase.employeeNumber) : []
+    
     if (!effectiveDate || !selectedStatus) {
       return
     }
     if (isOther && !selectedReason) {
       alert("Please select a reason when using Other status")
+      return
+    }
+    if (isRestricted && employeeRestrictions.length === 0) {
+      alert("Please add a work restriction before using RWD or RWDREGULARJOB status")
       return
     }
 
@@ -584,7 +591,7 @@ export function AbsenceRestrictionsTab() {
                 Status:
               </Label>
               <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger id="status" className="bg-background w-full">
+                <SelectTrigger id="status" className={`bg-background w-full ${selectedStatus.startsWith("RWD") && employeeRestrictions.length === 0 ? "border-destructive" : ""}`}>
                   <SelectValue placeholder="Select status..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -595,6 +602,9 @@ export function AbsenceRestrictionsTab() {
                   ))}
                 </SelectContent>
               </Select>
+              {selectedStatus.startsWith("RWD") && employeeRestrictions.length === 0 && (
+                <p className="text-xs text-destructive">Restriction required for this status</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="reason" className="text-sm text-muted-foreground">
@@ -633,7 +643,7 @@ export function AbsenceRestrictionsTab() {
               <Button 
                 onClick={handleAddEntry} 
                 className="w-full"
-                disabled={!effectiveDate || !selectedStatus || (selectedStatus.startsWith("OTH") && !selectedReason)}
+                disabled={!effectiveDate || !selectedStatus || (selectedStatus.startsWith("OTH") && !selectedReason) || (selectedStatus.startsWith("RWD") && employeeRestrictions.length === 0)}
               >Add Entry</Button>
             </div>
           </div>
