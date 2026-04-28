@@ -560,7 +560,7 @@ export function AbsenceRestrictionsTab() {
             </Alert>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
             <div className="space-y-2">
               <Label htmlFor="effective-date" className="text-sm text-muted-foreground">
                 Effective date:
@@ -568,7 +568,7 @@ export function AbsenceRestrictionsTab() {
               <Input
                 id="effective-date"
                 type="date"
-                className="bg-background"
+                className="bg-background w-full"
                 value={effectiveDate}
                 onChange={(e) => setEffectiveDate(e.target.value)}
               />
@@ -578,7 +578,7 @@ export function AbsenceRestrictionsTab() {
                 Status:
               </Label>
               <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger id="status" className="bg-background">
+                <SelectTrigger id="status" className="bg-background w-full">
                   <SelectValue placeholder="Select status..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -595,7 +595,7 @@ export function AbsenceRestrictionsTab() {
                 Reason:
               </Label>
               <Select value={selectedReason} onValueChange={setSelectedReason}>
-                <SelectTrigger id="reason" className="bg-background">
+                <SelectTrigger id="reason" className="bg-background w-full">
                   <SelectValue placeholder="Select reason..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -616,14 +616,15 @@ export function AbsenceRestrictionsTab() {
                 </Label>
                 <Input
                   id="other-name"
-                  className="bg-background"
+                  className="bg-background w-full"
                   value={otherName}
                   onChange={(e) => setOtherName(e.target.value)}
                   placeholder="Enter other name..."
                 />
               </div>
             )}
-            <div className="flex items-end">
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground invisible">Action</Label>
               <Button onClick={handleAddEntry} className="w-full">Add Entry</Button>
             </div>
             <div className="space-y-2">
@@ -633,7 +634,7 @@ export function AbsenceRestrictionsTab() {
               <Input
                 id="count-through"
                 type="date"
-                className="bg-background"
+                className="bg-background w-full"
                 value={countThrough}
                 onChange={(e) => setCountThrough(e.target.value)}
               />
