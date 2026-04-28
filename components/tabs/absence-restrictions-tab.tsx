@@ -117,8 +117,9 @@ export function AbsenceRestrictionsTab() {
   }
 
   const filteredAbsenceEntries = entries.filter((entry) => {
-    // An entry is considered inactive if it has an end date
-    const isInactive = !!entry.endDate
+    // An entry is considered inactive if it has an end date that is in the past
+    const today = new Date().toISOString().split('T')[0]
+    const isInactive = entry.endDate && entry.endDate < today
     if (absenceFilterActive === "active" && isInactive) return false
     if (absenceFilterActive === "inactive" && !isInactive) return false
     return true
