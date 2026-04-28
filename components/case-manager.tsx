@@ -449,7 +449,7 @@ export function CaseManager() {
               value="contact"
               className="rounded-t-lg rounded-b-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2.5 font-medium"
             >
-              Contact
+              Contacts
             </TabsTrigger>
             <TabsTrigger
               value="absence-restrictions"
