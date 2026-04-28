@@ -476,7 +476,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>TODO Backlog Report - ${new Date().toLocaleDateString()}</title>
+        <title>To Do Report - ${new Date().toLocaleDateString()}</title>
         <style>
           body { font-family: Arial, sans-serif; padding: 20px; font-size: 12px; }
           h1 { font-size: 18px; margin-bottom: 5px; }
@@ -501,7 +501,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
         </style>
       </head>
       <body>
-        <h1>TODO Backlog Report</h1>
+        <h1>To Do Report</h1>
         <div class="subtitle">Generated on ${new Date().toLocaleString()}</div>
         <div class="stats">
           <div class="stat"><div class="stat-label">Total</div><div class="stat-value">${stats.total}</div></div>
@@ -600,7 +600,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
             Back
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">TODO Backlog</h1>
+            <h1 className="text-2xl font-bold">To Do</h1>
             <p className="text-muted-foreground">All todos across all cases</p>
           </div>
         </div>

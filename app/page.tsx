@@ -90,7 +90,7 @@ export default function Page() {
                 size="sm"
               >
                 <ListTodo className="h-4 w-4" />
-                <span className="hidden sm:inline">TODO Backlog</span>
+                <span className="hidden sm:inline">To Do</span>
               </Button>
             </div>
             <div className="navbar-right flex items-center gap-1 sm:gap-2">
