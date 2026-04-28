@@ -780,10 +780,13 @@ export function AbsenceRestrictionsTab() {
       </div>
 
       {/* Restrictions Section */}
-      <div className="space-y-6 mt-20">
+      <div className={`space-y-6 mt-20 p-4 rounded-lg ${selectedStatus.startsWith("RWD") && employeeRestrictions.length === 0 ? "border-2 border-destructive" : ""}`}>
         <div className="flex items-center gap-3 border-b pb-3">
           <ShieldAlert className="h-5 w-5 text-primary" />
           <h3 className="text-lg font-semibold">Work Restrictions</h3>
+          {selectedStatus.startsWith("RWD") && employeeRestrictions.length === 0 && (
+            <span className="text-sm text-destructive ml-auto">Restriction required for selected status</span>
+          )}
         </div>
         
         <div className="flex justify-between items-center">
