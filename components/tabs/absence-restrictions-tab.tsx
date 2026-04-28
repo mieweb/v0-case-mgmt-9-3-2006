@@ -560,7 +560,7 @@ export function AbsenceRestrictionsTab() {
             </Alert>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
             <div className="space-y-2">
               <Label htmlFor="effective-date" className="text-sm text-muted-foreground">
                 Effective date:
@@ -595,8 +595,8 @@ export function AbsenceRestrictionsTab() {
                 Reason:
               </Label>
               <Select value={selectedReason} onValueChange={setSelectedReason}>
-                <SelectTrigger id="reason" className="bg-background w-full max-w-[200px] overflow-hidden">
-                  <SelectValue placeholder="Select reason..." className="truncate" />
+                <SelectTrigger id="reason" className="bg-background">
+                  <SelectValue placeholder="Select reason..." />
                 </SelectTrigger>
                 <SelectContent>
                   {codes.absenceReason
@@ -623,20 +623,20 @@ export function AbsenceRestrictionsTab() {
                 />
               </div>
             )}
-            <div className="flex gap-2 items-end">
-              <Button onClick={handleAddEntry}>Add Entry</Button>
-              <div className="flex-1 space-y-2">
-                <Label htmlFor="count-through" className="text-sm text-muted-foreground whitespace-nowrap">
-                  Count last status through:
-                </Label>
-                <Input
-                  id="count-through"
-                  type="date"
-                  className="bg-background"
-                  value={countThrough}
-                  onChange={(e) => setCountThrough(e.target.value)}
-                />
-              </div>
+            <div className="flex items-end">
+              <Button onClick={handleAddEntry} className="w-full">Add Entry</Button>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="count-through" className="text-sm text-muted-foreground whitespace-nowrap">
+                Count last status through:
+              </Label>
+              <Input
+                id="count-through"
+                type="date"
+                className="bg-background"
+                value={countThrough}
+                onChange={(e) => setCountThrough(e.target.value)}
+              />
             </div>
           </div>
 
