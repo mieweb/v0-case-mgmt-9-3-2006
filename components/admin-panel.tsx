@@ -308,33 +308,7 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
                                           }
                                         />
                                       </div>
-                                      <div className="space-y-2">
-                                        <Label>Surgery Date (optional)</Label>
-                                        <Input
-                                          type="date"
-                                          value={testAnchorDates.surgeryDate}
-                                          onChange={(e) =>
-                                            setTestAnchorDates((prev) => ({
-                                              ...prev,
-                                              surgeryDate: e.target.value,
-                                            }))
-                                          }
-                                        />
                                       </div>
-                                      <div className="space-y-2">
-                                        <Label>Delivery Date (optional)</Label>
-                                        <Input
-                                          type="date"
-                                          value={testAnchorDates.deliveryDate}
-                                          onChange={(e) =>
-                                            setTestAnchorDates((prev) => ({
-                                              ...prev,
-                                              deliveryDate: e.target.value,
-                                            }))
-                                          }
-                                        />
-                                      </div>
-                                    </div>
                                     <Button onClick={handleGenerateTodos}>Generate Todo Preview</Button>
 
                                     {generatedTodos.length > 0 && (
