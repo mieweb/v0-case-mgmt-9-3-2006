@@ -4,12 +4,40 @@ import { useCases, type ActivityLogEntry } from "@/contexts/cases-context"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Clock, Edit, Plus, Trash2, FileEdit } from "lucide-react"
+import { Clock, Edit, Plus, Trash2, FileEdit, Shield } from "lucide-react"
 
 export function ActivityTab() {
   const { currentCase } = useCases()
 
   const activityLog = currentCase?.activityLog || []
+  const adaTracking = currentCase?.adaTracking || []
+
+  // Helper to get ADA status for a given date
+  const getADAStatusForDate = (timestamp: string) => {
+    const entryDate = new Date(timestamp)
+    // Find the most recent ADA status on or before this date
+    const relevantADA = adaTracking
+      .filter((ada) => new Date(ada.date) <= entryDate)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]
+    return relevantADA?.status || null
+  }
+
+  const getADAStatusColor = (status: string | null) => {
+    switch (status) {
+      case "Approved":
+        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+      case "Denied":
+        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+      case "Pending":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+      case "Review Due":
+        return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400"
+      case "Closed":
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400"
+      default:
+        return ""
+    }
+  }
 
   // Sort by timestamp descending (most recent first)
   const sortedLog = [...activityLog].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
@@ -78,6 +106,7 @@ export function ActivityTab() {
               <TableRow>
                 <TableHead className="w-[180px]">Date & Time</TableHead>
                 <TableHead className="w-[100px]">Action</TableHead>
+                <TableHead className="w-[100px]">ADA Status</TableHead>
                 <TableHead className="w-[150px]">User</TableHead>
                 <TableHead className="w-[150px]">Field</TableHead>
                 <TableHead>Description</TableHead>
@@ -92,6 +121,16 @@ export function ActivityTab() {
                       {getActionIcon(entry.action)}
                       {entry.action}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {getADAStatusForDate(entry.timestamp) ? (
+                      <Badge variant="outline" className={`gap-1 ${getADAStatusColor(getADAStatusForDate(entry.timestamp))}`}>
+                        <Shield className="h-3 w-3" />
+                        {getADAStatusForDate(entry.timestamp)}
+                      </Badge>
+                    ) : (
+                      <span className="text-muted-foreground text-xs">-</span>
+                    )}
                   </TableCell>
                   <TableCell className="text-sm">{entry.userName}</TableCell>
                   <TableCell className="text-sm font-mono">{entry.field}</TableCell>

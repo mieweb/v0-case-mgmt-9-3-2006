@@ -588,26 +588,7 @@ export function TodosTab() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="surgeryDate">Surgery Date (optional)</Label>
-              <Input
-                id="surgeryDate"
-                type="date"
-                value={anchorDates.surgeryDate}
-                onChange={(e) => setAnchorDates({ ...anchorDates, surgeryDate: e.target.value })}
-              />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="deliveryDate">Delivery Date (optional)</Label>
-              <Input
-                id="deliveryDate"
-                type="date"
-                value={anchorDates.deliveryDate}
-                onChange={(e) => setAnchorDates({ ...anchorDates, deliveryDate: e.target.value })}
-              />
-            </div>
-          </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowGenerateDialog(false)}>

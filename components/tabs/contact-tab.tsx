@@ -181,19 +181,6 @@ export function ContactTab() {
 
       <div className="flex gap-4 items-center bg-muted/30 p-4 rounded-lg">
         <div className="flex gap-2 items-center">
-          <Label className="text-sm">Status:</Label>
-          <Select value={filterActive} onValueChange={(value: any) => setFilterActive(value)}>
-            <SelectTrigger className="w-[140px] bg-background">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="active">Active Only</SelectItem>
-              <SelectItem value="inactive">Inactive Only</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex gap-2 items-center">
           <Label className="text-sm">Case:</Label>
           <Select value={filterCase} onValueChange={(value: any) => setFilterCase(value)}>
             <SelectTrigger className="w-[160px] bg-background">

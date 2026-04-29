@@ -20,6 +20,7 @@ import { debug } from "@/lib/debug"
 interface AbsenceEntry {
   id: string
   effectiveDate: string
+  endDate?: string
   status: "FD" | "LWD" | "RWD" | "RWDREGULARJOB" | "OTH"
   reason?: string
   otherName?: string
@@ -44,19 +45,21 @@ export function AbsenceRestrictionsTab() {
   // ===== ABSENCE STATE =====
   const [entries, setEntries] = useState<AbsenceEntry[]>([])
   const [effectiveDate, setEffectiveDate] = useState("")
+  const [absenceEndDate, setAbsenceEndDate] = useState("")
   const [selectedStatus, setSelectedStatus] = useState<string>("")
   const [selectedReason, setSelectedReason] = useState<string>("")
   const [otherName, setOtherName] = useState("")
   const [countThrough, setCountThrough] = useState(new Date().toISOString().split("T")[0])
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [editData, setEditData] = useState<{ effectiveDate: string; status: string; reason: string; otherName: string }>({
+  const [editData, setEditData] = useState<{ effectiveDate: string; endDate: string; status: string; reason: string; otherName: string }>({
     effectiveDate: "",
+    endDate: "",
     status: "",
     reason: "",
     otherName: "",
   })
   const [absenceFilterActive, setAbsenceFilterActive] = useState<"all" | "active" | "inactive">("active")
-  const [absenceFilterCase, setAbsenceFilterCase] = useState<"all" | "current">("all")
+  const [absenceFilterCase, setAbsenceFilterCase] = useState<"all" | "current">("current")
   const [validationError, setValidationError] = useState<string | null>(null)
 
   // ===== RESTRICTIONS STATE =====
@@ -72,7 +75,7 @@ export function AbsenceRestrictionsTab() {
   const [showDialog, setShowDialog] = useState(false)
   const [restrictionEditingId, setRestrictionEditingId] = useState<string | null>(null)
   const [restrictionFilterActive, setRestrictionFilterActive] = useState<"all" | "active" | "inactive">("active")
-  const [restrictionFilterCase, setRestrictionFilterCase] = useState<"all" | "current">("all")
+  const [restrictionFilterCase, setRestrictionFilterCase] = useState<"all" | "current">("current")
   const [quickEntryMode, setQuickEntryMode] = useState(false)
   const [quickEntryData, setQuickEntryData] = useState({
     restriction: "",
@@ -114,6 +117,11 @@ export function AbsenceRestrictionsTab() {
   }
 
   const filteredAbsenceEntries = entries.filter((entry) => {
+    // An entry is considered inactive if it has an end date that is in the past
+    const today = new Date().toISOString().split('T')[0]
+    const isInactive = entry.endDate && entry.endDate < today
+    if (absenceFilterActive === "active" && isInactive) return false
+    if (absenceFilterActive === "inactive" && !isInactive) return false
     return true
   })
 
@@ -277,8 +285,21 @@ export function AbsenceRestrictionsTab() {
   }
 
   const handleAddEntry = () => {
-    if (!effectiveDate || !selectedStatus) return
-    if (selectedStatus === "OTH" && !otherName) return
+    const isOther = selectedStatus.startsWith("OTH")
+    const isRestricted = selectedStatus.startsWith("RWD")
+    const employeeRestrictions = currentCase ? getRestrictionsForEmployee(currentCase.employeeNumber) : []
+    
+    if (!effectiveDate || !selectedStatus) {
+      return
+    }
+    if (isOther && !selectedReason) {
+      alert("Please select a reason when using Other status")
+      return
+    }
+    if (isRestricted && employeeRestrictions.length === 0) {
+      alert("Please add a work restriction before using RWD or RWDREGULARJOB status")
+      return
+    }
 
     // Validate against consecutive entries
     const error = validateNewEntry(selectedStatus, effectiveDate)
@@ -291,9 +312,10 @@ export function AbsenceRestrictionsTab() {
     const newEntry: AbsenceEntry = {
       id: Date.now().toString(),
       effectiveDate,
+      endDate: absenceEndDate || undefined,
       status: selectedStatus as AbsenceEntry["status"],
       reason: selectedReason || undefined,
-      otherName: selectedStatus === "OTH" ? otherName : undefined,
+      otherName: selectedStatus.startsWith("OTH") ? otherName : undefined,
       createdSeq: Math.max(...entries.map((e) => e.createdSeq), 0) + 1,
     }
 
@@ -313,6 +335,7 @@ export function AbsenceRestrictionsTab() {
     }
 
     setEffectiveDate("")
+    setAbsenceEndDate("")
     setSelectedStatus("")
     setSelectedReason("")
     setOtherName("")
@@ -320,7 +343,7 @@ export function AbsenceRestrictionsTab() {
 
   const handleSave = () => {
     if (!editData.effectiveDate || !editData.status) return
-    if (editData.status === "OTH" && !editData.otherName) return
+    if (editData.status.startsWith("OTH") && !editData.otherName) return
 
     const oldEntry = entries.find((e) => e.id === editingId)
     const updatedEntries = entries.map((e) =>
@@ -328,6 +351,7 @@ export function AbsenceRestrictionsTab() {
         ? {
             ...e,
             effectiveDate: editData.effectiveDate,
+            endDate: editData.endDate || undefined,
             status: editData.status as AbsenceEntry["status"],
             reason: editData.reason || undefined,
             otherName: editData.otherName || undefined,
@@ -343,7 +367,7 @@ export function AbsenceRestrictionsTab() {
           action: "updated",
           field: "absence",
           oldValue: getStatusLabel(oldEntry),
-          newValue: `${editData.status}${editData.status === "OTH" && editData.otherName ? ` — ${editData.otherName}` : ""}`,
+          newValue: `${editData.status}${editData.status.startsWith("OTH") && editData.otherName ? ` — ${editData.otherName}` : ""}`,
           description: `Updated absence entry from ${getStatusLabel(oldEntry)} to ${editData.status}`,
         },
       )
@@ -357,7 +381,7 @@ export function AbsenceRestrictionsTab() {
 
   const getStatusLabel = (entry: AbsenceEntry) => {
     const option = statusOptions.find((o) => o.value === entry.status)
-    if (entry.status === "OTH" && entry.otherName) {
+    if (entry.status.startsWith("OTH") && entry.otherName) {
       return `OTH — ${entry.otherName}`
     }
     return option?.label || entry.status
@@ -367,6 +391,7 @@ export function AbsenceRestrictionsTab() {
     setEditingId(entry.id)
     setEditData({
       effectiveDate: entry.effectiveDate,
+      endDate: entry.endDate || "",
       status: entry.status,
       reason: entry.reason || "",
       otherName: entry.otherName || "",
@@ -490,11 +515,11 @@ export function AbsenceRestrictionsTab() {
           <Calendar className="h-5 w-5 text-primary" />
           <h3 className="text-lg font-semibold">Absence Tracking</h3>
         </div>
-          <div className="flex gap-4 items-center bg-muted/30 p-4 rounded-lg">
+          <div className="grid grid-cols-3 gap-4 items-center bg-muted/30 py-3 px-4 rounded-lg">
             <div className="flex gap-2 items-center">
-              <Label className="text-sm">Status:</Label>
+              <Label className="text-sm whitespace-nowrap">Status:</Label>
               <Select value={absenceFilterActive} onValueChange={(value: any) => setAbsenceFilterActive(value)}>
-                <SelectTrigger className="w-[140px] bg-background">
+                <SelectTrigger className="flex-1 bg-background">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -505,9 +530,9 @@ export function AbsenceRestrictionsTab() {
               </Select>
             </div>
             <div className="flex gap-2 items-center">
-              <Label className="text-sm">Case:</Label>
+              <Label className="text-sm whitespace-nowrap">Case:</Label>
               <Select value={absenceFilterCase} onValueChange={(value: any) => setAbsenceFilterCase(value)}>
-                <SelectTrigger className="w-[160px] bg-background">
+                <SelectTrigger className="w-[180px] bg-background">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -516,7 +541,7 @@ export function AbsenceRestrictionsTab() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="ml-auto text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground text-right">
               Showing {filteredAbsenceEntries.length} of {entries.length} entries
             </div>
           </div>
@@ -560,7 +585,7 @@ export function AbsenceRestrictionsTab() {
             </Alert>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
             <div className="space-y-2">
               <Label htmlFor="effective-date" className="text-sm text-muted-foreground">
                 Effective date:
@@ -568,9 +593,21 @@ export function AbsenceRestrictionsTab() {
               <Input
                 id="effective-date"
                 type="date"
-                className="bg-background"
+                className="bg-background w-full"
                 value={effectiveDate}
                 onChange={(e) => setEffectiveDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="absence-end-date" className="text-sm text-muted-foreground">
+                End date:
+              </Label>
+              <Input
+                id="absence-end-date"
+                type="date"
+                className="bg-background w-full"
+                value={absenceEndDate}
+                onChange={(e) => setAbsenceEndDate(e.target.value)}
               />
             </div>
             <div className="space-y-2">
@@ -578,7 +615,7 @@ export function AbsenceRestrictionsTab() {
                 Status:
               </Label>
               <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger id="status" className="bg-background">
+                <SelectTrigger id="status" className={`bg-background w-full ${selectedStatus.startsWith("RWD") && employeeRestrictions.length === 0 ? "border-destructive" : ""}`}>
                   <SelectValue placeholder="Select status..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -589,14 +626,17 @@ export function AbsenceRestrictionsTab() {
                   ))}
                 </SelectContent>
               </Select>
+              {selectedStatus.startsWith("RWD") && employeeRestrictions.length === 0 && (
+                <p className="text-xs text-destructive">Restriction required for this status</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="reason" className="text-sm text-muted-foreground">
-                Reason:
+                Reason:{selectedStatus.startsWith("OTH") && <span className="text-destructive ml-1">*</span>}
               </Label>
               <Select value={selectedReason} onValueChange={setSelectedReason}>
-                <SelectTrigger id="reason" className="bg-background w-full max-w-[200px] overflow-hidden">
-                  <SelectValue placeholder="Select reason..." className="truncate" />
+                <SelectTrigger id="reason" className={`bg-background w-full ${selectedStatus.startsWith("OTH") && !selectedReason ? "border-destructive" : ""}`}>
+                  <SelectValue placeholder="Select reason..." />
                 </SelectTrigger>
                 <SelectContent>
                   {codes.absenceReason
@@ -609,34 +649,26 @@ export function AbsenceRestrictionsTab() {
                 </SelectContent>
               </Select>
             </div>
-            {selectedStatus === "OTH" && (
-              <div className="space-y-2">
-                <Label htmlFor="other-name" className="text-sm text-muted-foreground">
-                  Other name:
-                </Label>
-                <Input
-                  id="other-name"
-                  className="bg-background"
-                  value={otherName}
-                  onChange={(e) => setOtherName(e.target.value)}
-                  placeholder="Enter other name..."
-                />
-              </div>
-            )}
-            <div className="flex gap-2 items-end">
-              <Button onClick={handleAddEntry}>Add Entry</Button>
-              <div className="flex-1 space-y-2">
-                <Label htmlFor="count-through" className="text-sm text-muted-foreground whitespace-nowrap">
-                  Count last status through:
-                </Label>
-                <Input
-                  id="count-through"
-                  type="date"
-                  className="bg-background"
-                  value={countThrough}
-                  onChange={(e) => setCountThrough(e.target.value)}
-                />
-              </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="count-through" className="text-sm text-muted-foreground whitespace-nowrap">
+                Count last status through:
+              </Label>
+              <Input
+                id="count-through"
+                type="date"
+                className="bg-background w-full"
+                value={countThrough}
+                onChange={(e) => setCountThrough(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground invisible">Action</Label>
+              <Button 
+                onClick={handleAddEntry} 
+                className="w-full"
+                disabled={!effectiveDate || !selectedStatus || (selectedStatus.startsWith("OTH") && !selectedReason) || (selectedStatus.startsWith("RWD") && employeeRestrictions.length === 0)}
+              >Add Entry</Button>
             </div>
           </div>
 
@@ -651,6 +683,7 @@ export function AbsenceRestrictionsTab() {
                 <TableRow>
                   <TableHead className="w-12">#</TableHead>
                   <TableHead>Effective Date</TableHead>
+                  <TableHead>End Date</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Reason</TableHead>
                   <TableHead className="text-center">FD</TableHead>
@@ -685,6 +718,18 @@ export function AbsenceRestrictionsTab() {
                     </TableCell>
                     <TableCell>
                       {editingId === entry.id ? (
+                        <Input
+                          type="date"
+                          value={editData.endDate || ""}
+                          onChange={(e) => setEditData({ ...editData, endDate: e.target.value })}
+                          className="h-8"
+                        />
+                      ) : (
+                        entry.endDate || "-"
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {editingId === entry.id ? (
                         <div className="flex gap-2">
                           <Select value={editData.status} onValueChange={(v) => setEditData({ ...editData, status: v })}>
                             <SelectTrigger className="h-8">
@@ -698,7 +743,7 @@ export function AbsenceRestrictionsTab() {
                               ))}
                             </SelectContent>
                           </Select>
-                          {editData.status === "OTH" && (
+                          {editData.status.startsWith("OTH") && (
                             <Input
                               value={editData.otherName}
                               onChange={(e) => setEditData({ ...editData, otherName: e.target.value })}
@@ -772,10 +817,13 @@ export function AbsenceRestrictionsTab() {
       </div>
 
       {/* Restrictions Section */}
-      <div className="space-y-6">
+      <div className={`space-y-6 mt-20 p-4 rounded-lg ${selectedStatus.startsWith("RWD") && employeeRestrictions.length === 0 ? "border-2 border-destructive" : ""}`}>
         <div className="flex items-center gap-3 border-b pb-3">
           <ShieldAlert className="h-5 w-5 text-primary" />
           <h3 className="text-lg font-semibold">Work Restrictions</h3>
+          {selectedStatus.startsWith("RWD") && employeeRestrictions.length === 0 && (
+            <span className="text-sm text-destructive ml-auto">Restriction required for selected status</span>
+          )}
         </div>
         
         <div className="flex justify-between items-center">
@@ -803,30 +851,28 @@ export function AbsenceRestrictionsTab() {
                     <DialogTitle>{restrictionEditingId ? "Edit" : "Add"} Restriction</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Restriction Type</Label>
-                        <Select value={formData.restriction} onValueChange={(value) => setFormData({ ...formData, restriction: value })}>
-                          <SelectTrigger className="bg-background">
-                            <SelectValue placeholder="Select restriction..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {restrictionOptions.map((opt) => (
-                              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="flex items-end space-x-2 pb-2">
-                        <Checkbox 
-                          id="is-active" 
-                          checked={formData.isActive}
-                          onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked as boolean })}
-                        />
-                        <Label htmlFor="is-active" className="font-normal">
-                          Currently Active
-                        </Label>
-                      </div>
+                    <div className="space-y-2">
+                      <Label>Restriction Type</Label>
+                      <Select value={formData.restriction} onValueChange={(value) => setFormData({ ...formData, restriction: value })}>
+                        <SelectTrigger className="bg-background">
+                          <SelectValue placeholder="Select restriction..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {restrictionOptions.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="is-active" 
+                        checked={formData.isActive}
+                        onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked as boolean })}
+                      />
+                      <Label htmlFor="is-active" className="font-normal">
+                        Currently Active
+                      </Label>
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
@@ -914,7 +960,7 @@ export function AbsenceRestrictionsTab() {
             <div className="flex gap-2 items-center">
               <Label className="text-sm">Case:</Label>
               <Select value={restrictionFilterCase} onValueChange={(value: any) => setRestrictionFilterCase(value)}>
-                <SelectTrigger className="w-[160px] bg-background">
+                <SelectTrigger className="w-[180px] bg-background">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

@@ -26,6 +26,7 @@ export interface CaseManager {
 
 interface CodeTables {
   letterTemplates: Code[]
+  caseNoteTemplates: Code[]
   caseStatus: Code[]
   caseCategory: Code[]
   caseClosureReason: Code[]
@@ -212,14 +213,35 @@ Sincerely,
 Case Management Team`,
     },
   ],
+  caseNoteTemplates: [
+    {
+      id: "1",
+      code: "initial-call",
+      name: "Initial Call",
+      description: "Template for initial call documentation",
+      active: true,
+      content: `Initial call with employee. Discussed claim details and next steps. Employee confirmed understanding of process.`,
+    },
+    {
+      id: "2",
+      code: "follow-up",
+      name: "Follow-up Call",
+      description: "Template for follow-up call documentation",
+      active: true,
+      content: `Follow-up call with employee. Reviewed current status and any changes to condition. No new concerns reported.`,
+    },
+    {
+      id: "3",
+      code: "medical-update",
+      name: "Medical Update",
+      description: "Template for medical update documentation",
+      active: true,
+      content: `Received medical update from provider. Reviewed documentation and updated case file accordingly.`,
+    },
+  ],
   caseStatus: [
-    { id: "1", code: "ACTIVE", description: "Active", active: true },
+    { id: "1", code: "OPEN", description: "Open", active: true },
     { id: "2", code: "CLOSED", description: "Closed", active: true },
-    { id: "3", code: "OPEN", description: "Open", active: true },
-    { id: "4", code: "PEND", description: "Pending", active: true },
-    { id: "5", code: "REOPEN", description: "Re-opened", active: true },
-    { id: "6", code: "COMP", description: "Completed", active: true },
-    { id: "7", code: "OVER", description: "Overdue", active: true },
   ],
   caseCategory: [
     { id: "1", code: "CORRECT", description: "DX Is Correct", active: true },

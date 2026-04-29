@@ -8,7 +8,7 @@ import { Plus, UserPlus, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useContacts, type Contact } from "@/contexts/contacts-context"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface ContactAutocompleteProps {
   onSelect: (contact: Contact) => void
@@ -28,7 +28,24 @@ export function ContactAutocomplete({ onSelect, className }: ContactAutocomplete
   const [newContactName, setNewContactName] = useState("")
   const [newContactEmail, setNewContactEmail] = useState("")
   const [newContactPhone, setNewContactPhone] = useState("")
-  const [newContactTypes, setNewContactTypes] = useState<string[]>([])
+  const [newContactType, setNewContactType] = useState<string>("")
+  const [emailError, setEmailError] = useState("")
+
+  // Email validation helper
+  const isValidEmail = (email: string) => {
+    if (!email) return true // Empty is valid since email is optional
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  const handleEmailChange = (email: string) => {
+    setNewContactEmail(email)
+    if (email && !isValidEmail(email)) {
+      setEmailError("Please enter a valid email address")
+    } else {
+      setEmailError("")
+    }
+  }
 
   useEffect(() => {
     if (value.length > 0) {
@@ -69,12 +86,12 @@ export function ContactAutocomplete({ onSelect, className }: ContactAutocomplete
   }
 
   const handleAddNewContact = () => {
-    if (newContactName && newContactEmail && newContactTypes.length > 0) {
+    if (newContactName && newContactEmail && newContactType) {
       const contactId = addContact({
         name: newContactName,
         email: newContactEmail,
         phone: newContactPhone,
-        type: newContactTypes,
+        type: [newContactType],
         isEmployee: false,
       })
 
@@ -94,14 +111,10 @@ export function ContactAutocomplete({ onSelect, className }: ContactAutocomplete
       setNewContactName("")
       setNewContactEmail("")
       setNewContactPhone("")
-      setNewContactTypes([])
+      setNewContactType("")
       setShowAddDialog(false)
       setValue("")
     }
-  }
-
-  const toggleContactType = (type: string) => {
-    setNewContactTypes((prev) => (prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]))
   }
 
   const availableTypes = [
@@ -113,7 +126,6 @@ export function ContactAutocomplete({ onSelect, className }: ContactAutocomplete
     "External Case Manager",
     "Family Member",
     "Emergency Contact",
-    "Other",
   ]
 
   return (
@@ -212,15 +224,16 @@ export function ContactAutocomplete({ onSelect, className }: ContactAutocomplete
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="new-email">Email *</Label>
+              <Label htmlFor="new-email">Email</Label>
               <Input
                 id="new-email"
                 type="email"
                 value={newContactEmail}
-                onChange={(e) => setNewContactEmail(e.target.value)}
+                onChange={(e) => handleEmailChange(e.target.value)}
                 placeholder="email@example.com"
-                className="bg-background"
+                className={`bg-background ${emailError ? "border-destructive" : ""}`}
               />
+              {emailError && <p className="text-xs text-destructive">{emailError}</p>}
             </div>
 
             <div className="space-y-2">
@@ -234,40 +247,20 @@ export function ContactAutocomplete({ onSelect, className }: ContactAutocomplete
               />
             </div>
 
-            <div className="space-y-3">
-              <Label>Contact Types * (select all that apply)</Label>
-              <div className="border rounded-md p-3 space-y-2 max-h-[200px] overflow-y-auto bg-background">
-                {availableTypes.map((type) => (
-                  <div key={type} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`type-${type}`}
-                      checked={newContactTypes.includes(type)}
-                      onCheckedChange={() => toggleContactType(type)}
-                    />
-                    <Label htmlFor={`type-${type}`} className="text-sm font-normal cursor-pointer flex-1">
+            <div className="space-y-2">
+              <Label htmlFor="contact-type">Contact Type *</Label>
+              <Select value={newContactType} onValueChange={setNewContactType}>
+                <SelectTrigger id="contact-type" className="bg-background">
+                  <SelectValue placeholder="Select contact type..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableTypes.map((type) => (
+                    <SelectItem key={type} value={type}>
                       {type}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-              {newContactTypes.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {newContactTypes.map((type) => (
-                    <span
-                      key={type}
-                      className="inline-flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded text-sm"
-                    >
-                      {type}
-                      <button
-                        onClick={() => toggleContactType(type)}
-                        className="hover:bg-primary/20 rounded-full p-0.5"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </span>
+                    </SelectItem>
                   ))}
-                </div>
-              )}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
@@ -276,7 +269,7 @@ export function ContactAutocomplete({ onSelect, className }: ContactAutocomplete
               </Button>
               <Button
                 onClick={handleAddNewContact}
-                disabled={!newContactName || !newContactEmail || newContactTypes.length === 0}
+                disabled={!newContactName || !newContactType || (newContactEmail && !isValidEmail(newContactEmail))}
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Add Contact

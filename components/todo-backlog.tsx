@@ -1,17 +1,30 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { useCases } from "@/contexts/cases-context"
 import { useAdmin } from "@/contexts/admin-context"
+import { useUser } from "@/contexts/user-context"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Download, CheckCircle2, Circle, AlertCircle, Printer, CheckSquare, Square, Edit2, Trash2, X } from "lucide-react"
+import { ArrowLeft, Download, CheckCircle2, Circle, AlertCircle, Printer, CheckSquare, Square, Edit2, Trash2, X, Bookmark, BookmarkCheck } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
+interface SavedSearch {
+  id: string
+  name: string
+  searchTerm: string
+  filterStatus: string
+  filterCaseManager: string
+  filterCaseType: string
+  userId: string
+  createdAt: string
+  resultCount?: number
+}
 
 interface TodoBacklogProps {
   onBack: () => void
@@ -21,14 +34,153 @@ interface TodoBacklogProps {
 export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
   const { cases, setCurrentCase } = useCases()
   const { getCaseType, caseManagers: adminCaseManagers, caseTypes: adminCaseTypes, codes } = useAdmin()
+  const { currentUser } = useUser()
   const [filterStatus, setFilterStatus] = useState<string>("all")
   const [filterCaseManager, setFilterCaseManager] = useState<string>("all")
   const [filterCaseType, setFilterCaseType] = useState<string>("all")
+  const [filterDraftLetters, setFilterDraftLetters] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedTodos, setSelectedTodos] = useState<Set<string>>(new Set())
   const [bulkEditMode, setBulkEditMode] = useState(false)
   const [bulkCaseManager, setBulkCaseManager] = useState<string>("")
   const [bulkCompleted, setBulkCompleted] = useState<string>("")
+  const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([])
+  const [activeSavedSearch, setActiveSavedSearch] = useState<string | null>(null)
+  const [showSaveDialog, setShowSaveDialog] = useState(false)
+  const [newSearchName, setNewSearchName] = useState("")
+
+  // Load saved searches from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("todoBacklogSavedSearches")
+    if (stored) {
+      try {
+        const allSearches: SavedSearch[] = JSON.parse(stored)
+        // Filter to only show current user's saved searches
+        const userSearches = allSearches.filter((s) => s.userId === currentUser?.id)
+        setSavedSearches(userSearches)
+      } catch (e) {
+        console.error("Failed to load saved searches:", e)
+      }
+    }
+  }, [currentUser?.id])
+
+  // Save a new search
+  const saveCurrentSearch = () => {
+    if (!newSearchName.trim() || !currentUser?.id) return
+
+    const newSearch: SavedSearch = {
+      id: `search-${Date.now()}`,
+      name: newSearchName.trim(),
+      searchTerm,
+      filterStatus,
+      filterCaseManager,
+      filterCaseType,
+      userId: currentUser.id,
+      createdAt: new Date().toISOString(),
+    }
+
+    // Get all searches from localStorage (including other users)
+    const stored = localStorage.getItem("todoBacklogSavedSearches")
+    const allSearches: SavedSearch[] = stored ? JSON.parse(stored) : []
+    
+    // Add new search
+    allSearches.push(newSearch)
+    localStorage.setItem("todoBacklogSavedSearches", JSON.stringify(allSearches))
+
+    // Update local state with user's searches
+    setSavedSearches((prev) => [...prev, newSearch])
+    setNewSearchName("")
+    setShowSaveDialog(false)
+  }
+
+  // Apply a saved search
+  const applySavedSearch = (search: SavedSearch) => {
+    if (activeSavedSearch === search.id) {
+      // Toggle off - reset filters
+      setSearchTerm("")
+      setFilterStatus("all")
+      setFilterCaseManager("all")
+      setFilterCaseType("all")
+      setActiveSavedSearch(null)
+    } else {
+      setSearchTerm(search.searchTerm)
+      setFilterStatus(search.filterStatus)
+      setFilterCaseManager(search.filterCaseManager)
+      setFilterCaseType(search.filterCaseType)
+      setFilterDraftLetters(false) // Clear draft letters filter when applying saved search
+      setActiveSavedSearch(search.id)
+    }
+  }
+
+  // Delete a saved search
+  const deleteSavedSearch = (searchId: string) => {
+    // Get all searches from localStorage
+    const stored = localStorage.getItem("todoBacklogSavedSearches")
+    const allSearches: SavedSearch[] = stored ? JSON.parse(stored) : []
+    
+    // Remove the search
+    const updated = allSearches.filter((s) => s.id !== searchId)
+    localStorage.setItem("todoBacklogSavedSearches", JSON.stringify(updated))
+
+    // Update local state
+    setSavedSearches((prev) => prev.filter((s) => s.id !== searchId))
+    if (activeSavedSearch === searchId) {
+      setActiveSavedSearch(null)
+    }
+  }
+
+  // Check if current filters match any criteria worth saving
+  const hasActiveFilters = searchTerm || filterStatus !== "all" || filterCaseManager !== "all" || filterCaseType !== "all"
+
+  // Calculate result count for a saved search
+  const getSearchResultCount = (search: SavedSearch): number => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    return allTodos.filter((item) => {
+      // Status filter
+      if (search.filterStatus !== "all") {
+        const isOverdue = !item.todo.completed && item.todo.dateScheduled && new Date(item.todo.dateScheduled) < today
+        
+        if (search.filterStatus === "active" && item.todo.completed) return false
+        if (search.filterStatus === "comp" && !item.todo.completed) return false
+        if (search.filterStatus === "over") {
+          if (item.todo.completed) return false
+          if (!isOverdue) return false
+        }
+        if (search.filterStatus === "open" && item.todo.completed) return false
+        if (search.filterStatus === "closed" && !item.todo.completed) return false
+        if (search.filterStatus === "pend" && item.todo.completed) return false
+        if (search.filterStatus === "reopen" && item.todo.completed) return false
+      }
+
+      // Case manager filter
+      if (search.filterCaseManager !== "all") {
+        if (item.todo.caseManager !== search.filterCaseManager && item.caseCaseManager !== search.filterCaseManager) {
+          return false
+        }
+      }
+
+      // Case type filter
+      if (search.filterCaseType !== "all" && item.caseType !== search.filterCaseType) {
+        return false
+      }
+
+      // Search filter
+      if (search.searchTerm) {
+        const searchLower = search.searchTerm.toLowerCase()
+        if (
+          !item.todo.activity.toLowerCase().includes(searchLower) &&
+          !item.employeeName.toLowerCase().includes(searchLower) &&
+          !item.caseNumber.toLowerCase().includes(searchLower)
+        ) {
+          return false
+        }
+      }
+
+      return true
+    }).length
+  }
 
   // Collect all todos from all cases
   const allTodos = useMemo(() => {
@@ -125,6 +277,13 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
         return false
       }
 
+      // Draft letter filter
+      if (filterDraftLetters) {
+        if (!item.todo.activity.toLowerCase().includes("complete draft letter")) {
+          return false
+        }
+      }
+
       // Search filter
       if (searchTerm) {
         const search = searchTerm.toLowerCase()
@@ -139,7 +298,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
 
       return true
     })
-  }, [allTodos, filterStatus, filterCaseManager, filterCaseType, searchTerm])
+  }, [allTodos, filterStatus, filterCaseManager, filterCaseType, filterDraftLetters, searchTerm])
 
   // Stats
   const stats = useMemo(() => {
@@ -153,8 +312,11 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
       if (t.todo.completed || !t.todo.dateScheduled) return false
       return new Date(t.todo.dateScheduled) < today
     }).length
+    const draftLetters = allTodos.filter((t) => 
+      !t.todo.completed && t.todo.activity.toLowerCase().includes("complete draft letter")
+    ).length
 
-    return { total, completed, active, overdue }
+    return { total, completed, active, overdue, draftLetters }
   }, [allTodos])
 
   const handleViewCase = (caseNumber: string) => {
@@ -314,7 +476,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>TODO Backlog Report - ${new Date().toLocaleDateString()}</title>
+        <title>To Do Report - ${new Date().toLocaleDateString()}</title>
         <style>
           body { font-family: Arial, sans-serif; padding: 20px; font-size: 12px; }
           h1 { font-size: 18px; margin-bottom: 5px; }
@@ -339,7 +501,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
         </style>
       </head>
       <body>
-        <h1>TODO Backlog Report</h1>
+        <h1>To Do Report</h1>
         <div class="subtitle">Generated on ${new Date().toLocaleString()}</div>
         <div class="stats">
           <div class="stat"><div class="stat-label">Total</div><div class="stat-value">${stats.total}</div></div>
@@ -438,7 +600,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
             Back
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">TODO Backlog</h1>
+            <h1 className="text-2xl font-bold">To Do</h1>
             <p className="text-muted-foreground">All todos across all cases</p>
           </div>
         </div>
@@ -455,32 +617,83 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
+      <div className="flex flex-wrap gap-4">
+        <Card className="min-w-[120px]">
           <CardHeader className="py-3">
             <CardDescription>Total</CardDescription>
             <CardTitle className="text-2xl">{stats.total}</CardTitle>
           </CardHeader>
         </Card>
-        <Card>
+        <Card className="min-w-[120px]">
           <CardHeader className="py-3">
             <CardDescription>Active</CardDescription>
             <CardTitle className="text-2xl text-blue-600">{stats.active}</CardTitle>
           </CardHeader>
         </Card>
-        <Card>
+        <Card className="min-w-[120px]">
           <CardHeader className="py-3">
             <CardDescription>Completed</CardDescription>
             <CardTitle className="text-2xl text-green-600">{stats.completed}</CardTitle>
           </CardHeader>
         </Card>
-        <Card>
+        <Card className="min-w-[120px]">
           <CardHeader className="py-3">
             <CardDescription>Overdue</CardDescription>
             <CardTitle className="text-2xl text-red-600">{stats.overdue}</CardTitle>
           </CardHeader>
         </Card>
+        <Card 
+          className={`min-w-[120px] cursor-pointer transition-colors hover:border-orange-400 ${filterDraftLetters ? "border-orange-500 bg-orange-50 dark:bg-orange-950/20" : ""}`}
+          onClick={() => setFilterDraftLetters(!filterDraftLetters)}
+        >
+          <CardHeader className="py-3">
+            <CardDescription className="flex items-center justify-between">
+              Draft Letters
+              {filterDraftLetters && <span className="text-xs text-orange-600">(filtered)</span>}
+            </CardDescription>
+            <CardTitle className="text-2xl text-orange-600">{stats.draftLetters}</CardTitle>
+          </CardHeader>
+        </Card>
       </div>
+
+      {/* Bookmarked Searches Banner - Only visible to the user who created them */}
+      {savedSearches.length > 0 && (
+        <Card className="border-purple-200 bg-purple-50/50 dark:bg-purple-950/10 dark:border-purple-900">
+          <CardContent className="py-2 px-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-2 text-purple-700 dark:text-purple-400">
+                <Bookmark className="h-4 w-4" />
+                <span className="text-sm font-medium">Bookmarked Searches:</span>
+              </div>
+              {savedSearches.map((search) => (
+                <div key={search.id} className="flex items-center">
+                  <Button
+                    variant={activeSavedSearch === search.id ? "default" : "outline"}
+                    size="sm"
+                    className={`h-8 ${activeSavedSearch === search.id ? "bg-purple-600 hover:bg-purple-700" : "border-purple-300 hover:border-purple-500 hover:bg-purple-100 dark:hover:bg-purple-900/30"}`}
+                    onClick={() => applySavedSearch(search)}
+                  >
+                    <BookmarkCheck className="h-3.5 w-3.5 mr-1.5" />
+                    {search.name}
+                    <Badge variant="secondary" className="ml-2 h-5 px-1.5 text-xs bg-purple-200 text-purple-800 dark:bg-purple-800 dark:text-purple-200">
+                      {getSearchResultCount(search)}
+                    </Badge>
+                    {activeSavedSearch === search.id && <span className="ml-1.5 text-xs">(active)</span>}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 ml-1 text-muted-foreground hover:text-destructive"
+                    onClick={() => deleteSavedSearch(search.id)}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Bulk Edit Toolbar */}
       {someSelected && (
@@ -630,6 +843,50 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
                 </SelectContent>
               </Select>
             </div>
+            {/* Save Search Button */}
+            {hasActiveFilters && !showSaveDialog && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9"
+                onClick={() => setShowSaveDialog(true)}
+              >
+                <Bookmark className="h-4 w-4 mr-2" />
+                Bookmark Search
+              </Button>
+            )}
+            {showSaveDialog && (
+              <div className="flex items-center gap-2">
+                <Input
+                  placeholder="Enter search name..."
+                  value={newSearchName}
+                  onChange={(e) => setNewSearchName(e.target.value)}
+                  className="w-[180px] h-9"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") saveCurrentSearch()
+                    if (e.key === "Escape") {
+                      setShowSaveDialog(false)
+                      setNewSearchName("")
+                    }
+                  }}
+                  autoFocus
+                />
+                <Button size="sm" className="h-9" onClick={saveCurrentSearch} disabled={!newSearchName.trim()}>
+                  Save
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-9"
+                  onClick={() => {
+                    setShowSaveDialog(false)
+                    setNewSearchName("")
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            )}
             <div className="ml-auto text-sm text-muted-foreground">
               Showing {filteredTodos.length} of {allTodos.length} todos
             </div>

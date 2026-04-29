@@ -29,10 +29,10 @@ const TAB_ORDER = ["case", "contact", "absence-restrictions", "diagnosis", "todo
 
 const TAB_LABELS: Record<string, string> = {
   "case": "Case",
-  "contact": "Contact", 
-  "absence-restrictions": "Absence & Restrictions",
+  "contact": "Contacts", 
+  "absence-restrictions": "Absences & Restrictions",
   "diagnosis": "Diagnosis",
-  "todos": "To-Dos",
+  "todos": "To Do",
   "case-notes": "Case Notes",
   "letters": "Letters",
   "documents": "Documents",
@@ -437,7 +437,8 @@ export function CaseManager() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="case-tabs w-full">
-          <TabsList className="case-tabs-list w-full justify-start bg-transparent border-b rounded-none h-auto p-0 flex-wrap">
+          <div className="sticky top-14 sm:top-16 z-40 bg-background shadow-sm">
+            <TabsList className="case-tabs-list w-full justify-start bg-background border-b rounded-none h-auto p-0 flex-wrap">
             <TabsTrigger
               value="case"
               className="rounded-t-lg rounded-b-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2.5 font-medium"
@@ -448,13 +449,13 @@ export function CaseManager() {
               value="contact"
               className="rounded-t-lg rounded-b-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2.5 font-medium"
             >
-              Contact
+              Contacts
             </TabsTrigger>
             <TabsTrigger
               value="absence-restrictions"
               className="rounded-t-lg rounded-b-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2.5 font-medium"
             >
-              Absence & Restrictions
+Absences & Restrictions
             </TabsTrigger>
             <TabsTrigger
               value="diagnosis"
@@ -466,7 +467,7 @@ export function CaseManager() {
               value="todos"
               className="rounded-t-lg rounded-b-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2.5 font-medium"
             >
-              To-Dos
+              To Do
             </TabsTrigger>
             <TabsTrigger
               value="case-notes"
@@ -493,6 +494,7 @@ export function CaseManager() {
               Activity
             </TabsTrigger>
           </TabsList>
+          </div>
 
           <div className="case-tabs-content bg-card rounded-lg rounded-tl-none shadow-sm border mt-0 p-6">
             <TabsContent value="case" className="m-0">

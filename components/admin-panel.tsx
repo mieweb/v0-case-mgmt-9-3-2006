@@ -19,6 +19,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { generateTodosFromTemplates, type ParsedTodo } from "@/lib/todo-parser"
 import { TodoTemplateBuilder, TodoTemplateHelp } from "@/components/todo-template-builder"
 import { LetterTemplateManager } from "@/components/letter-template-manager"
+import { CaseNoteTemplateManager } from "@/components/case-note-template-manager"
 import {
   Dialog,
   DialogContent,
@@ -146,6 +147,7 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
           <TabsTrigger value="case-managers">Case Managers</TabsTrigger>
           <TabsTrigger value="case-types">Case Types</TabsTrigger>
           <TabsTrigger value="letter-templates">Letter Templates</TabsTrigger>
+          <TabsTrigger value="case-note-templates">Case Note Templates</TabsTrigger>
           <TabsTrigger value="case-status-codes">Case Status</TabsTrigger>
           <TabsTrigger value="case-category-codes">Case Category</TabsTrigger>
           <TabsTrigger value="case-closure-reason-codes">Closure Reason</TabsTrigger>
@@ -306,33 +308,7 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
                                           }
                                         />
                                       </div>
-                                      <div className="space-y-2">
-                                        <Label>Surgery Date (optional)</Label>
-                                        <Input
-                                          type="date"
-                                          value={testAnchorDates.surgeryDate}
-                                          onChange={(e) =>
-                                            setTestAnchorDates((prev) => ({
-                                              ...prev,
-                                              surgeryDate: e.target.value,
-                                            }))
-                                          }
-                                        />
                                       </div>
-                                      <div className="space-y-2">
-                                        <Label>Delivery Date (optional)</Label>
-                                        <Input
-                                          type="date"
-                                          value={testAnchorDates.deliveryDate}
-                                          onChange={(e) =>
-                                            setTestAnchorDates((prev) => ({
-                                              ...prev,
-                                              deliveryDate: e.target.value,
-                                            }))
-                                          }
-                                        />
-                                      </div>
-                                    </div>
                                     <Button onClick={handleGenerateTodos}>Generate Todo Preview</Button>
 
                                     {generatedTodos.length > 0 && (
@@ -392,6 +368,15 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
             onAdd={(template) => addCode("letterTemplates", template)}
             onUpdate={(id, updates) => updateCode("letterTemplates", id, updates)}
             onDelete={(id) => deleteCode("letterTemplates", id)}
+          />
+        </TabsContent>
+
+        <TabsContent value="case-note-templates" className="space-y-6">
+          <CaseNoteTemplateManager
+            templates={codes.caseNoteTemplates}
+            onAdd={(template) => addCode("caseNoteTemplates", template)}
+            onUpdate={(id, updates) => updateCode("caseNoteTemplates", id, updates)}
+            onDelete={(id) => deleteCode("caseNoteTemplates", id)}
           />
         </TabsContent>
 

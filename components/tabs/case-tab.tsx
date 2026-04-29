@@ -22,7 +22,7 @@ import { useEmployees } from "@/contexts/employees-context"
 import { generateTodosFromTemplates } from "@/lib/todo-parser"
 import { useState, useEffect } from "react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Briefcase, MapPin, FileText, Stethoscope, Shield, Activity, Info, FolderOpen, Calendar, Baby, Clock, BarChart3, DollarSign, HardHat, RotateCcw } from "lucide-react"
+import { AlertCircle, Briefcase, MapPin, FileText, Stethoscope, Shield, Activity, Info, FolderOpen, Calendar, Clock, BarChart3, HardHat } from "lucide-react"
 import { CollapsibleSection } from "@/components/ui/collapsible-section"
 
 const adjusterData: Record<string, { name: string; phone: string; email: string }> = {
@@ -490,7 +490,7 @@ export function CaseTab() {
               </SelectTrigger>
               <SelectContent>
                 {codes.caseStatus
-                  .filter((s) => s.active && s.description !== "Closed")
+                  .filter((s) => s.active)
                   .map((statusCode) => (
                     <SelectItem key={statusCode.id} value={statusCode.description}>
                       {statusCode.description}
@@ -540,9 +540,6 @@ export function CaseTab() {
               }}
             />
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="case-manager" className="text-sm text-muted-foreground">
               Case manager
@@ -570,7 +567,108 @@ export function CaseTab() {
               </SelectContent>
             </Select>
           </div>
-          <div className="flex items-center space-x-2 pt-6">
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="adjuster" className="text-sm text-muted-foreground">
+              Adjuster
+            </Label>
+            <Select
+              value={adjuster}
+              onValueChange={(val) => {
+                setAdjuster(val)
+                const adjInfo = adjusterData[val]
+                if (adjInfo) {
+                  handleFieldUpdate("adjuster", val)
+                  handleFieldUpdate("adjusterPhone", adjInfo.phone)
+                  handleFieldUpdate("adjusterEmail", adjInfo.email)
+                } else {
+                  handleFieldUpdate("adjuster", val)
+                }
+              }}
+            >
+              <SelectTrigger id="adjuster" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALLENA">Ashley Allen</SelectItem>
+                <SelectItem value="ANDERSONR">Randolph Anderson</SelectItem>
+                <SelectItem value="BADALI">Derek Badali</SelectItem>
+                <SelectItem value="BENTLEY">Shuntrea Bentley</SelectItem>
+                <SelectItem value="BLUM">Michael Blum</SelectItem>
+                <SelectItem value="CAHILL">Erin Cahill</SelectItem>
+                <SelectItem value="CHINND">Donna Chinn</SelectItem>
+                <SelectItem value="CONNORD">Danielle Connor</SelectItem>
+                <SelectItem value="COPELANDC">Christie Copeland</SelectItem>
+                <SelectItem value="CRAWFORDT">Thellene Crawford</SelectItem>
+                <SelectItem value="CRUZT">Toni Cruz</SelectItem>
+                <SelectItem value="DROUARET">Tyler Drouare</SelectItem>
+                <SelectItem value="FOXC">Carol Fox</SelectItem>
+                <SelectItem value="GASTONC">Cristal Gaston</SelectItem>
+                <SelectItem value="GROTANS">Sandi Grotans</SelectItem>
+                <SelectItem value="HANDLEY">Deanna Handley</SelectItem>
+                <SelectItem value="JONESSANDY">Sandy Jones</SelectItem>
+                <SelectItem value="JONEST">Tellie Jones</SelectItem>
+                <SelectItem value="MALONE">Shemaya Malone</SelectItem>
+                <SelectItem value="MCDONALDA">Alexsis McDonald</SelectItem>
+                <SelectItem value="MCQUADE">Jennifer McQuade</SelectItem>
+                <SelectItem value="MELENDEZ">Tracy Melendez</SelectItem>
+                <SelectItem value="MORGANS">Susan Morgan</SelectItem>
+                <SelectItem value="MURPHY">Melanie Murphy</SelectItem>
+                <SelectItem value="NABORSS">Stephanie Nabors</SelectItem>
+                <SelectItem value="NEWTONM">Michelle Newton</SelectItem>
+                <SelectItem value="NORRIS">Andrew Norris</SelectItem>
+                <SelectItem value="OSBORNEL">Leslie Osborne</SelectItem>
+                <SelectItem value="OTERO">Jessie Otero</SelectItem>
+                <SelectItem value="PIKEB">Brittany Pike</SelectItem>
+                <SelectItem value="PRESLEYK">Karen Presley</SelectItem>
+                <SelectItem value="PROVENCHER">Karen Provencher</SelectItem>
+                <SelectItem value="RAINSA">April Rains</SelectItem>
+                <SelectItem value="SANCHEZJ">Jessica Sanchez</SelectItem>
+                <SelectItem value="SPANGLERB">Beth Spangler</SelectItem>
+                <SelectItem value="SPEAKER">Katrina Sepaker</SelectItem>
+                <SelectItem value="TAYLORH">Heather Taylor</SelectItem>
+                <SelectItem value="TURK">Maureen Turk</SelectItem>
+                <SelectItem value="VELEZM">Mayra Velez</SelectItem>
+                <SelectItem value="WADOODA">Aneesa Wadood</SelectItem>
+                <SelectItem value="WATSONA">Amy Watson</SelectItem>
+                <SelectItem value="WATSONL">Lisa Watson</SelectItem>
+                <SelectItem value="WHIPPLEV">Victoria Whipple</SelectItem>
+                <SelectItem value="WROBLAKH">Holly Wroblak</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="adjuster-phone" className="text-sm text-muted-foreground">
+              Adjuster Phone
+            </Label>
+            <Input
+              id="adjuster-phone"
+              type="tel"
+              className="bg-background w-40"
+              value={currentCase?.adjusterPhone || ""}
+              onChange={(e) => handleFieldUpdate("adjusterPhone", e.target.value)}
+              placeholder="(555) 123-4567"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="adjuster-email" className="text-sm text-muted-foreground">
+              Adjuster Email
+            </Label>
+            <Input
+              id="adjuster-email"
+              type="email"
+              className="bg-background w-56"
+              value={currentCase?.adjusterEmail || ""}
+              onChange={(e) => handleFieldUpdate("adjusterEmail", e.target.value)}
+              placeholder="adjuster@example.com"
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-4">
+          <div className="flex items-center space-x-2">
             <input
               type="checkbox"
               id="confidential-case"
@@ -579,34 +677,178 @@ export function CaseTab() {
               className="h-4 w-4 rounded border-gray-300"
             />
             <Label htmlFor="confidential-case" className="text-sm font-medium cursor-pointer">
-              Mark as Confidential Case
+              Confidential Case
             </Label>
           </div>
-          <div className="flex items-center pt-6">
-            <Button
-              type="button"
-              variant={status === "Closed" ? "secondary" : "destructive"}
-              size="sm"
-              disabled={status === "Closed"}
-              onClick={() => {
-                if (openTodos.length > 0 || openRestrictions.length > 0) {
-                  setPendingStatus("Closed")
-                  setSelectedTodosToClose([])
-                  setSelectedRestrictionsToClose([])
-                  setShowCloseCaseDialog(true)
-                } else {
-                  setStatus("Closed")
-                  handleFieldUpdate("status", "Closed")
-                }
-              }}
-            >
-              {status === "Closed" ? "Case Closed" : "Close Case"}
-            </Button>
-          </div>
+          <Button
+            type="button"
+            variant={status === "Closed" ? "secondary" : "destructive"}
+            size="sm"
+            disabled={status === "Closed"}
+            onClick={() => {
+              if (openTodos.length > 0 || openRestrictions.length > 0) {
+                setPendingStatus("Closed")
+                setSelectedTodosToClose([])
+                setSelectedRestrictionsToClose([])
+                setShowCloseCaseDialog(true)
+              } else {
+                setStatus("Closed")
+                handleFieldUpdate("status", "Closed")
+              }
+            }}
+          >
+            {status === "Closed" ? "Case Closed" : "Close Case"}
+          </Button>
         </div>
       </CollapsibleSection>
 
       <CollapsibleSection title="Case Dates" icon={<Calendar className="h-4 w-4" />} defaultOpen={true}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="date-disability" className="text-sm text-muted-foreground">
+              Date of disability
+            </Label>
+            <Input
+              id="date-disability"
+              type="date"
+              className="bg-background"
+              value={dateOfDisability}
+              onChange={(e) => {
+                setDateOfDisability(e.target.value)
+                handleFieldUpdate("dateOfDisability", e.target.value)
+                if (e.target.value) {
+                  generateTodosFromDisabilityDate(e.target.value)
+                }
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="initial-contact" className="text-sm text-muted-foreground">
+              Initial contact date
+            </Label>
+            <Input
+              id="initial-contact"
+              type="date"
+              className="bg-background"
+              value={initialContactDate}
+              onChange={(e) => {
+                setInitialContactDate(e.target.value)
+                handleFieldUpdate("initialContactDate", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="date-closed" className="text-sm text-muted-foreground">
+              Date closed
+            </Label>
+            <Input
+              id="date-closed"
+              type="date"
+              className="bg-background"
+              value={dateClosed}
+              onChange={(e) => {
+                setDateClosed(e.target.value)
+                handleFieldUpdate("dateClosed", e.target.value)
+              }}
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="closure-reason" className="text-sm text-muted-foreground">
+              Plan name
+            </Label>
+            <Select
+              value={closureReason}
+              onValueChange={(val) => {
+                setClosureReason(val)
+                handleFieldUpdate("closureReason", val)
+              }}
+            >
+              <SelectTrigger id="closure-reason" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                {codes.caseClosureReason
+                  .filter((c) => c.active)
+                  .map((reason) => (
+                    <SelectItem key={reason.id} value={reason.code}>
+                      {reason.description || reason.code}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="expected-return" className="text-sm text-muted-foreground">
+              Expected return date
+            </Label>
+            <Input
+              id="expected-return"
+              type="date"
+              className="bg-background"
+              value={expectedReturnDate}
+              onChange={(e) => {
+                setExpectedReturnDate(e.target.value)
+                handleFieldUpdate("expectedReturnDate", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="actual-return" className="text-sm text-muted-foreground">
+              Actual return date
+            </Label>
+            <Input
+              id="actual-return"
+              type="date"
+              className="bg-background"
+              value={actualReturnDate}
+              onChange={(e) => {
+                setActualReturnDate(e.target.value)
+                handleFieldUpdate("actualReturnDate", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="pay-start" className="text-sm text-muted-foreground">
+              Pay start date
+            </Label>
+            <Input
+              id="pay-start"
+              type="date"
+              className="bg-background"
+              value={payStartDate}
+              onChange={(e) => {
+                setPayStartDate(e.target.value)
+                handleFieldUpdate("payStartDate", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="pay-end" className="text-sm text-muted-foreground">
+              Pay end date
+            </Label>
+            <Input
+              id="pay-end"
+              type="date"
+              className="bg-background"
+              value={payEndDate}
+              onChange={(e) => {
+                setPayEndDate(e.target.value)
+                handleFieldUpdate("payEndDate", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="fica-date" className="text-sm text-muted-foreground">
+              FICA tracking date <span className="text-xs italic">(auto-calculated)</span>
+            </Label>
+            <Input id="fica-date" type="date" className="bg-muted/50" value={ficaDate} readOnly />
+            <p className="text-xs text-muted-foreground mt-1">
+              Date of disability + 6 months + first day of next month
+            </p>
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-2">
             <Label htmlFor="case-incident-date" className="text-sm text-muted-foreground">
@@ -669,86 +911,6 @@ export function CaseTab() {
             />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="date-disability" className="text-sm text-muted-foreground">
-              Date of disability
-            </Label>
-            <Input
-              id="date-disability"
-              type="date"
-              className="bg-background"
-              value={dateOfDisability}
-              onChange={(e) => {
-                setDateOfDisability(e.target.value)
-                handleFieldUpdate("dateOfDisability", e.target.value)
-                if (e.target.value) {
-                  generateTodosFromDisabilityDate(e.target.value)
-                }
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="initial-contact" className="text-sm text-muted-foreground">
-              Initial contact date
-            </Label>
-            <Input
-              id="initial-contact"
-              type="date"
-              className="bg-background"
-              value={initialContactDate}
-              onChange={(e) => {
-                setInitialContactDate(e.target.value)
-                handleFieldUpdate("initialContactDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="date-closed" className="text-sm text-muted-foreground">
-              Date closed
-            </Label>
-            <Input
-              id="date-closed"
-              type="date"
-              className="bg-background"
-              value={dateClosed}
-              onChange={(e) => {
-                setDateClosed(e.target.value)
-                handleFieldUpdate("dateClosed", e.target.value)
-              }}
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="closure-reason" className="text-sm text-muted-foreground">
-              Closure reason
-            </Label>
-            <Select
-              value={closureReason}
-              onValueChange={(val) => {
-                setClosureReason(val)
-                handleFieldUpdate("closureReason", val)
-              }}
-            >
-              <SelectTrigger id="closure-reason" className="bg-background">
-                <SelectValue placeholder="Select..." />
-              </SelectTrigger>
-              <SelectContent>
-                {codes.caseClosureReason
-                  .filter((c) => c.active)
-                  .map((reason) => (
-                    <SelectItem key={reason.id} value={reason.code}>
-                      {reason.description || reason.code}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </CollapsibleSection>
-
-      <CollapsibleSection title="Maternity Information" icon={<Baby className="h-4 w-4" />} defaultOpen={true}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="expected-confinement" className="text-sm text-muted-foreground">
@@ -780,6 +942,36 @@ export function CaseTab() {
               }}
             />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="std-start" className="text-sm text-muted-foreground">
+              STD (Pay) start date
+            </Label>
+            <Input
+              id="std-start"
+              type="date"
+              className="bg-background"
+              value={stdStartDate}
+              onChange={(e) => {
+                setStdStartDate(e.target.value)
+                handleFieldUpdate("stdStartDate", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="mmi" className="text-sm text-muted-foreground">
+              Maximum medical improvement (MMI)
+            </Label>
+            <Input
+              id="mmi"
+              type="date"
+              className="bg-background"
+              value={maximumMedicalImprovement}
+              onChange={(e) => {
+                setMaximumMedicalImprovement(e.target.value)
+                handleFieldUpdate("maximumMedicalImprovement", e.target.value)
+              }}
+            />
+          </div>
         </div>
       </CollapsibleSection>
 
@@ -800,120 +992,10 @@ export function CaseTab() {
               }}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="std-start" className="text-sm text-muted-foreground">
-              STD start date
-            </Label>
-            <Input
-              id="std-start"
-              type="date"
-              className="bg-background"
-              value={stdStartDate}
-              onChange={(e) => {
-                setStdStartDate(e.target.value)
-                handleFieldUpdate("stdStartDate", e.target.value)
-              }}
-            />
           </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="adjuster" className="text-sm text-muted-foreground">
-            Adjuster (GB adjuster)
-          </Label>
-          <Select
-            value={adjuster}
-            onValueChange={(val) => {
-              setAdjuster(val)
-              const adjInfo = adjusterData[val]
-              if (adjInfo) {
-                handleFieldUpdate("adjuster", val)
-                handleFieldUpdate("adjusterPhone", adjInfo.phone)
-                handleFieldUpdate("adjusterEmail", adjInfo.email)
-              } else {
-                handleFieldUpdate("adjuster", val)
-              }
-            }}
-          >
-            <SelectTrigger id="adjuster" className="bg-background w-full md:w-1/2">
-              <SelectValue placeholder="Select..." />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALLENA">Ashley Allen</SelectItem>
-              <SelectItem value="ANDERSONR">Randolph Anderson</SelectItem>
-              <SelectItem value="BADALI">Derek Badali</SelectItem>
-              <SelectItem value="BENTLEY">Shuntrea Bentley</SelectItem>
-              <SelectItem value="BLUM">Michael Blum</SelectItem>
-              <SelectItem value="CAHILL">Erin Cahill</SelectItem>
-              <SelectItem value="CHINND">Donna Chinn</SelectItem>
-              <SelectItem value="CONNORD">Danielle Connor</SelectItem>
-              <SelectItem value="COPELANDC">Christie Copeland</SelectItem>
-              <SelectItem value="CRAWFORDT">Thellene Crawford</SelectItem>
-              <SelectItem value="CRUZT">Toni Cruz</SelectItem>
-              <SelectItem value="DROUARET">Tyler Drouare</SelectItem>
-              <SelectItem value="FOXC">Carol Fox</SelectItem>
-              <SelectItem value="GASTONC">Cristal Gaston</SelectItem>
-              <SelectItem value="GROTANS">Sandi Grotans</SelectItem>
-              <SelectItem value="HANDLEY">Deanna Handley</SelectItem>
-              <SelectItem value="JONESSANDY">Sandy Jones</SelectItem>
-              <SelectItem value="JONEST">Tellie Jones</SelectItem>
-              <SelectItem value="MALONE">Shemaya Malone</SelectItem>
-              <SelectItem value="MCDONALDA">Alexsis McDonald</SelectItem>
-              <SelectItem value="MCQUADE">Jennifer McQuade</SelectItem>
-              <SelectItem value="MELENDEZ">Tracy Melendez</SelectItem>
-              <SelectItem value="MORGANS">Susan Morgan</SelectItem>
-              <SelectItem value="MURPHY">Melanie Murphy</SelectItem>
-              <SelectItem value="NABORSS">Stephanie Nabors</SelectItem>
-              <SelectItem value="NEWTONM">Michelle Newton</SelectItem>
-              <SelectItem value="NORRIS">Andrew Norris</SelectItem>
-              <SelectItem value="OSBORNEL">Leslie Osborne</SelectItem>
-              <SelectItem value="OTERO">Jessie Otero</SelectItem>
-              <SelectItem value="PIKEB">Brittany Pike</SelectItem>
-              <SelectItem value="PRESLEYK">Karen Presley</SelectItem>
-              <SelectItem value="PROVENCHER">Karen Provencher</SelectItem>
-              <SelectItem value="RAINSA">April Rains</SelectItem>
-              <SelectItem value="SANCHEZJ">Jessica Sanchez</SelectItem>
-              <SelectItem value="SPANGLERB">Beth Spangler</SelectItem>
-              <SelectItem value="SPEAKER">Katrina Sepaker</SelectItem>
-              <SelectItem value="TAYLORH">Heather Taylor</SelectItem>
-              <SelectItem value="TURK">Maureen Turk</SelectItem>
-              <SelectItem value="VELEZM">Mayra Velez</SelectItem>
-              <SelectItem value="WADOODA">Aneesa Wadood</SelectItem>
-              <SelectItem value="WATSONA">Amy Watson</SelectItem>
-              <SelectItem value="WATSONL">Lisa Watson</SelectItem>
-              <SelectItem value="WHIPPLEV">Victoria Whipple</SelectItem>
-              <SelectItem value="WROBLAKH">Holly Wroblak</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="adjuster-phone" className="text-sm text-muted-foreground">
-            Adjuster Phone
-          </Label>
-          <Input
-            id="adjuster-phone"
-            type="tel"
-            className="bg-background"
-            value={currentCase?.adjusterPhone || ""}
-            onChange={(e) => handleFieldUpdate("adjusterPhone", e.target.value)}
-            placeholder="(555) 123-4567"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="adjuster-email" className="text-sm text-muted-foreground">
-            Adjuster Email
-          </Label>
-          <Input
-            id="adjuster-email"
-            type="email"
-            className="bg-background"
-            value={currentCase?.adjusterEmail || ""}
-            onChange={(e) => handleFieldUpdate("adjusterEmail", e.target.value)}
-            placeholder="adjuster@example.com"
-          />
-        </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Duration of Disability Guidelines (DDG)" icon={<BarChart3 className="h-4 w-4" />} defaultOpen={true}>
+      <CollapsibleSection title="Disability Duration Guidelines (DDG)" icon={<BarChart3 className="h-4 w-4" />} defaultOpen={true}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="ddg-days" className="text-sm text-muted-foreground">
@@ -960,47 +1042,14 @@ export function CaseTab() {
                 htmlFor="hcp-contacted"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                Yes (prior to DDG expiring)
+                Yes
               </label>
             </div>
           </div>
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Return to Work" icon={<RotateCcw className="h-4 w-4" />} defaultOpen={true}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="expected-return" className="text-sm text-muted-foreground">
-              Expected return date
-            </Label>
-            <Input
-              id="expected-return"
-              type="date"
-              className="bg-background"
-              value={expectedReturnDate}
-              onChange={(e) => {
-                setExpectedReturnDate(e.target.value)
-                handleFieldUpdate("expectedReturnDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="actual-return" className="text-sm text-muted-foreground">
-              Actual return date
-            </Label>
-            <Input
-              id="actual-return"
-              type="date"
-              className="bg-background"
-              value={actualReturnDate}
-              onChange={(e) => {
-                setActualReturnDate(e.target.value)
-                handleFieldUpdate("actualReturnDate", e.target.value)
-              }}
-            />
-          </div>
-        </div>
-      </CollapsibleSection>
+      
 
       <CollapsibleSection title="Work Status Metrics" icon={<BarChart3 className="h-4 w-4" />} defaultOpen={true}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1015,21 +1064,6 @@ export function CaseTab() {
               Days restricted <span className="text-xs italic">(calculated)</span>
             </Label>
             <Input id="days-restricted" className="bg-muted/50" readOnly />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="mmi" className="text-sm text-muted-foreground">
-              Maximum medical improvement (MMI)
-            </Label>
-            <Input
-              id="mmi"
-              placeholder="Enter MMI..."
-              className="bg-background"
-              value={maximumMedicalImprovement}
-              onChange={(e) => {
-                setMaximumMedicalImprovement(e.target.value)
-                handleFieldUpdate("maximumMedicalImprovement", e.target.value)
-              }}
-            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="ppi" className="text-sm text-muted-foreground">
@@ -1064,51 +1098,7 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Pay Information" icon={<DollarSign className="h-4 w-4" />} defaultOpen={true}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="pay-start" className="text-sm text-muted-foreground">
-              Pay start date
-            </Label>
-            <Input
-              id="pay-start"
-              type="date"
-              className="bg-background"
-              value={payStartDate}
-              onChange={(e) => {
-                setPayStartDate(e.target.value)
-                handleFieldUpdate("payStartDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="pay-end" className="text-sm text-muted-foreground">
-              Pay end date
-            </Label>
-            <Input
-              id="pay-end"
-              type="date"
-              className="bg-background"
-              value={payEndDate}
-              onChange={(e) => {
-                setPayEndDate(e.target.value)
-                handleFieldUpdate("payEndDate", e.target.value)
-              }}
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="fica-date" className="text-sm text-muted-foreground">
-              FICA tracking date <span className="text-xs italic">(auto-calculated)</span>
-            </Label>
-            <Input id="fica-date" type="date" className="bg-muted/50" value={ficaDate} readOnly />
-            <p className="text-xs text-muted-foreground mt-1">
-              Date of disability + 6 months + first day of next month
-            </p>
-          </div>
-        </div>
-      </CollapsibleSection>
+      
 
       <CollapsibleSection title="Occupational Injury Information" icon={<HardHat className="h-4 w-4" />} defaultOpen={hasOccupationalInjuryData()}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1219,6 +1209,8 @@ export function CaseTab() {
                 <SelectItem value="10 Hr Fixed">10 Hr Fixed</SelectItem>
                 <SelectItem value="12 Hr Rotating">12 Hr Rotating</SelectItem>
                 <SelectItem value="12 Hr Fixed">12 Hr Fixed</SelectItem>
+                <SelectItem value="40 Hr">40 Hr</SelectItem>
+                <SelectItem value="45 Hr">45 Hr</SelectItem>
                 <SelectItem value="Non-Shift">Non-Shift</SelectItem>
                 <SelectItem value="Salary">Salary</SelectItem>
               </SelectContent>
@@ -2579,7 +2571,7 @@ export function CaseTab() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmConfidential} className="bg-destructive hover:bg-destructive/90">
-              Mark as Confidential
+              Confidential
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -90,7 +90,7 @@ export default function Page() {
                 size="sm"
               >
                 <ListTodo className="h-4 w-4" />
-                <span className="hidden sm:inline">TODO Backlog</span>
+                <span className="hidden sm:inline">To Do</span>
               </Button>
             </div>
             <div className="navbar-right flex items-center gap-1 sm:gap-2">
@@ -174,6 +174,9 @@ export default function Page() {
                     <DropdownMenuItem onClick={() => openAdminSection("case-types")}>Case Types</DropdownMenuItem>
                     <DropdownMenuItem onClick={() => openAdminSection("letter-templates")}>
                       Letter Templates
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openAdminSection("case-note-templates")}>
+                      Case Note Templates
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => openAdminSection("case-status-codes")}>
                       Case Status Codes

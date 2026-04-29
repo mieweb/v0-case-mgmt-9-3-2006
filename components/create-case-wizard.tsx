@@ -69,6 +69,16 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
     if (step < totalSteps) {
       setStep(step + 1)
     } else {
+      const initialCaseNote = formData.initialNotes?.trim() ? [{
+          id: `note-${Date.now()}`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          content: formData.initialNotes,
+          author: formData.caseManager || "System",
+          noteType: "General" as const,
+          versions: [],
+        }] : []
+
       addCase({
         employeeName: formData.employeeName,
         employeeNumber: formData.employeeNumber,
@@ -83,6 +93,7 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
         expectedReturnDate: formData.expectedReturnDate,
         stdPlan: formData.stdPlan,
         stdStartDate: formData.stdStartDate,
+        caseNotes: initialCaseNote,
       })
       onComplete()
     }
@@ -143,7 +154,7 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="employee-search">Employee Name or ID</Label>
+                <Label htmlFor="employee-search">Employee Name or Employee Number</Label>
                 <EmployeeAutocomplete
                   placeholder="Start typing to search..."
                   onSelect={(employee) => {
@@ -155,7 +166,7 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
                     }))
                   }}
                 />
-                <p className="text-xs text-muted-foreground">Search by name, employee number, or ID</p>
+                <p className="text-xs text-muted-foreground">Search by name or employee number</p>
               </div>
 
               <div className="space-y-2">
@@ -305,14 +316,15 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="initial-notes">Initial Notes</Label>
+                <Label htmlFor="initial-notes">Case Note</Label>
                 <Textarea
                   id="initial-notes"
-                  placeholder="Enter any initial case notes..."
+                  placeholder="Enter case note..."
                   value={formData.initialNotes}
                   onChange={(e) => setFormData((prev) => ({ ...prev, initialNotes: e.target.value }))}
                   rows={4}
                 />
+                <p className="text-xs text-muted-foreground">This note will be added to the Case Notes section of the case.</p>
               </div>
             </div>
           </div>
@@ -371,14 +383,14 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
                 <Label htmlFor="std-plan">STD Plan</Label>
                 <Input
                   id="std-plan"
-                  placeholder="Enter plan name or code"
+                  placeholder="Enter plan name"
                   value={formData.stdPlan}
                   onChange={(e) => setFormData((prev) => ({ ...prev, stdPlan: e.target.value }))}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="std-start">STD Start Date</Label>
+                <Label htmlFor="std-start">STD (Pay) Start Date</Label>
                 <Input
                   id="std-start"
                   type="date"
@@ -435,6 +447,11 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
                   <p>
                     <span className="text-muted-foreground">Case Manager:</span> {formData.caseManager || "Unassigned"}
                   </p>
+                  {formData.initialNotes && (
+                    <p>
+                      <span className="text-muted-foreground">Case Note:</span> {formData.initialNotes}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -446,12 +463,29 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
                     {formData.dateOfDisability || "[Not entered]"}
                   </p>
                   <p>
-                    <span className="text-muted-foreground">Expected Return:</span>{" "}
+                    <span className="text-muted-foreground">Initial Contact Date:</span>{" "}
+                    {formData.initialContactDate || "[Not entered]"}
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Expected Return Date:</span>{" "}
                     {formData.expectedReturnDate || "[Not entered]"}
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Actual Return Date:</span>{" "}
+                    {formData.actualReturnDate || "[Not entered]"}
                   </p>
                   <p>
                     <span className="text-muted-foreground">STD Plan:</span> {formData.stdPlan || "[Not entered]"}
                   </p>
+                  <p>
+                    <span className="text-muted-foreground">STD (Pay) Start Date:</span>{" "}
+                    {formData.stdStartDate || "[Not entered]"}
+                  </p>
+                  {formData.absenceNotes && (
+                    <p>
+                      <span className="text-muted-foreground">Notes:</span> {formData.absenceNotes}
+                    </p>
+                  )}
                 </div>
               </div>
 

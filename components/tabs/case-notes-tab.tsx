@@ -40,7 +40,7 @@ import { computeDiff, renderDiff } from "@/lib/diff-utils"
 export function CaseNotesTab() {
   const { currentCase, updateCase, addRestriction } = useCases()
   const { currentUser } = useUser()
-  const { codes, getCaseType } = useAdmin()
+  const { codes, getCaseType, caseManagers } = useAdmin()
   const [notes, setNotes] = useState<CaseNote[]>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
@@ -54,6 +54,8 @@ export function CaseNotesTab() {
   const [noteDate, setNoteDate] = useState(() => new Date().toISOString().split("T")[0])
   const [activity, setActivity] = useState("")
   const [content, setContent] = useState("")
+  const [selectedTemplate, setSelectedTemplate] = useState("")
+  const [noteCaseManager, setNoteCaseManager] = useState(currentCase?.caseManager || "")
   const [validationError, setValidationError] = useState<string>("")
 
   const isAdmin = currentUser?.role === "admin"
@@ -115,6 +117,8 @@ export function CaseNotesTab() {
     setNoteDate(new Date().toISOString().split("T")[0])
     setActivity("")
     setContent("")
+    setSelectedTemplate("")
+    setNoteCaseManager(currentCase?.caseManager || "")
     setValidationError("")
     setIsDialogOpen(true)
     setIsMinimized(false)
@@ -186,7 +190,7 @@ export function CaseNotesTab() {
         caseNumber: currentCase.caseNumber,
         noteDate,
         activity,
-        caseManager: userName,
+        caseManager: noteCaseManager || userName,
         notes: content,
         createdBy: userName,
         dateEntered: now,
@@ -502,7 +506,7 @@ export function CaseNotesTab() {
           </div>
           <Button size="sm" onClick={handleCreateNote}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Note
+            Add Case Note
           </Button>
         </div>
       </div>
@@ -874,7 +878,7 @@ export function CaseNotesTab() {
             </Alert>
           )}
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-4 gap-3">
             <div className="space-y-1">
               <Label htmlFor="note-date" className="text-xs">
                 Note Date
@@ -916,10 +920,53 @@ export function CaseNotesTab() {
               </Select>
             </div>
             <div className="space-y-1">
-              <Label className="text-xs">Case Manager</Label>
-              <div className="bg-muted/50 rounded-md px-3 py-1.5 text-sm h-8 flex items-center">
-                {currentCase?.caseManager || "Auto-assigned"}
-              </div>
+              <Label htmlFor="case-note-template" className="text-xs">
+                Case Note Template
+              </Label>
+              <Select
+                value={selectedTemplate}
+                onValueChange={(value) => {
+                  setSelectedTemplate(value)
+                  const template = codes.caseNoteTemplates.find((t) => t.code === value)
+                  if (template?.content) {
+                    setContent(template.content)
+                  }
+                }}
+              >
+                <SelectTrigger id="case-note-template" className="bg-background h-8 text-sm">
+                  <SelectValue placeholder="Select template..." />
+                </SelectTrigger>
+                <SelectContent position="popper" sideOffset={4} className="z-[100]">
+                  {codes.caseNoteTemplates
+                    .filter((template) => template.active)
+                    .map((template) => (
+                      <SelectItem key={template.id} value={template.code}>
+                        {template.name || template.code}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="note-case-manager" className="text-xs">Case Manager</Label>
+              <Select
+                value={noteCaseManager}
+                onValueChange={(value) => setNoteCaseManager(value)}
+              >
+                <SelectTrigger id="note-case-manager" className="bg-background h-8 text-sm">
+                  <SelectValue placeholder="Select case manager..." />
+                </SelectTrigger>
+                <SelectContent position="popper" sideOffset={4} className="z-[100]">
+                  {caseManagers
+                    .filter((cm) => cm.active)
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((cm) => (
+                      <SelectItem key={cm.id} value={cm.name}>
+                        {cm.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

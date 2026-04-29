@@ -65,7 +65,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
     search: "",
     status: "all",
     caseType: "all",
-    caseManager: "manager 1",
+    caseManager: "all",
     location: "all",
     dateCreatedFrom: "",
     dateCreatedTo: "",
@@ -79,7 +79,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
         search: "",
         status: "all",
         caseType: "all",
-        caseManager: "manager 1",
+        caseManager: "all",
         location: "all",
         dateCreatedFrom: "",
         dateCreatedTo: "",
@@ -103,9 +103,9 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
       name: "Unassigned Cases",
       criteria: {
         search: "",
-        status: "open",
+        status: "Open",
         caseType: "all",
-        caseManager: "unassigned",
+        caseManager: "Unassigned",
         location: "all",
         dateCreatedFrom: "",
         dateCreatedTo: "",
@@ -142,7 +142,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
     const matchesLocation =
       !showMoreFilters ||
       advancedFilters.location === "all" ||
-      caseItem.employeeLocation.toLowerCase().includes(advancedFilters.location.toLowerCase())
+      caseItem.employeeLocation === advancedFilters.location
 
     const matchesDateFrom =
       !showMoreFilters ||
@@ -335,7 +335,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="search"
-                  placeholder="Search by name, case number, or employee ID..."
+                  placeholder="Search by name, case number, or employee number..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -423,7 +423,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="adv-search"
-                    placeholder="Search by name, case number, or employee ID..."
+                    placeholder="Search by name, case number, or employee number..."
                     value={advancedFilters.search}
                     onChange={(e) => setAdvancedFilters({ ...advancedFilters, search: e.target.value })}
                     className="pl-10"
@@ -495,27 +495,29 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="adv-location" className="text-sm">
-                  Location
-                </Label>
-                <Select
-                  value={advancedFilters.location}
-                  onValueChange={(value) => setAdvancedFilters({ ...advancedFilters, location: value })}
-                >
-                  <SelectTrigger id="adv-location">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Locations</SelectItem>
-                    {uniqueLocations.map((location) => (
-                      <SelectItem key={location} value={location}>
-                        {location}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {(searchTerm || advancedFilters.search) && (
+                <div className="space-y-2">
+                  <Label htmlFor="adv-location" className="text-sm">
+                    Location
+                  </Label>
+                  <Select
+                    value={advancedFilters.location}
+                    onValueChange={(value) => setAdvancedFilters({ ...advancedFilters, location: value })}
+                  >
+                    <SelectTrigger id="adv-location">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Locations</SelectItem>
+                      {uniqueLocations.map((location) => (
+                        <SelectItem key={location} value={location}>
+                          {location}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="adv-date-from" className="text-sm">
@@ -589,7 +591,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   onClick={() => handleSort("employeeNumber")}
                   className="flex items-center hover:text-foreground transition-colors"
                 >
-                  Employee #{renderSortIcon("employeeNumber")}
+                  Employee Number{renderSortIcon("employeeNumber")}
                 </button>
               </TableHead>
               <TableHead>
