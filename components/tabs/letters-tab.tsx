@@ -37,7 +37,7 @@ interface Letter {
 
 export function LettersTab() {
   const { currentCase, updateCase } = useCases()
-  const { codes, addCode } = useAdmin()
+  const { codes, addCode, caseManagers } = useAdmin()
   const { employees } = useEmployees()
   const letterTemplates = codes.letterTemplates
 
@@ -57,7 +57,7 @@ export function LettersTab() {
   const [templateCode, setTemplateCode] = useState("")
   const [templateDescription, setTemplateDescription] = useState("")
 
-  const [sentFrom, setSentFrom] = useState("Case Management Team")
+  const [sentFrom, setSentFrom] = useState(currentCase?.caseManager || "")
   const [letterType, setLetterType] = useState("")
   const [template, setTemplate] = useState("")
   const [content, setContent] = useState("")
@@ -81,7 +81,7 @@ export function LettersTab() {
 
   const handleCreateLetter = () => {
     setEditingLetter(null)
-    setSentFrom("Case Management Team")
+    setSentFrom(currentCase?.caseManager || "")
     setLetterType("")
     setTemplate("")
     setContent("")
@@ -484,13 +484,21 @@ export function LettersTab() {
               <Label htmlFor="letter-from" className="text-xs">
                 Letter Sent From
               </Label>
-              <Input
-                id="letter-from"
-                value={sentFrom}
-                onChange={(e) => setSentFrom(e.target.value)}
-                placeholder="e.g., Case Management Team"
-                className="bg-background h-8 text-sm"
-              />
+              <Select value={sentFrom} onValueChange={setSentFrom}>
+                <SelectTrigger id="letter-from" className="bg-background h-8 text-sm">
+                  <SelectValue placeholder="Select case manager..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {caseManagers
+                    .filter((cm) => cm.active)
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((cm) => (
+                      <SelectItem key={cm.id} value={cm.name}>
+                        {cm.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1">
               <Label htmlFor="letter-type" className="text-xs">
