@@ -979,7 +979,6 @@ export function AbsenceRestrictionsTab() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Status</TableHead>
                   <TableHead>Restriction</TableHead>
                   <TableHead>Case</TableHead>
                   <TableHead>Start Date</TableHead>
@@ -992,12 +991,6 @@ export function AbsenceRestrictionsTab() {
               <TableBody>
                 {quickEntryMode && (
                   <TableRow className="bg-blue-50 dark:bg-blue-950/20 border-2 border-blue-200 dark:border-blue-800">
-                    <TableCell>
-                      <Checkbox 
-                        checked={quickEntryData.isActive}
-                        onCheckedChange={(checked) => setQuickEntryData({ ...quickEntryData, isActive: checked as boolean })}
-                      />
-                    </TableCell>
                     <TableCell>
                       <Select 
                         value={quickEntryData.restriction} 
@@ -1084,18 +1077,13 @@ export function AbsenceRestrictionsTab() {
                 )}
                 {filteredRestrictions.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                       No restrictions found
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredRestrictions.map((restriction) => (
                     <TableRow key={restriction.id}>
-                      <TableCell>
-                        <Badge variant={restriction.isActive ? "default" : "secondary"}>
-                          {restriction.isActive ? "Active" : "Inactive"}
-                        </Badge>
-                      </TableCell>
                       <TableCell className="font-medium">
                         {getRestrictionDisplayName(restriction.restriction)}
                         {restriction.isPermanent && (
