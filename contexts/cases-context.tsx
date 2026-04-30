@@ -155,6 +155,7 @@ export interface Case {
   lastWorkDate?: string
   returnToWorkDate?: string
   fileDate?: string
+  documents?: Document[]
 }
 
 export interface TodoItem {
@@ -165,6 +166,17 @@ export interface TodoItem {
   completed: boolean
   dateClosed?: string
   linkedLetterId?: string
+}
+
+export interface Document {
+  id: string
+  caseNumber: string
+  dateReceived: string
+  documentType: string
+  receivedFrom: string
+  description: string
+  fileName?: string
+  fileSize?: number
 }
 
 export interface CaseContact {
