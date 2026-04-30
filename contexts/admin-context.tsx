@@ -59,7 +59,7 @@ const AdminContext = createContext<AdminContextType | undefined>(undefined)
 const initialCaseTypes: CaseType[] = [
   {
     id: "7",
-    name: "Confidential Type Case",
+    name: "Confidential Case Type",
     defaultTodos: [
       "HA review; offset=1 Month",
       "Initial Assessment; offset=1 Month",
