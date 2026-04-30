@@ -162,25 +162,66 @@ export function DocumentsTab() {
     return docType?.description || docType?.code || code
   }
   
-  const handleViewDocument = (doc: Document) => {
+  const handleViewDocument = async (doc: Document) => {
     if (doc.fileDataUrl) {
-      // Open the file in a new tab
-      const newWindow = window.open()
-      if (newWindow) {
-        newWindow.document.write(`
-          <html>
-            <head><title>${doc.fileName || 'Document'}</title></head>
-            <body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f5f5f5;">
-              ${doc.fileDataUrl.startsWith('data:image/') 
-                ? `<img src="${doc.fileDataUrl}" style="max-width:100%;max-height:100vh;" />`
-                : doc.fileDataUrl.startsWith('data:application/pdf')
-                  ? `<iframe src="${doc.fileDataUrl}" style="width:100%;height:100vh;border:none;"></iframe>`
-                  : `<a href="${doc.fileDataUrl}" download="${doc.fileName || 'document'}" style="padding:20px;background:#007bff;color:white;text-decoration:none;border-radius:8px;font-family:sans-serif;">Download ${doc.fileName || 'Document'}</a>`
-              }
-            </body>
-          </html>
-        `)
-        newWindow.document.close()
+      const isWordDoc = doc.fileDataUrl.startsWith('data:application/vnd.openxmlformats-officedocument.wordprocessingml') ||
+                        doc.fileDataUrl.startsWith('data:application/msword') ||
+                        doc.fileName?.endsWith('.docx') ||
+                        doc.fileName?.endsWith('.doc')
+      
+      if (isWordDoc && doc.fileDataUrl.includes('base64,')) {
+        // Convert Word document to HTML using mammoth
+        try {
+          const mammoth = await import('mammoth')
+          const base64Data = doc.fileDataUrl.split('base64,')[1]
+          const arrayBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)).buffer
+          const result = await mammoth.convertToHtml({ arrayBuffer })
+          
+          const newWindow = window.open()
+          if (newWindow) {
+            newWindow.document.write(`
+              <html>
+                <head>
+                  <title>${doc.fileName || 'Document'}</title>
+                  <style>
+                    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+                    img { max-width: 100%; }
+                    table { border-collapse: collapse; width: 100%; }
+                    td, th { border: 1px solid #ddd; padding: 8px; }
+                  </style>
+                </head>
+                <body>${result.value}</body>
+              </html>
+            `)
+            newWindow.document.close()
+          }
+        } catch (error) {
+          console.error('Error converting Word document:', error)
+          // Fallback to download
+          const link = document.createElement('a')
+          link.href = doc.fileDataUrl
+          link.download = doc.fileName || 'document'
+          link.click()
+        }
+      } else {
+        // Open the file in a new tab for images and PDFs
+        const newWindow = window.open()
+        if (newWindow) {
+          newWindow.document.write(`
+            <html>
+              <head><title>${doc.fileName || 'Document'}</title></head>
+              <body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f5f5f5;">
+                ${doc.fileDataUrl.startsWith('data:image/') 
+                  ? `<img src="${doc.fileDataUrl}" style="max-width:100%;max-height:100vh;" />`
+                  : doc.fileDataUrl.startsWith('data:application/pdf')
+                    ? `<iframe src="${doc.fileDataUrl}" style="width:100%;height:100vh;border:none;"></iframe>`
+                    : `<a href="${doc.fileDataUrl}" download="${doc.fileName || 'document'}" style="padding:20px;background:#007bff;color:white;text-decoration:none;border-radius:8px;font-family:sans-serif;">Download ${doc.fileName || 'Document'}</a>`
+                }
+              </body>
+            </html>
+          `)
+          newWindow.document.close()
+        }
       }
     }
   }
