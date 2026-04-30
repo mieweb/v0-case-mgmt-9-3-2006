@@ -270,7 +270,7 @@ export function DocumentsTab() {
               id="received-from" 
               value={receivedFrom}
               onChange={(e) => setReceivedFrom(e.target.value)}
-              placeholder="Enter source..." 
+              placeholder="Received from..." 
               className="bg-background" 
             />
           </div>
