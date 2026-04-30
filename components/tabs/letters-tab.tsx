@@ -367,7 +367,6 @@ export function LettersTab() {
             <TableHeader>
               <TableRow>
                 <TableHead>Date</TableHead>
-                <TableHead>Type</TableHead>
                 <TableHead>Template</TableHead>
                 <TableHead>From</TableHead>
                 <TableHead>Status</TableHead>
@@ -377,7 +376,7 @@ export function LettersTab() {
             <TableBody>
               {letters.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                     No letters created yet. Click "Create Letter" to get started.
                   </TableCell>
                 </TableRow>
@@ -385,7 +384,6 @@ export function LettersTab() {
                 letters.map((letter) => (
                   <TableRow key={letter.id}>
                     <TableCell>{new Date(letter.createdDate).toLocaleDateString()}</TableCell>
-                    <TableCell>{letter.letterType || "—"}</TableCell>
                     <TableCell>{letter.template || "—"}</TableCell>
                     <TableCell className="pii-data">{letter.sentFrom}</TableCell>
                     <TableCell>
@@ -422,10 +420,6 @@ export function LettersTab() {
                     <div>
                       <div className="text-xs text-muted-foreground mb-1">Date</div>
                       <div className="font-medium">{new Date(letter.createdDate).toLocaleDateString()}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-muted-foreground mb-1">Type</div>
-                      <div>{letter.letterType || "—"}</div>
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground mb-1">Template</div>
