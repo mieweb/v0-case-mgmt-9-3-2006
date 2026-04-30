@@ -276,7 +276,7 @@ export function DocumentsTab() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="file-select" className="text-sm text-muted-foreground">
-              File (optional)
+              File
             </Label>
             <Input 
               id="file-select"
