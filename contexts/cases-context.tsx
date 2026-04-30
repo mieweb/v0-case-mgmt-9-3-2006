@@ -136,6 +136,7 @@ export interface Case {
   expectedConfinementDate?: string
   stdPlan?: string
   stdStartDate?: string
+  stdEndDate?: string
   pmdDays?: string
   pmdDate?: string
   ddgDays?: string
