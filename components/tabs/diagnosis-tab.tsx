@@ -469,20 +469,6 @@ export function DiagnosisTab() {
               <Input type="date" value={diagnosisDate} onChange={(e) => setDiagnosisDate(e.target.value)} />
             </div>
 
-            {/* Status */}
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select value={isActive ? "active" : "inactive"} onValueChange={(v) => setIsActive(v === "active")}>
-                <SelectTrigger className="bg-background">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* Notes */}
             <div className="space-y-2">
               <Label>Notes</Label>
