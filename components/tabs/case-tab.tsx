@@ -2850,7 +2850,9 @@ export function CaseTab() {
                 openAbsences.some((absence) => 
                   closeCaseAbsenceUpdates[absence.id]?.status === "OTH" && 
                   !closeCaseAbsenceUpdates[absence.id]?.otherStatus
-                )
+                ) ||
+                // Prevent closing if there are open todos not selected to close
+                openTodos.length > 0 && selectedTodosToClose.length < openTodos.length
               }
               onClick={() => {
                 // Close selected todos
