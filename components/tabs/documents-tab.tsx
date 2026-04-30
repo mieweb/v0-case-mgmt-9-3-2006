@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Upload, FileText, Pencil, Trash2, X, Check } from 'lucide-react'
+import { Upload, FileText, Pencil, Trash2, X, Check, Eye } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useAdmin } from "@/contexts/admin-context"
 import { useCases, type Document } from "@/contexts/cases-context"
@@ -27,6 +27,7 @@ export function DocumentsTab() {
   const [receivedFrom, setReceivedFrom] = useState("")
   const [description, setDescription] = useState("")
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [fileDataUrl, setFileDataUrl] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   // Edit state
@@ -44,6 +45,12 @@ export function DocumentsTab() {
     const file = e.target.files?.[0]
     if (file) {
       setSelectedFile(file)
+      // Read file as data URL for storage and viewing
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        setFileDataUrl(event.target?.result as string)
+      }
+      reader.readAsDataURL(file)
     }
   }
   
@@ -52,6 +59,7 @@ export function DocumentsTab() {
     setReceivedFrom("")
     setDescription("")
     setSelectedFile(null)
+    setFileDataUrl(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
     }
@@ -69,6 +77,7 @@ export function DocumentsTab() {
       description,
       fileName: selectedFile?.name,
       fileSize: selectedFile?.size,
+      fileDataUrl: fileDataUrl || undefined,
     }
     
     const updatedDocuments = [...documents, newDocument]
@@ -151,6 +160,29 @@ export function DocumentsTab() {
   const getDocumentTypeName = (code: string) => {
     const docType = codes.documentType.find((t) => t.code === code)
     return docType?.description || docType?.code || code
+  }
+  
+  const handleViewDocument = (doc: Document) => {
+    if (doc.fileDataUrl) {
+      // Open the file in a new tab
+      const newWindow = window.open()
+      if (newWindow) {
+        newWindow.document.write(`
+          <html>
+            <head><title>${doc.fileName || 'Document'}</title></head>
+            <body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f5f5f5;">
+              ${doc.fileDataUrl.startsWith('data:image/') 
+                ? `<img src="${doc.fileDataUrl}" style="max-width:100%;max-height:100vh;" />`
+                : doc.fileDataUrl.startsWith('data:application/pdf')
+                  ? `<iframe src="${doc.fileDataUrl}" style="width:100%;height:100vh;border:none;"></iframe>`
+                  : `<a href="${doc.fileDataUrl}" download="${doc.fileName || 'document'}" style="padding:20px;background:#007bff;color:white;text-decoration:none;border-radius:8px;font-family:sans-serif;">Download ${doc.fileName || 'Document'}</a>`
+              }
+            </body>
+          </html>
+        `)
+        newWindow.document.close()
+      }
+    }
   }
   
   return (
@@ -331,6 +363,11 @@ export function DocumentsTab() {
                       </div>
                     ) : (
                       <div className="flex items-center gap-1">
+                        {doc.fileDataUrl && (
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleViewDocument(doc)} title="View document">
+                            <Eye className="h-4 w-4 text-blue-600" />
+                          </Button>
+                        )}
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(doc)}>
                           <Pencil className="h-4 w-4" />
                         </Button>

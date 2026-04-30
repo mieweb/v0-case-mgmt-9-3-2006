@@ -177,6 +177,7 @@ export interface Document {
   description: string
   fileName?: string
   fileSize?: number
+  fileDataUrl?: string
 }
 
 export interface CaseContact {
