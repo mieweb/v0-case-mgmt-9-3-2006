@@ -249,7 +249,7 @@ export function DocumentsTab() {
             </Label>
             <Select value={documentType} onValueChange={setDocumentType}>
               <SelectTrigger id="doc-type" className="bg-background">
-                <SelectValue placeholder="Select type..." />
+                <SelectValue placeholder="Select document type..." />
               </SelectTrigger>
               <SelectContent className="max-h-80 overflow-y-auto">
                 {codes.documentType
