@@ -50,8 +50,7 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
   const [testCaseTypeId, setTestCaseTypeId] = useState<string | null>(null)
   const [testAnchorDates, setTestAnchorDates] = useState({
     caseCreation: new Date(),
-    surgeryDate: "",
-    deliveryDate: "",
+    incidentDate: "",
   })
   const [generatedTodos, setGeneratedTodos] = useState<ParsedTodo[]>([])
 
@@ -111,8 +110,7 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
     setTestDialogOpen(true)
     setTestAnchorDates({
       caseCreation: new Date(),
-      surgeryDate: "",
-      deliveryDate: "",
+      incidentDate: "",
     })
     setGeneratedTodos([])
   }
@@ -125,8 +123,7 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
 
     const anchorDates = {
       caseCreation: testAnchorDates.caseCreation,
-      surgeryDate: testAnchorDates.surgeryDate ? new Date(testAnchorDates.surgeryDate) : undefined,
-      deliveryDate: testAnchorDates.deliveryDate ? new Date(testAnchorDates.deliveryDate) : undefined,
+      incidentDate: testAnchorDates.incidentDate ? new Date(testAnchorDates.incidentDate) : testAnchorDates.caseCreation,
     }
 
     const todos = generateTodosFromTemplates(caseType.defaultTodos, anchorDates)
@@ -304,6 +301,19 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
                                             setTestAnchorDates((prev) => ({
                                               ...prev,
                                               caseCreation: new Date(e.target.value),
+                                            }))
+                                          }
+                                        />
+                                      </div>
+                                      <div className="space-y-2">
+                                        <Label>Case (Incident) Date</Label>
+                                        <Input
+                                          type="date"
+                                          value={testAnchorDates.incidentDate}
+                                          onChange={(e) =>
+                                            setTestAnchorDates((prev) => ({
+                                              ...prev,
+                                              incidentDate: e.target.value,
                                             }))
                                           }
                                         />

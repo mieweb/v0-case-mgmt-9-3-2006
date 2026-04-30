@@ -336,8 +336,7 @@ export function CaseTab() {
 
     const dates = {
       caseCreation: new Date(disabilityDate),
-      surgeryDate: undefined,
-      deliveryDate: currentCase.deliveryDate ? new Date(currentCase.deliveryDate) : undefined,
+      incidentDate: currentCase.caseIncidentDate ? new Date(currentCase.caseIncidentDate) : new Date(disabilityDate),
     }
 
     const parsedTodos = generateTodosFromTemplates(caseTypeObj.defaultTodos, dates)
