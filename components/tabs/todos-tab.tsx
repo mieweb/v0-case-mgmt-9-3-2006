@@ -639,12 +639,6 @@ export function TodosTab() {
             <Button variant="outline" onClick={cancelTodoCompletion}>
               Cancel
             </Button>
-            <Button variant="secondary" onClick={() => {
-              setCompletionNote("")
-              confirmTodoCompletion()
-            }}>
-              Skip Note
-            </Button>
             <Button onClick={confirmTodoCompletion}>
               Complete
             </Button>
