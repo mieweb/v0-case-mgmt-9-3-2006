@@ -281,7 +281,6 @@ export function DocumentsTab() {
             <div className="flex items-center gap-3">
               <Button
                 type="button"
-                variant="outline"
                 size="sm"
                 onClick={() => fileInputRef.current?.click()}
               >
