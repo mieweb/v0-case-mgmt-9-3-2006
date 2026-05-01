@@ -2592,7 +2592,7 @@ export function CaseTab() {
           <AlertDialogHeader>
             <AlertDialogTitle>Close Case - Review Open Items</AlertDialogTitle>
             <AlertDialogDescription>
-              Complete the closure details and review open items before closing the case.
+              Complete the closure details and review open items before closing the case. All open to-dos must be completed before the case can be closed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           

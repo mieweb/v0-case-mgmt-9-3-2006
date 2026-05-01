@@ -275,16 +275,28 @@ export function DocumentsTab() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="file-select" className="text-sm text-muted-foreground">
+            <Label className="text-sm text-muted-foreground">
               File
             </Label>
-            <Input 
-              id="file-select"
-              ref={fileInputRef}
-              type="file"
-              onChange={handleFileSelect}
-              className="bg-background"
-            />
+            <div className="flex items-center gap-3">
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Choose File
+              </Button>
+              <span className="text-sm text-muted-foreground truncate max-w-[200px]">
+                {selectedFile ? selectedFile.name : "No file chosen"}
+              </span>
+              <input 
+                ref={fileInputRef}
+                type="file"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+            </div>
           </div>
         </div>
 
