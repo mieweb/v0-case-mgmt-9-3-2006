@@ -112,12 +112,22 @@ export function CaseTab() {
   const [pendingStatus, setPendingStatus] = useState<string | null>(null)
   const [selectedTodosToClose, setSelectedTodosToClose] = useState<string[]>([])
   const [selectedRestrictionsToClose, setSelectedRestrictionsToClose] = useState<string[]>([])
+  // Close case dialog fields
+  const [closeCaseDateClosed, setCloseCaseDateClosed] = useState(new Date().toISOString().split("T")[0])
+  const [closeCaseClosureReason, setCloseCaseClosureReason] = useState("")
+  const [closeCaseActualReturnDate, setCloseCaseActualReturnDate] = useState("")
+  const [closeCaseStdEndDate, setCloseCaseStdEndDate] = useState("")
+  const [closeCaseAbsenceUpdates, setCloseCaseAbsenceUpdates] = useState<Record<string, { status: string; otherStatus?: string }>>({})
+  const [closeCaseRestrictionUpdates, setCloseCaseRestrictionUpdates] = useState<Record<string, { endDate?: string; isPermanent?: boolean }>>({})
+  const [closeCaseOtherAbsenceStatus, setCloseCaseOtherAbsenceStatus] = useState("")
   
   // Get open items for current case
   const openTodos = currentCase?.todos?.filter((t) => !t.completed) || []
   const openRestrictions = restrictions.filter(
     (r) => r.caseNumber === currentCase?.caseNumber && r.isActive
   )
+  // Get open absences - those without an end status (FD = Full Duty means closed)
+  const openAbsences = currentCase?.absences?.filter((a) => a.statusType !== "FD") || []
   
   // Occupational Injury Information
   const [siteCaseNumber, setSiteCaseNumber] = useState("")
@@ -326,8 +336,7 @@ export function CaseTab() {
 
     const dates = {
       caseCreation: new Date(disabilityDate),
-      surgeryDate: undefined,
-      deliveryDate: currentCase.deliveryDate ? new Date(currentCase.deliveryDate) : undefined,
+      incidentDate: currentCase.caseIncidentDate ? new Date(currentCase.caseIncidentDate) : new Date(disabilityDate),
     }
 
     const parsedTodos = generateTodosFromTemplates(caseTypeObj.defaultTodos, dates)
@@ -2579,16 +2588,201 @@ export function CaseTab() {
 
       {/* Close Case Dialog - Shows open restrictions and todos */}
       <AlertDialog open={showCloseCaseDialog} onOpenChange={setShowCloseCaseDialog}>
-        <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+        <AlertDialogContent className="max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
           <AlertDialogHeader>
             <AlertDialogTitle>Close Case - Review Open Items</AlertDialogTitle>
             <AlertDialogDescription>
-              This case has open items that should be reviewed before closing. 
-              Select items to close them along with the case, or leave unchecked to keep them open.
+              Complete the closure details and review open items before closing the case.
             </AlertDialogDescription>
           </AlertDialogHeader>
           
           <div className="flex-1 overflow-y-auto space-y-6 py-4">
+            {/* Closure Details */}
+            <div className="space-y-4 border rounded-md p-4 bg-muted/30">
+              <h4 className="font-semibold text-foreground">Closure Details</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="close-date">Date Closed *</Label>
+                  <Input
+                    id="close-date"
+                    type="date"
+                    value={closeCaseDateClosed}
+                    onChange={(e) => setCloseCaseDateClosed(e.target.value)}
+                    className="bg-background"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="closure-reason">Closure Reason *</Label>
+                  <Select value={closeCaseClosureReason} onValueChange={setCloseCaseClosureReason}>
+                    <SelectTrigger className="bg-background">
+                      <SelectValue placeholder="Select reason..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {codes.caseClosureReason
+                        .filter((r) => r.active)
+                        .map((reason) => (
+                          <SelectItem key={reason.id} value={reason.code}>
+                            {reason.description}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="actual-return-date">Actual Return Date</Label>
+                  <Input
+                    id="actual-return-date"
+                    type="date"
+                    value={closeCaseActualReturnDate}
+                    onChange={(e) => setCloseCaseActualReturnDate(e.target.value)}
+                    className="bg-background"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="std-end-date">STD End Date</Label>
+                  <Input
+                    id="std-end-date"
+                    type="date"
+                    value={closeCaseStdEndDate}
+                    onChange={(e) => setCloseCaseStdEndDate(e.target.value)}
+                    className="bg-background"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Open Absences */}
+            {openAbsences.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-semibold text-foreground">Open Absences ({openAbsences.length})</h4>
+                <div className="border rounded-md divide-y max-h-48 overflow-y-auto">
+                  {openAbsences.map((absence) => (
+                    <div key={absence.id} className="p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">
+                          {absence.statusType === "LWD" ? "Lost Work Days" :
+                           absence.statusType === "RWD" ? "Restricted Work Days" :
+                           absence.statusType === "RWDREGULARJOB" ? "RWD Regular Job" :
+                           absence.statusType === "OTH" ? (absence.customOthName || "Other") :
+                           absence.statusType}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          Started: {absence.effectiveDate}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Label className="text-xs whitespace-nowrap">Move to Status:</Label>
+                        <Select
+                          value={closeCaseAbsenceUpdates[absence.id]?.status || ""}
+                          onValueChange={(val) => {
+                            setCloseCaseAbsenceUpdates((prev) => ({
+                              ...prev,
+                              [absence.id]: { ...prev[absence.id], status: val }
+                            }))
+                          }}
+                        >
+                          <SelectTrigger className="bg-background h-8 text-xs flex-1">
+                            <SelectValue placeholder="Select status..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="FD">Full Duty</SelectItem>
+                            <SelectItem value="LWD">Lost Work Days</SelectItem>
+                            <SelectItem value="RWD">Restricted Work Days</SelectItem>
+                            <SelectItem value="RWDREGULARJOB">RWD Regular Job</SelectItem>
+                            <SelectItem value="OTH">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {closeCaseAbsenceUpdates[absence.id]?.status === "OTH" && (
+                          <Select
+                            value={closeCaseAbsenceUpdates[absence.id]?.otherStatus || ""}
+                            onValueChange={(val) => {
+                              setCloseCaseAbsenceUpdates((prev) => ({
+                                ...prev,
+                                [absence.id]: { ...prev[absence.id], otherStatus: val }
+                              }))
+                            }}
+                          >
+                            <SelectTrigger className="bg-background h-8 text-xs w-48">
+                              <SelectValue placeholder="Select absence status *" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {codes.absenceStatus
+                                ?.filter((s) => s.active)
+                                .map((status) => (
+                                  <SelectItem key={status.id} value={status.code}>
+                                    {status.description}
+                                  </SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Open Restrictions */}
+            {openRestrictions.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-semibold text-foreground">Active Restrictions ({openRestrictions.length})</h4>
+                <div className="border rounded-md divide-y max-h-48 overflow-y-auto">
+                  {openRestrictions.map((restriction) => (
+                    <div key={restriction.id} className="p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">{restriction.restriction}</span>
+                        <span className="text-xs text-muted-foreground">
+                          Started: {restriction.startDate}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <Label className="text-xs whitespace-nowrap">End Date:</Label>
+                          <Input
+                            type="date"
+                            value={closeCaseRestrictionUpdates[restriction.id]?.endDate || ""}
+                            onChange={(e) => {
+                              setCloseCaseRestrictionUpdates((prev) => ({
+                                ...prev,
+                                [restriction.id]: { 
+                                  ...prev[restriction.id], 
+                                  endDate: e.target.value,
+                                  isPermanent: false 
+                                }
+                              }))
+                            }}
+                            disabled={closeCaseRestrictionUpdates[restriction.id]?.isPermanent}
+                            className="bg-background h-8 text-xs w-36"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Checkbox
+                            id={`permanent-${restriction.id}`}
+                            checked={closeCaseRestrictionUpdates[restriction.id]?.isPermanent || false}
+                            onCheckedChange={(checked) => {
+                              setCloseCaseRestrictionUpdates((prev) => ({
+                                ...prev,
+                                [restriction.id]: { 
+                                  ...prev[restriction.id], 
+                                  isPermanent: checked as boolean,
+                                  endDate: checked ? "" : prev[restriction.id]?.endDate
+                                }
+                              }))
+                            }}
+                          />
+                          <Label htmlFor={`permanent-${restriction.id}`} className="text-xs cursor-pointer">
+                            Permanent
+                          </Label>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Open To-Dos */}
             {openTodos.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -2639,89 +2833,98 @@ export function CaseTab() {
                 </div>
               </div>
             )}
-
-            {openRestrictions.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-semibold text-foreground">Active Restrictions ({openRestrictions.length})</h4>
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setSelectedRestrictionsToClose(openRestrictions.map((r) => r.id))}
-                    >
-                      Select All
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setSelectedRestrictionsToClose([])}
-                    >
-                      Clear
-                    </Button>
-                  </div>
-                </div>
-                <div className="border rounded-md divide-y max-h-48 overflow-y-auto">
-                  {openRestrictions.map((restriction) => (
-                    <div key={restriction.id} className="flex items-center gap-3 p-3 hover:bg-muted/50">
-                      <Checkbox
-                        id={`restriction-${restriction.id}`}
-                        checked={selectedRestrictionsToClose.includes(restriction.id)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setSelectedRestrictionsToClose((prev) => [...prev, restriction.id])
-                          } else {
-                            setSelectedRestrictionsToClose((prev) => prev.filter((id) => id !== restriction.id))
-                          }
-                        }}
-                      />
-                      <label htmlFor={`restriction-${restriction.id}`} className="text-sm cursor-pointer flex-1">
-                        <span className="font-medium">{restriction.restriction}</span>
-                        <span className="text-muted-foreground ml-2 text-xs">
-                          Started: {restriction.startDate}
-                          {restriction.isPermanent ? " (Permanent)" : restriction.endDate ? ` - Ends: ${restriction.endDate}` : ""}
-                        </span>
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           <AlertDialogFooter className="border-t pt-4">
-            <AlertDialogCancel onClick={() => setPendingStatus(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => {
+              setPendingStatus(null)
+              setCloseCaseAbsenceUpdates({})
+              setCloseCaseRestrictionUpdates({})
+            }}>Cancel</AlertDialogCancel>
             <AlertDialogAction
+              disabled={
+                !closeCaseDateClosed || 
+                !closeCaseClosureReason ||
+                // Check if any absence with OTH status is missing the required otherStatus
+                openAbsences.some((absence) => 
+                  closeCaseAbsenceUpdates[absence.id]?.status === "OTH" && 
+                  !closeCaseAbsenceUpdates[absence.id]?.otherStatus
+                ) ||
+                // Prevent closing if there are open todos not selected to close
+                openTodos.length > 0 && selectedTodosToClose.length < openTodos.length
+              }
               onClick={() => {
                 // Close selected todos
                 if (currentCase && selectedTodosToClose.length > 0) {
                   const updatedTodos = currentCase.todos?.map((todo) => {
                     if (selectedTodosToClose.includes(todo.id)) {
-                      return { ...todo, completed: true, dateClosed: new Date().toISOString().split("T")[0] }
+                      return { ...todo, completed: true, dateClosed: closeCaseDateClosed }
                     }
                     return todo
                   })
                   updateCase(currentCase.caseNumber, { todos: updatedTodos })
                 }
 
-                // Close selected restrictions
-                selectedRestrictionsToClose.forEach((restrictionId) => {
-                  updateRestriction(restrictionId, { 
-                    isActive: false, 
-                    endDate: new Date().toISOString().split("T")[0] 
-                  })
+                // Update restrictions
+                Object.entries(closeCaseRestrictionUpdates).forEach(([restrictionId, updates]) => {
+                  if (updates.endDate || updates.isPermanent) {
+                    updateRestriction(restrictionId, { 
+                      isActive: updates.isPermanent ? true : false,
+                      endDate: updates.endDate || undefined,
+                      isPermanent: updates.isPermanent || false
+                    })
+                  }
                 })
 
-                // Update case status
-                if (pendingStatus) {
-                  setStatus(pendingStatus)
-                  handleFieldUpdate("status", pendingStatus)
+                // Update absences
+                if (currentCase && Object.keys(closeCaseAbsenceUpdates).length > 0) {
+                  const updatedAbsences = currentCase.absences?.map((absence) => {
+                    const update = closeCaseAbsenceUpdates[absence.id]
+                    if (update?.status) {
+                      return {
+                        ...absence,
+                        statusType: update.status as typeof absence.statusType,
+                        customOthName: update.status === "OTH" ? update.otherStatus : absence.customOthName
+                      }
+                    }
+                    return absence
+                  })
+                  updateCase(currentCase.caseNumber, { absences: updatedAbsences })
                 }
 
+                // Update case with closure details and status
+                const caseUpdates: Record<string, any> = {
+                  dateClosed: closeCaseDateClosed,
+                  closureReason: closeCaseClosureReason,
+                }
+                if (closeCaseActualReturnDate) {
+                  caseUpdates.actualReturnDate = closeCaseActualReturnDate
+                }
+                if (closeCaseStdEndDate) {
+                  caseUpdates.stdEndDate = closeCaseStdEndDate
+                }
+                if (pendingStatus) {
+                  caseUpdates.status = pendingStatus
+                  setStatus(pendingStatus)
+                }
+                
+                updateCase(currentCase!.caseNumber, caseUpdates, {
+                  action: "updated",
+                  field: "status",
+                  oldValue: currentCase?.status,
+                  newValue: pendingStatus || "Closed",
+                  description: `Case closed: ${codes.caseClosureReason.find(r => r.code === closeCaseClosureReason)?.description || closeCaseClosureReason}`
+                })
+
+                // Reset dialog state
                 setShowCloseCaseDialog(false)
                 setPendingStatus(null)
+                setCloseCaseAbsenceUpdates({})
+                setCloseCaseRestrictionUpdates({})
+                setCloseCaseDateClosed(new Date().toISOString().split("T")[0])
+                setCloseCaseClosureReason("")
+                setCloseCaseActualReturnDate("")
+                setCloseCaseStdEndDate("")
               }}
             >
               Close Case

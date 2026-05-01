@@ -7,6 +7,7 @@ import { CreateCaseWizard } from "@/components/create-case-wizard"
 import { AdminPanel } from "@/components/admin-panel"
 import { TodoBacklog } from "@/components/todo-backlog"
 import { Button } from "@/components/ui/button"
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -90,7 +91,7 @@ export default function Page() {
                 size="sm"
               >
                 <ListTodo className="h-4 w-4" />
-                <span className="hidden sm:inline">To Do</span>
+                <span className="hidden sm:inline">To Do Backlog</span>
               </Button>
             </div>
             <div className="navbar-right flex items-center gap-1 sm:gap-2">

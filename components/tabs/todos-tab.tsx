@@ -137,8 +137,7 @@ export function TodosTab() {
 
     const dates = {
       caseCreation: new Date(anchorDates.caseCreation || new Date()),
-      surgeryDate: anchorDates.surgeryDate ? new Date(anchorDates.surgeryDate) : undefined,
-      deliveryDate: anchorDates.deliveryDate ? new Date(anchorDates.deliveryDate) : undefined,
+      incidentDate: currentCase?.caseIncidentDate ? new Date(currentCase.caseIncidentDate) : new Date(anchorDates.caseCreation || new Date()),
     }
 
     const parsedTodos = generateTodosFromTemplates(caseType.defaultTodos, dates)
@@ -638,12 +637,6 @@ export function TodosTab() {
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={cancelTodoCompletion}>
               Cancel
-            </Button>
-            <Button variant="secondary" onClick={() => {
-              setCompletionNote("")
-              confirmTodoCompletion()
-            }}>
-              Skip Note
             </Button>
             <Button onClick={confirmTodoCompletion}>
               Complete

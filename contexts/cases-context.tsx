@@ -136,6 +136,7 @@ export interface Case {
   expectedConfinementDate?: string
   stdPlan?: string
   stdStartDate?: string
+  stdEndDate?: string
   pmdDays?: string
   pmdDate?: string
   ddgDays?: string
@@ -155,6 +156,7 @@ export interface Case {
   lastWorkDate?: string
   returnToWorkDate?: string
   fileDate?: string
+  documents?: Document[]
 }
 
 export interface TodoItem {
@@ -165,6 +167,18 @@ export interface TodoItem {
   completed: boolean
   dateClosed?: string
   linkedLetterId?: string
+}
+
+export interface Document {
+  id: string
+  caseNumber: string
+  dateReceived: string
+  documentType: string
+  receivedFrom: string
+  description: string
+  fileName?: string
+  fileSize?: number
+  fileDataUrl?: string
 }
 
 export interface CaseContact {

@@ -675,7 +675,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   <TableCell className="text-muted-foreground">{caseItem.caseManager}</TableCell>
                   <TableCell className="text-muted-foreground">{caseItem.employeeLocation}</TableCell>
                   <TableCell className="text-muted-foreground">{caseItem.dateOfDisability || "—"}</TableCell>
-                  <TableCell className="text-muted-foreground text-sm">{getNextTodo(caseItem)}</TableCell>
+                  <TableCell className="text-muted-foreground text-sm" suppressHydrationWarning>{getNextTodo(caseItem)}</TableCell>
                 </TableRow>
               ))
             )}

@@ -37,7 +37,7 @@ interface Letter {
 
 export function LettersTab() {
   const { currentCase, updateCase } = useCases()
-  const { codes, addCode } = useAdmin()
+  const { codes, addCode, caseManagers } = useAdmin()
   const { employees } = useEmployees()
   const letterTemplates = codes.letterTemplates
 
@@ -57,8 +57,8 @@ export function LettersTab() {
   const [templateCode, setTemplateCode] = useState("")
   const [templateDescription, setTemplateDescription] = useState("")
 
-  const [sentFrom, setSentFrom] = useState("Case Management Team")
-  const [letterType, setLetterType] = useState("")
+  const [sentFrom, setSentFrom] = useState(currentCase?.caseManager || "")
+  
   const [template, setTemplate] = useState("")
   const [content, setContent] = useState("")
 
@@ -81,8 +81,8 @@ export function LettersTab() {
 
   const handleCreateLetter = () => {
     setEditingLetter(null)
-    setSentFrom("Case Management Team")
-    setLetterType("")
+    setSentFrom(currentCase?.caseManager || "")
+    
     setTemplate("")
     setContent("")
     setIsDialogOpen(true)
@@ -92,7 +92,7 @@ export function LettersTab() {
   const handleEditLetter = (letter: Letter) => {
     setEditingLetter(letter)
     setSentFrom(letter.sentFrom)
-    setLetterType(letter.letterType)
+    
     setTemplate(letter.template)
     setContent(letter.content)
     setIsDialogOpen(true)
@@ -105,10 +105,11 @@ export function LettersTab() {
     const now = new Date().toISOString()
     // Evaluate mustache variables in the content before saving
     const evaluatedContent = evaluateMustacheTemplate(content, currentCase)
+    const templateName = letterTemplates?.find((t) => t.code === template)?.name || template || "Draft"
 
     if (editingLetter) {
       setLetters((prev) =>
-        prev.map((l) => (l.id === editingLetter.id ? { ...l, sentFrom, letterType, template, content: evaluatedContent } : l)),
+        prev.map((l) => (l.id === editingLetter.id ? { ...l, sentFrom, letterType: templateName, template, content: evaluatedContent } : l)),
       )
       updateCase(
         currentCase.caseNumber,
@@ -117,8 +118,8 @@ export function LettersTab() {
           action: "updated",
           field: "letter",
           oldValue: editingLetter.letterType,
-          newValue: letterType,
-          description: `Updated letter: ${letterType || "Draft"}`,
+          newValue: templateName,
+          description: `Updated letter: ${templateName}`,
         },
       )
     } else {
@@ -126,7 +127,7 @@ export function LettersTab() {
       const newLetter: Letter = {
         id: letterId,
         caseNumber: currentCase.caseNumber,
-        letterType,
+        letterType: templateName,
         template,
         sentFrom,
         content: evaluatedContent,
@@ -138,7 +139,7 @@ export function LettersTab() {
       // Create a TODO for a Case Manager Leader to complete the letter (linked to the letter)
       const newTodo: TodoItem = {
         id: `todo-letter-${Date.now()}`,
-        activity: `Complete draft letter: ${letterType || "Untitled"}`,
+        activity: `Complete draft letter: ${templateName}`,
         caseManager: getCaseManagerLeader(),
         dateScheduled: new Date().toISOString().split("T")[0],
         completed: false,
@@ -152,8 +153,8 @@ export function LettersTab() {
         {
           action: "added",
           field: "letter",
-          newValue: letterType || "Draft",
-          description: `Added draft letter: ${letterType || "Untitled"} (TODO assigned to Case Manager Leader)`,
+          newValue: templateName,
+          description: `Added draft letter: ${templateName} (TODO assigned to Case Manager Leader)`,
         },
       )
     }
@@ -167,12 +168,13 @@ export function LettersTab() {
     const now = new Date().toISOString()
     // Evaluate mustache variables in the content before sending
     const evaluatedContent = evaluateMustacheTemplate(content, currentCase)
+    const templateName = letterTemplates?.find((t) => t.code === template)?.name || template || "Letter"
 
     if (editingLetter) {
       setLetters((prev) =>
         prev.map((l) =>
           l.id === editingLetter.id
-            ? { ...l, sentFrom, letterType, template, content: evaluatedContent, status: "Sent" as const, sentDate: now }
+            ? { ...l, sentFrom, letterType: templateName, template, content: evaluatedContent, status: "Sent" as const, sentDate: now }
             : l,
         ),
       )
@@ -184,14 +186,14 @@ export function LettersTab() {
           field: "letter",
           oldValue: "Draft",
           newValue: "Sent",
-          description: `Sent letter: ${letterType}`,
+          description: `Sent letter: ${templateName}`,
         },
       )
     } else {
       const newLetter: Letter = {
         id: `letter-${Date.now()}`,
         caseNumber: currentCase.caseNumber,
-        letterType,
+        letterType: templateName,
         template,
         sentFrom,
         content: evaluatedContent,
@@ -206,8 +208,8 @@ export function LettersTab() {
         {
           action: "added",
           field: "letter",
-          newValue: letterType || "Letter",
-          description: `Created and sent letter: ${letterType || "Untitled"}`,
+          newValue: templateName,
+          description: `Created and sent letter: ${templateName}`,
         },
       )
     }
@@ -365,7 +367,6 @@ export function LettersTab() {
             <TableHeader>
               <TableRow>
                 <TableHead>Date</TableHead>
-                <TableHead>Type</TableHead>
                 <TableHead>Template</TableHead>
                 <TableHead>From</TableHead>
                 <TableHead>Status</TableHead>
@@ -375,7 +376,7 @@ export function LettersTab() {
             <TableBody>
               {letters.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                     No letters created yet. Click "Create Letter" to get started.
                   </TableCell>
                 </TableRow>
@@ -383,7 +384,6 @@ export function LettersTab() {
                 letters.map((letter) => (
                   <TableRow key={letter.id}>
                     <TableCell>{new Date(letter.createdDate).toLocaleDateString()}</TableCell>
-                    <TableCell>{letter.letterType || "—"}</TableCell>
                     <TableCell>{letter.template || "—"}</TableCell>
                     <TableCell className="pii-data">{letter.sentFrom}</TableCell>
                     <TableCell>
@@ -420,10 +420,6 @@ export function LettersTab() {
                     <div>
                       <div className="text-xs text-muted-foreground mb-1">Date</div>
                       <div className="font-medium">{new Date(letter.createdDate).toLocaleDateString()}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-muted-foreground mb-1">Type</div>
-                      <div>{letter.letterType || "—"}</div>
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground mb-1">Template</div>
@@ -479,40 +475,30 @@ export function LettersTab() {
         onSendLetter={handleSendLetterAction}
       >
         <div className="letter-form space-y-4 p-6">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label htmlFor="letter-from" className="text-xs">
                 Letter Sent From
               </Label>
-              <Input
-                id="letter-from"
-                value={sentFrom}
-                onChange={(e) => setSentFrom(e.target.value)}
-                placeholder="e.g., Case Management Team"
-                className="bg-background h-8 text-sm"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="letter-type" className="text-xs">
-                Letter Type
-              </Label>
-              <Select value={letterType} onValueChange={setLetterType}>
-                <SelectTrigger id="letter-type" className="bg-background h-8 text-sm">
-                  <SelectValue placeholder="Select type..." />
+              <Select value={sentFrom} onValueChange={setSentFrom}>
+                <SelectTrigger id="letter-from" className="bg-background h-8 text-sm">
+                  <SelectValue placeholder="Select case manager..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="initial">Initial Contact Letter</SelectItem>
-                  <SelectItem value="followup">Follow-up Letter</SelectItem>
-                  <SelectItem value="closure">Case Closure Letter</SelectItem>
-                  <SelectItem value="rtw">Return to Work Letter</SelectItem>
-                  <SelectItem value="medical">Medical Documentation Request</SelectItem>
-                  <SelectItem value="benefits">Benefits Information</SelectItem>
+                  {caseManagers
+                    .filter((cm) => cm.active)
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((cm) => (
+                      <SelectItem key={cm.id} value={cm.name}>
+                        {cm.name}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1">
               <Label htmlFor="letter-template" className="text-xs">
-                Template
+                Letter Template
               </Label>
               <Select value={template} onValueChange={handleTemplateChange}>
                 <SelectTrigger id="letter-template" className="bg-background h-8 text-sm">
