@@ -1211,17 +1211,8 @@ export function CaseTab() {
                 <SelectValue placeholder="Select shift hours..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="8 Hr Rotating">8 Hr Rotating</SelectItem>
-                <SelectItem value="8 Hr Fixed">8 Hr Fixed</SelectItem>
-                <SelectItem value="9 Hr">9 Hr</SelectItem>
-                <SelectItem value="10 Hr Rotating">10 Hr Rotating</SelectItem>
-                <SelectItem value="10 Hr Fixed">10 Hr Fixed</SelectItem>
-                <SelectItem value="12 Hr Rotating">12 Hr Rotating</SelectItem>
-                <SelectItem value="12 Hr Fixed">12 Hr Fixed</SelectItem>
-                <SelectItem value="40 Hr">40 Hr</SelectItem>
-                <SelectItem value="45 Hr">45 Hr</SelectItem>
-                <SelectItem value="Non-Shift">Non-Shift</SelectItem>
-                <SelectItem value="Salary">Salary</SelectItem>
+                <SelectItem value="40 hrs">40 hrs</SelectItem>
+                <SelectItem value="45 hrs">45 hrs</SelectItem>
               </SelectContent>
             </Select>
           </div>
