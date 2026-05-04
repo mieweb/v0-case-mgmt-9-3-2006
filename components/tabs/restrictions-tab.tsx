@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 
 export function RestrictionsTab() {
-  const { currentCase, restrictions, addRestriction, updateRestriction, deleteRestriction, getRestrictionsForEmployee } = useCases()
+  const { currentCase, restrictions, addRestriction, updateRestriction, deleteRestriction, getRestrictionsForEmployee, updateCase } = useCases()
   const { codes } = useAdmin()
   
   // Get active restriction codes from admin, showing description (name) as the display value
@@ -100,6 +100,22 @@ export function RestrictionsTab() {
     })
   }
 
+  // Helper function to add a review todo when a review date is entered
+  const addReviewTodoIfNeeded = (restrictionName: string, reviewDate: string) => {
+    if (!reviewDate || !currentCase) return
+
+    const newTodo = {
+      id: `todo-${Date.now()}`,
+      dateScheduled: reviewDate,
+      activity: `Review Permanent Restriction - ${restrictionName}`,
+      caseManager: currentCase.caseManager || "",
+      completed: false,
+    }
+
+    const updatedTodos = [...(currentCase.todos || []), newTodo]
+    updateCase(currentCase.caseNumber, { todos: updatedTodos })
+  }
+
   const handleQuickEntrySaveAndNew = () => {
     if (!quickEntryData.restriction || !quickEntryData.startDate || !currentCase) return
 
@@ -107,6 +123,9 @@ export function RestrictionsTab() {
       ...quickEntryData,
       caseNumber: currentCase.caseNumber,
     })
+
+    // Add review todo if review date is entered
+    addReviewTodoIfNeeded(quickEntryData.restriction, quickEntryData.reviewDate)
 
     // Reset for next entry
     resetQuickEntry()
@@ -119,6 +138,9 @@ export function RestrictionsTab() {
       ...quickEntryData,
       caseNumber: currentCase.caseNumber,
     })
+
+    // Add review todo if review date is entered
+    addReviewTodoIfNeeded(quickEntryData.restriction, quickEntryData.reviewDate)
 
     resetQuickEntry()
   }
@@ -133,6 +155,9 @@ export function RestrictionsTab() {
         ...formData,
         caseNumber: currentCase.caseNumber,
       })
+      
+      // Add review todo if review date is entered (only for new restrictions)
+      addReviewTodoIfNeeded(formData.restriction, formData.reviewDate)
     }
 
     resetForm()
