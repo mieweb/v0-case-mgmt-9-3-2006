@@ -2591,7 +2591,7 @@ export function CaseTab() {
             {/* Closure Details */}
             <div className="space-y-2 border rounded-md p-3 bg-muted/30">
               <h4 className="font-semibold text-foreground text-sm">Closure Details</h4>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                 <div className="space-y-1">
                   <Label htmlFor="close-date" className="text-xs">Date Closed *</Label>
                   <Input
@@ -2599,13 +2599,13 @@ export function CaseTab() {
                     type="date"
                     value={closeCaseDateClosed}
                     onChange={(e) => setCloseCaseDateClosed(e.target.value)}
-                    className="bg-background h-8 text-sm"
+                    className="bg-background h-8 text-sm w-full"
                   />
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="closure-reason" className="text-xs">Closure Reason *</Label>
                   <Select value={closeCaseClosureReason} onValueChange={setCloseCaseClosureReason}>
-                    <SelectTrigger className="bg-background h-8 text-sm">
+                    <SelectTrigger className="bg-background h-8 text-sm w-full">
                       <SelectValue placeholder="Select reason..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -2626,7 +2626,7 @@ export function CaseTab() {
                     type="date"
                     value={closeCaseActualReturnDate}
                     onChange={(e) => setCloseCaseActualReturnDate(e.target.value)}
-                    className="bg-background h-8 text-sm"
+                    className="bg-background h-8 text-sm w-full"
                   />
                 </div>
                 <div className="space-y-1">
@@ -2636,7 +2636,7 @@ export function CaseTab() {
                     type="date"
                     value={closeCaseStdEndDate}
                     onChange={(e) => setCloseCaseStdEndDate(e.target.value)}
-                    className="bg-background h-8 text-sm"
+                    className="bg-background h-8 text-sm w-full"
                   />
                 </div>
               </div>
