@@ -711,7 +711,7 @@ export function CaseNotesTab() {
       )}
 
       <Dialog open={showVersionHistory} onOpenChange={setShowVersionHistory}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] max-w-4xl h-auto max-h-[90vh] overflow-y-auto overflow-x-hidden">
           <DialogHeader>
             <DialogTitle>Version History</DialogTitle>
             <DialogDescription>
@@ -792,7 +792,8 @@ export function CaseNotesTab() {
                 </div>
 
                 <div
-                  className="diff-content prose prose-sm max-w-none phi-data p-4 bg-background rounded border"
+                  className="diff-content prose prose-sm max-w-none phi-data p-4 bg-background rounded border break-words overflow-x-hidden"
+                  style={{ wordBreak: "break-word" }}
                   dangerouslySetInnerHTML={{ __html: getDiffContent()?.diffHtml || "" }}
                 />
               </div>
