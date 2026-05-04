@@ -930,7 +930,12 @@ export function CaseNotesTab() {
                   setSelectedTemplate(value)
                   const template = codes.caseNoteTemplates.find((t) => t.code === value)
                   if (template?.content) {
-                    setContent(template.content)
+                    // Convert plain text with newlines to HTML paragraphs
+                    const htmlContent = template.content
+                      .split('\n\n')
+                      .map(paragraph => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
+                      .join('')
+                    setContent(htmlContent)
                   }
                 }}
               >
