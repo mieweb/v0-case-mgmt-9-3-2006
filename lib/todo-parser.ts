@@ -2,7 +2,7 @@ export interface TodoTemplate {
   title: string
   offset: number
   offsetUnit: "Day" | "Week" | "Month"
-  anchor?: "incidentDate" | "caseCreation"
+  anchor?: "dateOfDisability" | "caseCreation"
   rrule?: string // Recurrence rule in iCalendar format
 }
 
@@ -28,7 +28,7 @@ export function parseTodoTemplate(template: string): TodoTemplate | null {
       title,
       offset: 0,
       offsetUnit: "Day",
-      anchor: "incidentDate",
+      anchor: "dateOfDisability",
     }
 
     for (let i = 1; i < parts.length; i++) {
@@ -44,7 +44,7 @@ export function parseTodoTemplate(template: string): TodoTemplate | null {
       // Parse anchor
       const anchorMatch = part.match(/anchor=(\w+)/i)
       if (anchorMatch) {
-        result.anchor = anchorMatch[1] as "incidentDate" | "caseCreation"
+        result.anchor = anchorMatch[1] as "dateOfDisability" | "caseCreation"
       }
 
       // Parse rrule
@@ -68,7 +68,7 @@ export function generateTodosFromTemplates(
   templates: string[],
   anchorDates: {
     caseCreation: Date
-    incidentDate?: Date
+    dateOfDisability?: Date
   }
 ): ParsedTodo[] {
   const todos: ParsedTodo[] = []
@@ -77,9 +77,9 @@ export function generateTodosFromTemplates(
     const template = parseTodoTemplate(templateStr)
     if (!template) continue
 
-    // Default to incident date, fall back to case creation if not provided
-    const anchorDate = template.anchor === "incidentDate"
-      ? anchorDates.incidentDate || anchorDates.caseCreation
+    // Default to date of disability, fall back to case creation if not provided
+    const anchorDate = template.anchor === "dateOfDisability"
+      ? anchorDates.dateOfDisability || anchorDates.caseCreation
       : anchorDates.caseCreation
 
     // Calculate the base due date
@@ -98,8 +98,8 @@ export function generateTodosFromTemplates(
 
     // Generate description
     let description = `Offset: ${template.offset} ${template.offsetUnit}`
-    if (template.anchor && template.anchor === "incidentDate") {
-      description += ` from incident date`
+    if (template.anchor && template.anchor === "dateOfDisability") {
+      description += ` from date of disability`
     }
     if (template.rrule) {
       description += ` | Recurrence: ${template.rrule}`

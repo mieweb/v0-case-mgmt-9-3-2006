@@ -50,7 +50,7 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
   const [testCaseTypeId, setTestCaseTypeId] = useState<string | null>(null)
   const [testAnchorDates, setTestAnchorDates] = useState({
     caseCreation: new Date(),
-    incidentDate: "",
+    dateOfDisability: "",
   })
   const [generatedTodos, setGeneratedTodos] = useState<ParsedTodo[]>([])
 
@@ -110,7 +110,7 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
     setTestDialogOpen(true)
     setTestAnchorDates({
       caseCreation: new Date(),
-      incidentDate: "",
+      dateOfDisability: "",
     })
     setGeneratedTodos([])
   }
@@ -123,7 +123,7 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
 
     const anchorDates = {
       caseCreation: testAnchorDates.caseCreation,
-      incidentDate: testAnchorDates.incidentDate ? new Date(testAnchorDates.incidentDate) : testAnchorDates.caseCreation,
+      dateOfDisability: testAnchorDates.dateOfDisability ? new Date(testAnchorDates.dateOfDisability) : testAnchorDates.caseCreation,
     }
 
     const todos = generateTodosFromTemplates(caseType.defaultTodos, anchorDates)
@@ -306,14 +306,14 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
                                         />
                                       </div>
                                       <div className="space-y-2">
-                                        <Label>Case (Incident) Date</Label>
+                                        <Label>Date of Disability</Label>
                                         <Input
                                           type="date"
-                                          value={testAnchorDates.incidentDate}
+                                          value={testAnchorDates.dateOfDisability}
                                           onChange={(e) =>
                                             setTestAnchorDates((prev) => ({
                                               ...prev,
-                                              incidentDate: e.target.value,
+                                              dateOfDisability: e.target.value,
                                             }))
                                           }
                                         />

@@ -137,7 +137,7 @@ export function TodosTab() {
 
     const dates = {
       caseCreation: new Date(anchorDates.caseCreation || new Date()),
-      incidentDate: currentCase?.caseIncidentDate ? new Date(currentCase.caseIncidentDate) : new Date(anchorDates.caseCreation || new Date()),
+      dateOfDisability: currentCase?.dateOfDisability ? new Date(currentCase.dateOfDisability) : new Date(anchorDates.caseCreation || new Date()),
     }
 
     const parsedTodos = generateTodosFromTemplates(caseType.defaultTodos, dates)
