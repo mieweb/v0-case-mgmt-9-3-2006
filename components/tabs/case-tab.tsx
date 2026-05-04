@@ -78,7 +78,7 @@ export function CaseTab() {
   const { employees } = useEmployees()
 
   const [status, setStatus] = useState("")
-  const [caseType, setCaseType] = useState("")
+  const [caseType, setCaseType] = useState("Non-occupational injury / illness")
   const [caseSeverity, setCaseSeverity] = useState("")
   const [caseManager, setCaseManager] = useState(currentCase?.caseManager || "Unassigned")
   const [dateOfDisability, setDateOfDisability] = useState("")
@@ -206,7 +206,7 @@ export function CaseTab() {
   useEffect(() => {
     if (currentCase) {
       setStatus(currentCase.status || "Open")
-      setCaseType(currentCase.caseType || "")
+      setCaseType(currentCase.caseType || "Non-occupational injury / illness")
       setCaseSeverity(currentCase.caseSeverity || "")
       setCaseManager(currentCase.caseManager || "Unassigned")
       setIsConfidential(currentCase.confidential || false)
