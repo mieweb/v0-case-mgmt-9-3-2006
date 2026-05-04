@@ -442,7 +442,7 @@ export function DiagnosisTab() {
             <div className="text-sm text-foreground font-bold">Or</div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Enter Custom ICD-10 Code</Label>
+                <Label>Enter ICD-10 Code</Label>
                 <Input
                   value={customCode}
                   onChange={(e) => {
@@ -454,7 +454,7 @@ export function DiagnosisTab() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Custom Description</Label>
+                <Label>Description</Label>
                 <Input
                   value={customDescription}
                   onChange={(e) => setCustomDescription(e.target.value)}
