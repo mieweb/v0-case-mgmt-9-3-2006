@@ -2579,7 +2579,7 @@ export function CaseTab() {
 
       {/* Close Case Dialog - Shows open restrictions and todos */}
       <AlertDialog open={showCloseCaseDialog} onOpenChange={setShowCloseCaseDialog}>
-        <AlertDialogContent className="max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
+        <AlertDialogContent className="w-[95vw] max-w-4xl max-h-[92vh] overflow-hidden flex flex-col">
           <AlertDialogHeader>
             <AlertDialogTitle>Close Case - Review Open Items</AlertDialogTitle>
             <AlertDialogDescription>
