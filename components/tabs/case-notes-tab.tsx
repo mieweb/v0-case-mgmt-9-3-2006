@@ -718,7 +718,7 @@ export function CaseNotesTab() {
               View all versions of this case note. Current version: v{selectedNoteForHistory?.currentVersion}
             </DialogDescription>
           </DialogHeader>
-          <div className="flex items-center justify-between border-b pb-4">
+          <div className="flex flex-wrap items-center gap-3 border-b pb-4">
             <div className="flex items-center gap-2">
               <Button variant={!diffMode ? "default" : "outline"} size="sm" onClick={() => setDiffMode(false)}>
                 All Versions
@@ -734,7 +734,7 @@ export function CaseNotesTab() {
             </div>
 
             {diffMode && selectedNoteForHistory && selectedNoteForHistory.versions.length > 0 && (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -744,7 +744,7 @@ export function CaseNotesTab() {
                   <ChevronLeft className="h-4 w-4 mr-1" />
                   Older
                 </Button>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-muted-foreground whitespace-nowrap">
                   Comparing v{getDiffContent()?.oldVersionNumber} → v{getDiffContent()?.newVersionNumber}
                 </span>
                 <Button variant="outline" size="sm" onClick={handleNextDiff} disabled={compareVersionIndex === 0}>
