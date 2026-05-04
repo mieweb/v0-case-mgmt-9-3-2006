@@ -2842,7 +2842,15 @@ export function CaseTab() {
                   !closeCaseAbsenceUpdates[absence.id]?.otherStatus
                 ) ||
                 // Prevent closing if there are open todos not selected to close
-                openTodos.length > 0 && selectedTodosToClose.length < openTodos.length
+                (openTodos.length > 0 && selectedTodosToClose.length < openTodos.length) ||
+                // Prevent closing if there are active restrictions that are not marked as permanent
+                openRestrictions.some((restriction) => {
+                  const updates = closeCaseRestrictionUpdates[restriction.id]
+                  // Check if the restriction is permanent (either originally or via update)
+                  const isPermanent = updates?.isPermanent || restriction.isPermanent
+                  // If not permanent, case cannot be closed
+                  return !isPermanent
+                })
               }
               onClick={() => {
                 // Close selected todos
