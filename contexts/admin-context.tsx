@@ -345,6 +345,153 @@ Case Management Team`,
       active: true,
       content: `Received medical update from provider. Reviewed documentation and updated case file accordingly.`,
     },
+    {
+      id: "4",
+      code: "DIS_ADA_Init_Intervw",
+      name: "DIS_ADA Init Intervw",
+      description: "Employee Initial Interview for ADA process",
+      active: true,
+      content: `Employee Initial Interview – Introduction of yourself and role as the Medical Case Manager. 
+Purpose of this call. Discussion of the ADA process (i.e. forms, interactive dialogue, ADA Medical Review, subsequent calls between MCM, Leadership, etc.)  
+What is the reason for the request – such as … difficulty getting to work, unable to attend meetings, difficulty lifting, no stairs, etc.    
+Have you discussed with your manager or HR – or plant manager, supervisor?  
+Current Diagnosis:   
+Co-morbidities:  Initial onset of diagnosis: 
+Treating providers (historical and current):  
+Last office visit:  
+Next office visit:  
+Symptoms:  
+Referrals:  
+Testing: 
+Medications:   
+Job title:  
+What does your current work schedule look like:  
+Have you had a temporary work plan agreement or common day agreement plan in place with leadership/HR?  
+Accommodation request:   
+ADA process: 
+Informed he / she they will be provided ADA forms to have filled out and returned to me within 30 days then ADA meeting with team consisting of myself, Team Lead, Legal and Medical Director  Personal email (to send ADA forms):`,
+    },
+    {
+      id: "5",
+      code: "DIS_AllDermQuestions",
+      name: "DIS_AllDermQuestions",
+      description: "Allergy Questions and Dermatitis Conditions",
+      active: true,
+      content: `Allergy Questions and Dermatitis Conditions  These are all samples: 
+1. When was the individual first diagnosed with (name diagnosis).
+2. What testing or evaluation tools were use? How Long ago. 
+3. You the Dm list the symptoms and actions that the ee is experiencing.  
+4. What assessments will be done in the future? 
+5. Medication? 
+6. Have you reviewed our Industrial Hygiene Data along with our MSDS sheets? 
+7. In reviewing the individuals job description and duties – the employee is exposed or not exposed – (DM's please consult with Safety and your OHN and HR as to what product the ee is touching or has been exposed to. 
+8. What accommodation are you recommending?  
+9. Has there been a pulmonary function test, or specific allergy testing? If so when and what are your recommendations.  Once you get all of these answered – then pull in myself and OC Medical Director to review – if we have further questions – before you go back to the plant.`,
+    },
+    {
+      id: "6",
+      code: "DIS_HAScript",
+      name: "DIS_HAScript",
+      description: "Health Assessment Script",
+      active: true,
+      content: `Owens Corning strives to ensure that our employees can say they are healthier because they work for Owens Corning.   
+One of the first steps in identifying opportunities and tracking progress is completing the annual health risk assessment (HRA).  
+The questionnaire takes approximately 15 minutes to complete.  You will receive your overall wellness score and recommended next steps in the areas of smoking, eating, exercise, stress, weight, biometric results and more!  Take advantage of the tools and resources available to you through the Healthy Living Wellness program by visiting www.join.virginpulse.com/OC and completing your HRA today!`,
+    },
+    {
+      id: "7",
+      code: "DIS_Init_NON",
+      name: "DIS_Init_NON",
+      description: "Initial Assessment for Non-occupational",
+      active: true,
+      content: `Owens Corning Disability Initial Assessment-Non-occupational (contact within 24 hours and completion of assessment within 1 week):    
+SSDI referral due (5 months):    
+LTD date/eligibility (5 years of service):    
+Date LTD application due to Disability Process Mgr (90 days prior to STD end date):    
+Employee Central:  (eligibility checked) Full or Part time:  
+(STD leave entered):    
+Discuss and list current medical status:    
+Discuss and list any co-morbidities (please refer to prior WC or STD cases):  
+Discuss whether this was a result of a car accident or other 3rd Party for which STD benefits would be offset:  Reimbursement agreement completed:   
+List Current medications:   
+HA review (should be completed for salary and nonunion hourly employees to be eligible for benefits):    
+Specific Wellness Discussion – discuss current health struggles/issues, how ee is addressing those concerns and willingness for referral to the Healthy Living Program:    
+Inquire about other income: 
+SSDI (only SS offset is SSDI), WComp, State Benefits:   
+Employee personal email address: Employee work email address: Preferred email address to contact employee:     
+Describe pertinent vocational/social information and barriers as impacts RTW plans:    
+MDA review:          standard or predictive used?         
+number of days?    
+Date Job Description requested from site:    
+Describe discussion of rtw goal:    
+Short Term Goal: (what you will achieve in the 30 days/with time frame)    
+Long Term Goal: (what overall achievements will be/with time frames)    
+FMLA notification sent ASAP to FMLA:  
+STD notification sent:    
+Letter (approval/denial/pending) completed:   
+Benefits documented in case and payroll updated:`,
+    },
+    {
+      id: "8",
+      code: "DIS_Init_OCC",
+      name: "DIS_Init_OCC",
+      description: "Initial Assessment for Occupational",
+      active: true,
+      content: `Owens Corning Disability Initial Assessment-Occupational (alleged or accepted) (contact within 24 hours and completion of assessment within 1 week):    
+SSDI referral due (5 months):    
+LTD date/eligibility (5 years of service):    
+Date LTD application due to Disability Process Mgr (90 days prior to STD end date):    *you will be notified of new Occupational cases through Cority processes, please do not open a new case*    
+Parts 1 and 2 of STD application completed:   
+Reimbursement agreement completed:    
+Employee Central:  (eligibility checked) Full or Part time:  (STD leave entered):    
+Discuss and list current medical status:    
+Discuss and list co-morbidities (please review prior STD/WC cases):   
+List current medications:   
+HA review (should be completed for salary and nonunion hourly employees to be eligible for benefits):    
+Specific Wellness Discussion – discuss current health struggles/issues, how ee is addressing those concerns and willingness for referral to the Healthy Living Program:    
+Inquire about other income: SSDI (only SS offset is SSDI), WComp, State Benefits:   
+Employee personal email address: Employee work email address: Preferred email address to contact employee:  
+Describe pertinent vocational/social information and barriers as impacts RTW plans:    
+MDA review:  standard or predictive used?  Number of days?    
+Date Job Description requested from site:    
+Describe discussion of rtw goal:    
+Short Term Goal: (what you will achieve in the 30 days/with time frame)   Long Term Goal: (what overall achievements will be/with time frames)    
+First Fill Card supplied/Drug card set up through MyMatrixx:    
+FMLA notification sent ASAP to FMLA:  STD notification sent:   
+Letter (approval/denial/pending) completed:    2 year wage history requested and forwarded to GB resolution manager:    
+Benefits documented in case and payroll updated:    Copy of all information to GB resolution manager:`,
+    },
+    {
+      id: "9",
+      code: "DIS_Mo_Reassess",
+      name: "DIS_Mo_Reassess",
+      description: "Monthly Reassessment template",
+      active: true,
+      content: `Owens Corning Disability Reassessment template (due by end of every month)   
+MEDICAL & RTW STATUS:  
+Provider(s):  
+Diagnosis:  
+MDA review (MDA follow up letter sent within 7 days of exceeding guidelines):  
+Next Office Visit:  
+Updated Medical status:  
+Medication update:  
+Updates to treatment plan:  
+Compliance with treatment plan:  
+Physical medicine (PT/OT/etc) program:  
+SSDI Status (n/a month's 1-4):   
+Usual Job:   
+Restrictions:   
+RTW plan and reevaluation:      
+Barriers for RTW/Safety issues:   
+Specific Wellness Discussion – discuss current health struggles/issues, how ee is addressing those concerns and willingness for referral to the Healthy Living Program:  
+Reimbursement agreement completed:     
+UPDATED CASE MANAGEMENT PLAN: Facilitate a successful return to work without accommodation by communicating with EE after each MD appt to confirm his/her understanding of treatment recommendations and compliance, evaluate his/her progress and review against treatment guidelines, progress duties and physical capacities as allowed by MD and in collaboration with mgmt and confirm work adjustment.    
+In collaboration with the ill/injured person, the following goals were discussed:    
+Short Term Goals:   
+Long Term Goals: WRITE GOALS AND ADD - Return to usual and customary job with/without accommodations.      
+Final:   
+What further evaluations are needed? What questions/concerns do you have? Any concerns from the plant/HR, etc?`,
+    },
   ],
   caseStatus: [
     { id: "1", code: "OPEN", description: "Open", active: true },
