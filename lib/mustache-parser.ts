@@ -72,9 +72,12 @@ export function evaluateMustacheTemplate(template: string, caseData: Case): stri
     employeeFirstName,
     employeeLastName,
     employeeNumber: caseData.employeeNumber || "",
+    employeeSSN: caseData.employeeSSN || "",
     employeeLocation: caseData.employeeLocation || "",
     employeeClass: caseData.employeeClass || "",
+    employeeEthnicGroup: caseData.employeeEthnicGroup || "",
     dateOfBirth: caseData.dateOfBirth || "",
+    dateOfHire: caseData.dateOfHire || "",
     address: caseData.address || "",
     employeeStreet1,
     employeeStreet2,
@@ -101,6 +104,10 @@ export function evaluateMustacheTemplate(template: string, caseData: Case): stri
     initialContactDate: caseData.initialContactDate || "",
     dateClosed: caseData.dateClosed || "",
     closureReason: caseData.closureReason || "",
+    
+    // Medical Info
+    diagnosis: caseData.diagnosis || "",
+    natureOfInjury: caseData.natureOfInjury || "",
 
     // Adjuster Info - lookup name from code, fallback to stored values
     adjuster: caseData.adjuster ? (adjusterData[caseData.adjuster]?.name || caseData.adjuster) : "",
