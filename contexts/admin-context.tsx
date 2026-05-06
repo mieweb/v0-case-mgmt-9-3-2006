@@ -421,6 +421,56 @@ SSDI STATUS AND ANY OTHER PERTINENT INFORMATION:
 FUTURE VISITS, PROCEDURES, TESTS, ETC:
 (List all future visits--provider name, visit date, etc)`,
     },
+    {
+      id: "7",
+      code: "cm-work-restrict",
+      name: "CM-Work Restrictions",
+      description: "Work restrictions form for physician to complete",
+      active: true,
+      content: `CM-Work Restrict
+
+{{today}}
+
+Re: {{employeeFirstName}} {{employeeLastName}}
+SSN: {{employeeSSN}}
+DOB: {{dateOfBirth}}
+
+WORK RESTRICTIONS
+
+Dear Dr. {{physicianName}}:
+
+You indicated work restrictions are needed for {{employeeFirstName}} {{employeeLastName}}. Please assist Owens Corning with providing appropriate job duties without compromising her/his medical condition.
+
+Please address the issues below:
+
+What is the current diagnosis? ___________________________________________________
+
+In the course of _________ work day, with rest breaks every ______________ how many hours can {{employeeFirstName}} {{employeeLastName}} perform each of the following activities?
+
+Stand __________ Walk ____________ Sit ____________ Drive __________
+Climb Stairs _________ Climb Ladders ____________ (please indicate max...)
+____________ Crawl ___________ Stoop ___________ Squat _________ Bend __________
+
+Indicate the maximum weight in the following tasks:
+Lifting _____________ Push ____________ Pulling ____________ Carry __________
+
+Can {{employeeFirstName}} {{employeeLastName}} perform tasks using the following? Indicate yes or no:
+- Use of vibratory Equipment Yes _________ No_______
+- Operate high speed/moving equipment Yes _________ No _________
+- Perform tasks above shoulder level Yes _________ No _________
+
+Please indicate any additional restrictions and or limitations for {{employeeFirstName}} {{employeeLastName}}.
+
+Date _______________________ may return to work with these limitations: _____________
+
+Estimated length of time for these limitations: ________________________________.
+
+MD Signature: _________________________________ Date: ________________________
+
+PLEASE FAX FORM BACK TO:
+{{caseManagerWithCredentials}}, Medical Case Manager
+419-325-0319`,
+    },
   ],
   caseNoteTemplates: [
     {
