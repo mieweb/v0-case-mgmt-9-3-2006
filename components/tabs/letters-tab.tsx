@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Pencil, Trash2, List, LayoutList } from "lucide-react"
+import { Plus, Pencil, Trash2, List, LayoutList, Paperclip, X, FileText } from "lucide-react"
 import { RichTextEditor } from "@/components/rich-text-editor"
 import { useCases, type TodoItem } from "@/contexts/cases-context"
 import { useAdmin } from "@/contexts/admin-context"
@@ -23,6 +23,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 
+interface LetterAttachment {
+  id: string
+  name: string
+  size: number
+  type: string
+  dataUrl: string
+}
+
 interface Letter {
   id: string
   caseNumber: string
@@ -33,6 +41,7 @@ interface Letter {
   createdDate: string
   sentDate?: string
   status: "Draft" | "Sent"
+  attachments?: LetterAttachment[]
 }
 
 export function LettersTab() {
@@ -61,6 +70,39 @@ export function LettersTab() {
   
   const [template, setTemplate] = useState("")
   const [content, setContent] = useState("")
+  const [attachments, setAttachments] = useState<LetterAttachment[]>([])
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        const newAttachment: LetterAttachment = {
+          id: `att-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          dataUrl: event.target?.result as string,
+        }
+        setAttachments((prev) => [...prev, newAttachment])
+      }
+      reader.readAsDataURL(file)
+    })
+    // Reset input
+    e.target.value = ""
+  }
+
+  const handleRemoveAttachment = (id: string) => {
+    setAttachments((prev) => prev.filter((att) => att.id !== id))
+  }
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  }
 
   useEffect(() => {
     if (currentCase?.caseNumber) {
@@ -85,6 +127,7 @@ export function LettersTab() {
     
     setTemplate("")
     setContent("")
+    setAttachments([])
     setIsDialogOpen(true)
     setIsMinimized(false)
   }
@@ -95,6 +138,7 @@ export function LettersTab() {
     
     setTemplate(letter.template)
     setContent(letter.content)
+    setAttachments(letter.attachments || [])
     setIsDialogOpen(true)
     setIsMinimized(false)
   }
@@ -109,7 +153,7 @@ export function LettersTab() {
 
     if (editingLetter) {
       setLetters((prev) =>
-        prev.map((l) => (l.id === editingLetter.id ? { ...l, sentFrom, letterType: templateName, template, content: evaluatedContent } : l)),
+        prev.map((l) => (l.id === editingLetter.id ? { ...l, sentFrom, letterType: templateName, template, content: evaluatedContent, attachments } : l)),
       )
       updateCase(
         currentCase.caseNumber,
@@ -133,6 +177,7 @@ export function LettersTab() {
         content: evaluatedContent,
         createdDate: now,
         status: "Draft",
+        attachments,
       }
       setLetters((prev) => [...prev, newLetter])
       
@@ -160,6 +205,7 @@ export function LettersTab() {
     }
 
     setIsDialogOpen(false)
+    setAttachments([])
   }
 
   const handleSendLetterAction = () => {
@@ -174,7 +220,7 @@ export function LettersTab() {
       setLetters((prev) =>
         prev.map((l) =>
           l.id === editingLetter.id
-            ? { ...l, sentFrom, letterType: templateName, template, content: evaluatedContent, status: "Sent" as const, sentDate: now }
+            ? { ...l, sentFrom, letterType: templateName, template, content: evaluatedContent, status: "Sent" as const, sentDate: now, attachments }
             : l,
         ),
       )
@@ -200,6 +246,7 @@ export function LettersTab() {
         createdDate: now,
         sentDate: now,
         status: "Sent",
+        attachments,
       }
       setLetters((prev) => [...prev, newLetter])
       updateCase(
@@ -215,6 +262,7 @@ export function LettersTab() {
     }
 
     setIsDialogOpen(false)
+    setAttachments([])
   }
 
   const handleDeleteLetter = (id: string) => {
@@ -536,6 +584,55 @@ export function LettersTab() {
               placeholder="Type your letter content here or select a template..."
               className="phi-data"
             />
+          </div>
+
+          {/* Attachments Section */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs">Attachments</Label>
+              <label htmlFor="letter-attachment-upload" className="cursor-pointer">
+                <Button type="button" variant="outline" size="sm" asChild>
+                  <span>
+                    <Paperclip className="mr-2 h-4 w-4" />
+                    Add Attachment
+                  </span>
+                </Button>
+                <input
+                  id="letter-attachment-upload"
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={handleFileUpload}
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.png,.jpg,.jpeg"
+                />
+              </label>
+            </div>
+            
+            {attachments.length > 0 ? (
+              <div className="border rounded-md divide-y">
+                {attachments.map((attachment) => (
+                  <div key={attachment.id} className="flex items-center justify-between p-2 hover:bg-muted/50">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">{attachment.name}</p>
+                        <p className="text-xs text-muted-foreground">{formatFileSize(attachment.size)}</p>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveAttachment(attachment.id)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">No attachments added</p>
+            )}
           </div>
         </div>
       </LetterWindow>
