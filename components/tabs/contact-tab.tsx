@@ -162,27 +162,32 @@ export function ContactTab() {
         <h3 className="text-lg font-medium">Case Contacts</h3>
         <div className="flex gap-2">
           {/* Import from Previous Cases Button */}
-          {previousCases.length > 0 && (
-            <Dialog open={isImportDialogOpen} onOpenChange={(open) => {
-              setIsImportDialogOpen(open)
-              if (!open) {
-                setSelectedPreviousCase("")
-                setSelectedContactsToImport([])
-              }
-            }}>
-              <DialogTrigger asChild>
-                <Button size="sm" variant="outline">
-                  <History className="mr-2 h-4 w-4" />
-                  Import from Previous Case
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[650px]">
-                <DialogHeader>
-                  <DialogTitle>Import Contacts from Previous Cases</DialogTitle>
-                  <DialogDescription>
-                    Select a previous case to import contacts from. These contacts will be added to the current case.
-                  </DialogDescription>
-                </DialogHeader>
+          <Dialog open={isImportDialogOpen} onOpenChange={(open) => {
+            setIsImportDialogOpen(open)
+            if (!open) {
+              setSelectedPreviousCase("")
+              setSelectedContactsToImport([])
+            }
+          }}>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="outline">
+                <History className="mr-2 h-4 w-4" />
+                Import from Previous Case
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[650px]">
+              <DialogHeader>
+                <DialogTitle>Import Contacts from Previous Cases</DialogTitle>
+                <DialogDescription>
+                  Select a previous case to import contacts from. These contacts will be added to the current case.
+                </DialogDescription>
+              </DialogHeader>
+              
+              {previousCases.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No previous cases found for this employee.
+                </div>
+              ) : (
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
                     <Label>Select Previous Case</Label>
@@ -280,9 +285,9 @@ export function ContactTab() {
                     </Button>
                   </div>
                 </div>
-              </DialogContent>
-            </Dialog>
-          )}
+              )}
+            </DialogContent>
+          </Dialog>
 
           {/* Add Contact Button */}
           <Dialog open={isAddingContact} onOpenChange={setIsAddingContact}>
