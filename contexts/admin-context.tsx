@@ -319,6 +319,38 @@ You have the right to appeal this decision within 30 days. Please contact {{case
 Sincerely,
 Case Management Team`,
     },
+    {
+      id: "5",
+      code: "std-continuation-question",
+      name: "STD Continuation in Question",
+      description: "Letter when STD benefit continuation is in question due to missing medical documentation",
+      active: true,
+      content: `{{today}}
+
+{{employeeFirstName}} {{employeeLastName}}
+{{employeeStreet1}} {{employeeStreet2}}
+{{employeeCity}}, {{employeeState}} {{employeeZip}}
+
+Dear {{employeeFirstName}}:
+
+This letter is to acknowledge that continuance of Short Term Disability benefits is in question. According to the Owens Corning Short Term Disability (add Plan document name) Plan document:
+
+Benefit Termination. STD Disability Benefits will be terminated when an eligible employee:
+
+Add Plan Document section:
+
+At this time, we have not received any current medical updates, I am requesting medical documentation to support your continued disability within 15 days of the date of this letter. Failure to follow-up with your physician and to provide updated documentation will result in benefits termination.
+
+If I can be of any assistance or if you have any questions, please call me at {{caseManagerPhone}}.
+
+Sincerely,
+{{caseManagerWithCredentials}}
+Medical Case Manager
+
+CC:  Laura Higginbotham, Benefits Leader
+        Disability Management
+        _________, Plant HR Leader`,
+    },
   ],
   caseNoteTemplates: [
     {

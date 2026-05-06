@@ -50,15 +50,37 @@ const adjusterData: Record<string, { name: string; phone: string; email: string 
 export function evaluateMustacheTemplate(template: string, caseData: Case): string {
   let result = template
 
+  // Parse employee name into first and last name
+  const nameParts = (caseData.employeeName || "").split(" ")
+  const employeeFirstName = nameParts[0] || ""
+  const employeeLastName = nameParts.slice(1).join(" ") || ""
+
+  // Parse address into components (assuming format: "Street, City, State ZIP" or similar)
+  const addressParts = (caseData.address || "").split(",").map(s => s.trim())
+  const employeeStreet1 = addressParts[0] || ""
+  const employeeStreet2 = "" // Can be extended if address format supports it
+  const cityStateZip = addressParts[1] || ""
+  const cityStateZipMatch = cityStateZip.match(/^(.+?)\s+([A-Z]{2})\s+(\d{5}(?:-\d{4})?)$/)
+  const employeeCity = cityStateZipMatch ? cityStateZipMatch[1] : cityStateZip
+  const employeeState = cityStateZipMatch ? cityStateZipMatch[2] : ""
+  const employeeZip = cityStateZipMatch ? cityStateZipMatch[3] : ""
+
   // Create a context object with all case data
   const context: Record<string, any> = {
     // Employee Info
     employeeName: caseData.employeeName || "",
+    employeeFirstName,
+    employeeLastName,
     employeeNumber: caseData.employeeNumber || "",
     employeeLocation: caseData.employeeLocation || "",
     employeeClass: caseData.employeeClass || "",
     dateOfBirth: caseData.dateOfBirth || "",
     address: caseData.address || "",
+    employeeStreet1,
+    employeeStreet2,
+    employeeCity,
+    employeeState,
+    employeeZip,
     age: caseData.age || "",
     employmentType: caseData.employmentType || "",
     cellPhone: caseData.cellPhone || "",
@@ -72,6 +94,8 @@ export function evaluateMustacheTemplate(template: string, caseData: Case): stri
     caseType: caseData.caseType || "",
     caseCategory: caseData.caseCategory || "",
     caseManager: caseData.caseManager || "",
+    caseManagerPhone: caseData.caseManagerPhone || "",
+    caseManagerWithCredentials: caseData.caseManager || "",
     status: caseData.status || "",
     dateOfDisability: caseData.dateOfDisability || "",
     initialContactDate: caseData.initialContactDate || "",
