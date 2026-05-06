@@ -295,7 +295,12 @@ export function LettersTab() {
       const selectedTemplate = letterTemplates?.find((t) => t.code === templateCode)
       if (selectedTemplate?.content) {
         const evaluatedContent = evaluateMustacheTemplate(selectedTemplate.content, currentCase)
-        setContent(evaluatedContent)
+        // Convert plain text with newlines to HTML paragraphs for the rich text editor
+        const htmlContent = evaluatedContent
+          .split('\n\n')
+          .map(paragraph => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
+          .join('')
+        setContent(htmlContent)
       }
     }
   }
