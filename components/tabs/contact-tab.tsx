@@ -354,6 +354,7 @@ export function ContactTab() {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <div className="flex gap-4 items-center bg-muted/30 p-4 rounded-lg">
