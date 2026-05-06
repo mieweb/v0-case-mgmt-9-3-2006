@@ -78,7 +78,7 @@ export function CaseTab() {
   const { employees } = useEmployees()
 
   const [status, setStatus] = useState("")
-  const [caseType, setCaseType] = useState("")
+  const [caseType, setCaseType] = useState("Non-occupational injury / illness")
   const [caseSeverity, setCaseSeverity] = useState("")
   const [caseManager, setCaseManager] = useState(currentCase?.caseManager || "Unassigned")
   const [dateOfDisability, setDateOfDisability] = useState("")
@@ -206,7 +206,7 @@ export function CaseTab() {
   useEffect(() => {
     if (currentCase) {
       setStatus(currentCase.status || "Open")
-      setCaseType(currentCase.caseType || "")
+      setCaseType(currentCase.caseType || "Non-occupational injury / illness")
       setCaseSeverity(currentCase.caseSeverity || "")
       setCaseManager(currentCase.caseManager || "Unassigned")
       setIsConfidential(currentCase.confidential || false)
@@ -336,7 +336,7 @@ export function CaseTab() {
 
     const dates = {
       caseCreation: new Date(disabilityDate),
-      incidentDate: currentCase.caseIncidentDate ? new Date(currentCase.caseIncidentDate) : new Date(disabilityDate),
+      dateOfDisability: new Date(disabilityDate),
     }
 
     const parsedTodos = generateTodosFromTemplates(caseTypeObj.defaultTodos, dates)
@@ -1211,17 +1211,8 @@ export function CaseTab() {
                 <SelectValue placeholder="Select shift hours..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="8 Hr Rotating">8 Hr Rotating</SelectItem>
-                <SelectItem value="8 Hr Fixed">8 Hr Fixed</SelectItem>
-                <SelectItem value="9 Hr">9 Hr</SelectItem>
-                <SelectItem value="10 Hr Rotating">10 Hr Rotating</SelectItem>
-                <SelectItem value="10 Hr Fixed">10 Hr Fixed</SelectItem>
-                <SelectItem value="12 Hr Rotating">12 Hr Rotating</SelectItem>
-                <SelectItem value="12 Hr Fixed">12 Hr Fixed</SelectItem>
-                <SelectItem value="40 Hr">40 Hr</SelectItem>
-                <SelectItem value="45 Hr">45 Hr</SelectItem>
-                <SelectItem value="Non-Shift">Non-Shift</SelectItem>
-                <SelectItem value="Salary">Salary</SelectItem>
+                <SelectItem value="40 hrs">40 hrs</SelectItem>
+                <SelectItem value="45 hrs">45 hrs</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -2588,7 +2579,7 @@ export function CaseTab() {
 
       {/* Close Case Dialog - Shows open restrictions and todos */}
       <AlertDialog open={showCloseCaseDialog} onOpenChange={setShowCloseCaseDialog}>
-        <AlertDialogContent className="max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
+        <AlertDialogContent className="w-[98vw] max-w-5xl h-[95vh] overflow-hidden flex flex-col">
           <AlertDialogHeader>
             <AlertDialogTitle>Close Case - Review Open Items</AlertDialogTitle>
             <AlertDialogDescription>
@@ -2596,25 +2587,25 @@ export function CaseTab() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           
-          <div className="flex-1 overflow-y-auto space-y-6 py-4">
+          <div className="flex-1 overflow-y-auto space-y-4 py-2">
             {/* Closure Details */}
-            <div className="space-y-4 border rounded-md p-4 bg-muted/30">
-              <h4 className="font-semibold text-foreground">Closure Details</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="close-date">Date Closed *</Label>
+            <div className="space-y-2 border rounded-md p-3 bg-muted/30">
+              <h4 className="font-semibold text-foreground text-sm">Closure Details</h4>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                <div className="space-y-1">
+                  <Label htmlFor="close-date" className="text-xs">Date Closed *</Label>
                   <Input
                     id="close-date"
                     type="date"
                     value={closeCaseDateClosed}
                     onChange={(e) => setCloseCaseDateClosed(e.target.value)}
-                    className="bg-background"
+                    className="bg-background h-8 text-sm w-full"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="closure-reason">Closure Reason *</Label>
+                <div className="space-y-1">
+                  <Label htmlFor="closure-reason" className="text-xs">Closure Reason *</Label>
                   <Select value={closeCaseClosureReason} onValueChange={setCloseCaseClosureReason}>
-                    <SelectTrigger className="bg-background">
+                    <SelectTrigger className="bg-background h-8 text-sm w-full">
                       <SelectValue placeholder="Select reason..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -2628,24 +2619,24 @@ export function CaseTab() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="actual-return-date">Actual Return Date</Label>
+                <div className="space-y-1">
+                  <Label htmlFor="actual-return-date" className="text-xs">Actual Return Date</Label>
                   <Input
                     id="actual-return-date"
                     type="date"
                     value={closeCaseActualReturnDate}
                     onChange={(e) => setCloseCaseActualReturnDate(e.target.value)}
-                    className="bg-background"
+                    className="bg-background h-8 text-sm w-full"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="std-end-date">STD End Date</Label>
+                <div className="space-y-1">
+                  <Label htmlFor="std-end-date" className="text-xs">STD End Date</Label>
                   <Input
                     id="std-end-date"
                     type="date"
                     value={closeCaseStdEndDate}
                     onChange={(e) => setCloseCaseStdEndDate(e.target.value)}
-                    className="bg-background"
+                    className="bg-background h-8 text-sm w-full"
                   />
                 </div>
               </div>
@@ -2653,9 +2644,9 @@ export function CaseTab() {
 
             {/* Open Absences */}
             {openAbsences.length > 0 && (
-              <div className="space-y-3">
-                <h4 className="font-semibold text-foreground">Open Absences ({openAbsences.length})</h4>
-                <div className="border rounded-md divide-y max-h-48 overflow-y-auto">
+              <div className="space-y-2">
+                <h4 className="font-semibold text-foreground text-sm">Open Absences ({openAbsences.length})</h4>
+                <div className="border rounded-md divide-y max-h-32 overflow-y-auto">
                   {openAbsences.map((absence) => (
                     <div key={absence.id} className="p-3 space-y-2">
                       <div className="flex items-center justify-between">
@@ -2725,9 +2716,9 @@ export function CaseTab() {
 
             {/* Open Restrictions */}
             {openRestrictions.length > 0 && (
-              <div className="space-y-3">
-                <h4 className="font-semibold text-foreground">Active Restrictions ({openRestrictions.length})</h4>
-                <div className="border rounded-md divide-y max-h-48 overflow-y-auto">
+              <div className="space-y-2">
+                <h4 className="font-semibold text-foreground text-sm">Active Restrictions ({openRestrictions.length})</h4>
+                <div className="border rounded-md divide-y max-h-32 overflow-y-auto">
                   {openRestrictions.map((restriction) => (
                     <div key={restriction.id} className="p-3 space-y-2">
                       <div className="flex items-center justify-between">
@@ -2784,9 +2775,9 @@ export function CaseTab() {
 
             {/* Open To-Dos */}
             {openTodos.length > 0 && (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-semibold text-foreground">Open To-Dos ({openTodos.length})</h4>
+                  <h4 className="font-semibold text-foreground text-sm">Open To-Dos ({openTodos.length})</h4>
                   <div className="flex gap-2">
                     <Button
                       type="button"
@@ -2806,9 +2797,9 @@ export function CaseTab() {
                     </Button>
                   </div>
                 </div>
-                <div className="border rounded-md divide-y max-h-48 overflow-y-auto">
+                <div className="border rounded-md divide-y max-h-40 overflow-y-auto">
                   {openTodos.map((todo) => (
-                    <div key={todo.id} className="flex items-center gap-3 p-3 hover:bg-muted/50">
+                    <div key={todo.id} className="flex items-center gap-3 p-2 hover:bg-muted/50">
                       <Checkbox
                         id={`todo-${todo.id}`}
                         checked={selectedTodosToClose.includes(todo.id)}
@@ -2851,7 +2842,15 @@ export function CaseTab() {
                   !closeCaseAbsenceUpdates[absence.id]?.otherStatus
                 ) ||
                 // Prevent closing if there are open todos not selected to close
-                openTodos.length > 0 && selectedTodosToClose.length < openTodos.length
+                (openTodos.length > 0 && selectedTodosToClose.length < openTodos.length) ||
+                // Prevent closing if there are active restrictions that are not marked as permanent
+                openRestrictions.some((restriction) => {
+                  const updates = closeCaseRestrictionUpdates[restriction.id]
+                  // Check if the restriction is permanent (either originally or via update)
+                  const isPermanent = updates?.isPermanent || restriction.isPermanent
+                  // If not permanent, case cannot be closed
+                  return !isPermanent
+                })
               }
               onClick={() => {
                 // Close selected todos

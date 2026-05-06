@@ -319,6 +319,205 @@ You have the right to appeal this decision within 30 days. Please contact {{case
 Sincerely,
 Case Management Team`,
     },
+    {
+      id: "5",
+      code: "std-continuation-question",
+      name: "STD Continuation in Question",
+      description: "Letter when STD benefit continuation is in question due to missing medical documentation",
+      active: true,
+      content: `{{today}}
+
+{{employeeFirstName}} {{employeeLastName}}
+{{employeeStreet1}} {{employeeStreet2}}
+{{employeeCity}}, {{employeeState}} {{employeeZip}}
+
+Dear {{employeeFirstName}},
+
+This letter is to acknowledge that the continuance of your Short Term Disability benefits is in question. According to the Owens Corning Short Term Disability [Plan Document Name] Plan Document:
+
+"Benefit Termination: STD Disability Benefits will be terminated when an eligible employee:"
+
+[Add Plan Document Section]
+
+At this time, we have not received any current medical updates. I am requesting medical documentation to support your continued disability within 15 days of the date of this letter. Failure to follow up with your physician and provide updated documentation will result in benefits termination.
+
+If I can be of any assistance or if you have any questions, please call me at {{caseManagerPhone}}.
+
+Sincerely,
+
+{{caseManagerWithCredentials}}
+Medical Case Manager
+
+CC: Laura Higginbotham, Benefits Leader
+      Disability Management
+      _________, Plant HR Leader`,
+    },
+    {
+      id: "6",
+      code: "ltd-cover-summary",
+      name: "LTD Cover Summary",
+      description: "Case summary for LTD application",
+      active: true,
+      content: `CASE SUMMARY
+
+Please find the LTD Application for:
+
+NAME	{{employeeFirstName}} {{employeeLastName}}
+EMPLOYEE ID	{{employeeNumber}}
+SOCIAL SECURITY #	{{employeeSSN}}
+DATE OF BIRTH	{{dateOfBirth}}
+RACE	{{employeeEthnicGroup}}
+LOCATION	{{employeeLocation}}
+UNUM POLICY #	
+LTD COVERAGE	60%
+DATE OF HIRE	{{dateOfHire}}
+YEARS OF SERVICE	
+DATE OF INJURY-INJ/ILL	{{dateOfDisability}}
+OCCUPATIONAL/NON-OCCUPATIONAL	
+JOB TITLE/DUTIES	{{position}}
+LAST DAY WORKED	
+FIRST DAY OF STD/WC	{{stdStartDate}}
+LAST DAY OF STD/WC	
+FIRST DAY OF LTD if approved	
+RATE OF PAY on last day worked	
+INCENTIVE if Salary employee	
+FULL/PART TIME STATUS	{{employmentType}}
+LTD BENEFIT-based on 40 hours	40 hours
+WORK COMP Pay and Begin/End Date(s)	
+DATE OF INITIAL APPLICATION FOR SSDI	
+DATE SSDI RECONSIDERATION FILED	
+SSDI ENTITLEMENT/DENIAL DATE WITH DOLLAR AMOUNT	
+DEPENDENT SSDI-AMOUNT AND EFFECTIVE DATE	
+STD OVERPAYMENT Amount/Status	
+MEDICAL CASE MANAGER	{{caseManagerWithCredentials}}
+CASE MANAGER PHONE	{{caseManagerPhone}}
+
+If you need any additional information, please do not hesitate to call.
+
+Signature: 
+Date: {{today}}
+
+TREATING PHYSICIANS:
+(List all employee's currently treating and/or restricting physicians and most current medical through date.)
+
+{{diagnosis}}
+
+CASE HISTORY:
+(Give a brief overview of the employee illness, treatment plan, restrictions, etc.)
+
+{{natureOfInjury}}
+
+TESTINGS:
+(Listing of diagnostic testing and results: for example, IME, FCE)
+
+TREATMENTS:
+(Surgery, Chemo, Radiation, Physical Therapy, Work Hardening, Vocational rehabilitation)
+
+RESTRICTIONS:
+(Restrictions preventing employee from working)
+
+SSDI STATUS AND ANY OTHER PERTINENT INFORMATION:
+
+FUTURE VISITS, PROCEDURES, TESTS, ETC:
+(List all future visits--provider name, visit date, etc)`,
+    },
+    {
+      id: "7",
+      code: "cm-work-restrict",
+      name: "CM-Work Restrictions",
+      description: "Work restrictions form for physician to complete",
+      active: true,
+      content: `CM-Work Restrict
+
+{{today}}
+
+Re: {{employeeFirstName}} {{employeeLastName}}
+SSN: {{employeeSSN}}
+DOB: {{dateOfBirth}}
+
+WORK RESTRICTIONS
+
+Dear Dr. {{physicianName}}:
+
+You indicated work restrictions are needed for {{employeeFirstName}} {{employeeLastName}}. Please assist Owens Corning with providing appropriate job duties without compromising her/his medical condition.
+
+Please address the issues below:
+
+What is the current diagnosis? ___________________________________________________
+
+In the course of _________ work day, with rest breaks every ______________ how many hours can {{employeeFirstName}} {{employeeLastName}} perform each of the following activities?
+
+Stand __________ Walk ____________ Sit ____________ Drive __________
+Climb Stairs _________ Climb Ladders ____________ (please indicate max...)
+____________ Crawl ___________ Stoop ___________ Squat _________ Bend __________
+
+Indicate the maximum weight in the following tasks:
+Lifting _____________ Push ____________ Pulling ____________ Carry __________
+
+Can {{employeeFirstName}} {{employeeLastName}} perform tasks using the following? Indicate yes or no:
+- Use of vibratory Equipment Yes _________ No_______
+- Operate high speed/moving equipment Yes _________ No _________
+- Perform tasks above shoulder level Yes _________ No _________
+
+Please indicate any additional restrictions and or limitations for {{employeeFirstName}} {{employeeLastName}}.
+
+Date _______________________ may return to work with these limitations: _____________
+
+Estimated length of time for these limitations: ________________________________.
+
+MD Signature: _________________________________ Date: ________________________
+
+PLEASE FAX FORM BACK TO:
+{{caseManagerWithCredentials}}, Medical Case Manager
+419-325-0319`,
+    },
+    {
+      id: "8",
+      code: "cm-wc-cover-ltr",
+      name: "CM-WC Cover Letter",
+      description: "Workers' Compensation cover letter for disability management",
+      active: true,
+      content: `{{today}}
+{{employeeFirstName}} {{employeeLastName}}
+{{employeeStreet1}} {{employeeStreet2}}
+{{employeeCity}}, {{employeeState}} {{employeeZip}}
+
+Dear {{employeeFirstName}},
+
+(Only choose one of the applicable paragraphs from the first two listed below)
+
+(If WC claim being accepted):
+The Disability Management Program is aware you are off work related to your Workers' Compensation claim. Your date of disability is: {{dateOfDisability}}. Although you are receiving Workers' Compensation wages, your leave is managed under the Short Term Disability Plan. Please complete Parts 1 and 2 of the enclosed Short Term Disability Benefits Application and the Reimbursement agreement.
+
+(If questioning the WC claim):
+The Disability Management Program is aware you are off work and a Workers' Compensation claim has been filed. While decisions are being made about your Workers' Compensation claim, you may be eligible for Short Term Disability Benefits. To apply for Short Term Disability Benefits, please complete Parts 1 and 2 of the enclosed Short Term Disability Benefits Application and the Reimbursement Agreement. If your Workers' Compensation claim is approved, you will need to reimburse Owens Corning Short Term Disability Benefits paid to you.
+
+The time you are off work will be applied to your eligibility for family and medical leave (for up to twelve weeks) in accordance with the Family and Medical Leave Act (FMLA). If approved for FMLA leave, you will be granted return to work to the same or equivalent job.
+
+After you have been on a Workers' Compensation disability leave for 30 days, you are required to pay your healthcare premiums. Medical coverage, for the injury or illness which caused you to be off work, will be included as part of your Workers' Compensation claim. You will need to maintain your present healthcare coverage in case any other injury or illness requires you or your covered family members to seek medical treatment. You will receive a letter from Owens Corning's Benefits Department notifying you of the amount and due date of your monthly premium. If you have questions, please contact Benefits at 1-800-725-9335. Failure to make the required premium payments may result in discontinuation of your healthcare coverage. The estimated amount of your monthly premium is $_______.
+
+Be sure to review your letter from Owens Corning Benefit Service Center and mail your monthly healthcare premium payment to:
+
+Owens Corning
+Attn: Benefits Service Center 1B1
+One Owens Corning Parkway
+Toledo, OH 43659
+
+You may be covered under the Short Term Disability Plan for up to 18 months, as long as you remain disabled from performing your own job. Prior to the end of the 18 months, if you are still unable to perform your own job at Owens Corning, you may be required to apply for Long Term Disability benefits. You are not to derive any new source of income from any source (activity) on your own, while receiving disability benefits. Disability benefits are offset by other sources of disability and/or retirement.
+
+Workers' Compensation disability benefits are paid based on state regulations. Your claims adjuster is {{adjuster}} and can be reached at {{adjusterPhone}}. The only deduction withheld from Workers' Compensation benefits is child support.
+
+In addition to the Short Term Disability Application, we recommend you complete the Health Assessment through Personify Health. If you have not completed the Health Assessment this year, please complete by following the enclosed instructions. The Health Assessment can be taken on a computer or a smartphone.
+
+If you have any questions, I may be reached at {{caseManagerPhone}}.
+
+Sincerely,
+
+{{caseManagerWithCredentials}}
+Medical Case Manager
+
+Cc: Benefits`,
+    },
   ],
   caseNoteTemplates: [
     {
@@ -344,6 +543,278 @@ Case Management Team`,
       description: "Template for medical update documentation",
       active: true,
       content: `Received medical update from provider. Reviewed documentation and updated case file accordingly.`,
+    },
+    {
+      id: "4",
+      code: "DIS_ADA_Init_Intervw",
+      name: "DIS_ADA Init Intervw",
+      description: "Employee Initial Interview for ADA process",
+      active: true,
+      content: `EMPLOYEE INITIAL INTERVIEW - ADA PROCESS
+
+Introduction of yourself and role as the Medical Case Manager.
+Purpose of this call: Discussion of the ADA process (i.e. forms, interactive dialogue, ADA Medical Review, subsequent calls between MCM, Leadership, etc.)
+
+REASON FOR REQUEST
+What is the reason for the request – such as difficulty getting to work, unable to attend meetings, difficulty lifting, no stairs, etc.
+Have you discussed with your manager or HR – or plant manager, supervisor?
+
+MEDICAL INFORMATION
+Current Diagnosis:
+Co-morbidities:
+Initial onset of diagnosis:
+Treating providers (historical and current):
+Last office visit:
+Next office visit:
+Symptoms:
+Referrals:
+Testing:
+Medications:
+
+EMPLOYMENT INFORMATION
+Job title:
+What does your current work schedule look like:
+Have you had a temporary work plan agreement or common day agreement plan in place with leadership/HR?
+
+ACCOMMODATION REQUEST
+Accommodation request:
+
+ADA PROCESS
+Informed he/she they will be provided ADA forms to have filled out and returned to me within 30 days then ADA meeting with team consisting of myself, Team Lead, Legal and Medical Director.
+
+Personal email (to send ADA forms):`,
+    },
+    {
+      id: "5",
+      code: "DIS_AllDermQuestions",
+      name: "DIS_AllDermQuestions",
+      description: "Allergy Questions and Dermatitis Conditions",
+      active: true,
+      content: `ALLERGY QUESTIONS AND DERMATITIS CONDITIONS
+(These are all samples)
+
+1. When was the individual first diagnosed with (name diagnosis)?
+
+2. What testing or evaluation tools were used? How long ago?
+
+3. List the symptoms and actions that the employee is experiencing.
+
+4. What assessments will be done in the future?
+
+5. Medication?
+
+6. Have you reviewed our Industrial Hygiene Data along with our MSDS sheets?
+
+7. In reviewing the individual's job description and duties – the employee is exposed or not exposed?
+   (DM's please consult with Safety and your OHN and HR as to what product the employee is touching or has been exposed to.)
+
+8. What accommodation are you recommending?
+
+9. Has there been a pulmonary function test, or specific allergy testing? If so when and what are your recommendations?
+
+NEXT STEPS
+Once you get all of these answered – then pull in myself and OC Medical Director to review – if we have further questions – before you go back to the plant.`,
+    },
+    {
+      id: "6",
+      code: "DIS_HAScript",
+      name: "DIS_HAScript",
+      description: "Health Assessment Script",
+      active: true,
+      content: `HEALTH ASSESSMENT SCRIPT
+
+Owens Corning strives to ensure that our employees can say they are healthier because they work for Owens Corning.
+
+One of the first steps in identifying opportunities and tracking progress is completing the annual health risk assessment (HRA).
+
+The questionnaire takes approximately 15 minutes to complete. You will receive your overall wellness score and recommended next steps in the areas of:
+- Smoking
+- Eating
+- Exercise
+- Stress
+- Weight
+- Biometric results
+- And more!
+
+Take advantage of the tools and resources available to you through the Healthy Living Wellness program by visiting www.join.virginpulse.com/OC and completing your HRA today!`,
+    },
+    {
+      id: "7",
+      code: "DIS_Init_NON",
+      name: "DIS_Init_NON",
+      description: "Initial Assessment for Non-occupational",
+      active: true,
+      content: `OWENS CORNING DISABILITY INITIAL ASSESSMENT - NON-OCCUPATIONAL
+(Contact within 24 hours and completion of assessment within 1 week)
+
+KEY DATES
+SSDI referral due (5 months):
+LTD date/eligibility (5 years of service):
+Date LTD application due to Disability Process Mgr (90 days prior to STD end date):
+
+EMPLOYEE CENTRAL
+Eligibility checked:
+Full or Part time:
+STD leave entered:
+
+MEDICAL STATUS
+Discuss and list current medical status:
+Discuss and list any co-morbidities (please refer to prior WC or STD cases):
+Discuss whether this was a result of a car accident or other 3rd Party for which STD benefits would be offset:
+Reimbursement agreement completed:
+List Current medications:
+
+WELLNESS
+HA review (should be completed for salary and nonunion hourly employees to be eligible for benefits):
+Specific Wellness Discussion – discuss current health struggles/issues, how ee is addressing those concerns and willingness for referral to the Healthy Living Program:
+
+OTHER INCOME
+Inquire about other income:
+SSDI (only SS offset is SSDI):
+WComp:
+State Benefits:
+
+CONTACT INFORMATION
+Employee personal email address:
+Employee work email address:
+Preferred email address to contact employee:
+
+RTW PLANNING
+Describe pertinent vocational/social information and barriers as impacts RTW plans:
+MDA review:
+Standard or predictive used?
+Number of days?
+Date Job Description requested from site:
+Describe discussion of RTW goal:
+
+GOALS
+Short Term Goal (what you will achieve in the 30 days/with time frame):
+Long Term Goal (what overall achievements will be/with time frames):
+
+NOTIFICATIONS & DOCUMENTATION
+FMLA notification sent ASAP to FMLA:
+STD notification sent:
+Letter (approval/denial/pending) completed:
+Benefits documented in case and payroll updated:`,
+    },
+    {
+      id: "8",
+      code: "DIS_Init_OCC",
+      name: "DIS_Init_OCC",
+      description: "Initial Assessment for Occupational",
+      active: true,
+      content: `OWENS CORNING DISABILITY INITIAL ASSESSMENT - OCCUPATIONAL
+(Alleged or Accepted - Contact within 24 hours and completion of assessment within 1 week)
+
+*NOTE: You will be notified of new Occupational cases through Cority processes, please do not open a new case*
+
+KEY DATES
+SSDI referral due (5 months):
+LTD date/eligibility (5 years of service):
+Date LTD application due to Disability Process Mgr (90 days prior to STD end date):
+
+STD APPLICATION
+Parts 1 and 2 of STD application completed:
+Reimbursement agreement completed:
+
+EMPLOYEE CENTRAL
+Eligibility checked:
+Full or Part time:
+STD leave entered:
+
+MEDICAL STATUS
+Discuss and list current medical status:
+Discuss and list co-morbidities (please review prior STD/WC cases):
+List current medications:
+
+WELLNESS
+HA review (should be completed for salary and nonunion hourly employees to be eligible for benefits):
+Specific Wellness Discussion – discuss current health struggles/issues, how ee is addressing those concerns and willingness for referral to the Healthy Living Program:
+
+OTHER INCOME
+Inquire about other income:
+SSDI (only SS offset is SSDI):
+WComp:
+State Benefits:
+
+CONTACT INFORMATION
+Employee personal email address:
+Employee work email address:
+Preferred email address to contact employee:
+
+RTW PLANNING
+Describe pertinent vocational/social information and barriers as impacts RTW plans:
+MDA review:
+Standard or predictive used?
+Number of days?
+Date Job Description requested from site:
+Describe discussion of RTW goal:
+
+GOALS
+Short Term Goal (what you will achieve in the 30 days/with time frame):
+Long Term Goal (what overall achievements will be/with time frames):
+
+MEDICATIONS
+First Fill Card supplied/Drug card set up through MyMatrixx:
+
+NOTIFICATIONS & DOCUMENTATION
+FMLA notification sent ASAP to FMLA:
+STD notification sent:
+Letter (approval/denial/pending) completed:
+2 year wage history requested and forwarded to GB resolution manager:
+Benefits documented in case and payroll updated:
+Copy of all information to GB resolution manager:`,
+    },
+    {
+      id: "9",
+      code: "DIS_Mo_Reassess",
+      name: "DIS_Mo_Reassess",
+      description: "Monthly Reassessment template",
+      active: true,
+      content: `OWENS CORNING DISABILITY REASSESSMENT
+(Due by end of every month)
+
+MEDICAL & RTW STATUS
+Provider(s):
+Diagnosis:
+MDA review (MDA follow up letter sent within 7 days of exceeding guidelines):
+Next Office Visit:
+Updated Medical status:
+Medication update:
+Updates to treatment plan:
+Compliance with treatment plan:
+Physical medicine (PT/OT/etc) program:
+SSDI Status (n/a months 1-4):
+
+WORK STATUS
+Usual Job:
+Restrictions:
+RTW plan and reevaluation:
+Barriers for RTW/Safety issues:
+
+WELLNESS
+Specific Wellness Discussion – discuss current health struggles/issues, how ee is addressing those concerns and willingness for referral to the Healthy Living Program:
+Reimbursement agreement completed:
+
+UPDATED CASE MANAGEMENT PLAN
+Facilitate a successful return to work without accommodation by:
+- Communicating with EE after each MD appt to confirm his/her understanding of treatment recommendations and compliance
+- Evaluate his/her progress and review against treatment guidelines
+- Progress duties and physical capacities as allowed by MD and in collaboration with mgmt
+- Confirm work adjustment
+
+GOALS
+In collaboration with the ill/injured person, the following goals were discussed:
+
+Short Term Goals:
+
+Long Term Goals:
+(WRITE GOALS AND ADD - Return to usual and customary job with/without accommodations)
+
+FINAL REVIEW
+What further evaluations are needed?
+What questions/concerns do you have?
+Any concerns from the plant/HR, etc?`,
     },
   ],
   caseStatus: [

@@ -711,14 +711,14 @@ export function CaseNotesTab() {
       )}
 
       <Dialog open={showVersionHistory} onOpenChange={setShowVersionHistory}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] max-w-4xl h-auto max-h-[90vh] overflow-y-auto overflow-x-hidden">
           <DialogHeader>
             <DialogTitle>Version History</DialogTitle>
             <DialogDescription>
               View all versions of this case note. Current version: v{selectedNoteForHistory?.currentVersion}
             </DialogDescription>
           </DialogHeader>
-          <div className="flex items-center justify-between border-b pb-4">
+          <div className="flex flex-wrap items-center gap-3 border-b pb-4">
             <div className="flex items-center gap-2">
               <Button variant={!diffMode ? "default" : "outline"} size="sm" onClick={() => setDiffMode(false)}>
                 All Versions
@@ -734,7 +734,7 @@ export function CaseNotesTab() {
             </div>
 
             {diffMode && selectedNoteForHistory && selectedNoteForHistory.versions.length > 0 && (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -744,7 +744,7 @@ export function CaseNotesTab() {
                   <ChevronLeft className="h-4 w-4 mr-1" />
                   Older
                 </Button>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-muted-foreground whitespace-nowrap">
                   Comparing v{getDiffContent()?.oldVersionNumber} → v{getDiffContent()?.newVersionNumber}
                 </span>
                 <Button variant="outline" size="sm" onClick={handleNextDiff} disabled={compareVersionIndex === 0}>
@@ -792,7 +792,8 @@ export function CaseNotesTab() {
                 </div>
 
                 <div
-                  className="diff-content prose prose-sm max-w-none phi-data p-4 bg-background rounded border"
+                  className="diff-content prose prose-sm max-w-none phi-data p-4 bg-background rounded border break-words overflow-x-hidden"
+                  style={{ wordBreak: "break-word" }}
                   dangerouslySetInnerHTML={{ __html: getDiffContent()?.diffHtml || "" }}
                 />
               </div>
@@ -929,7 +930,12 @@ export function CaseNotesTab() {
                   setSelectedTemplate(value)
                   const template = codes.caseNoteTemplates.find((t) => t.code === value)
                   if (template?.content) {
-                    setContent(template.content)
+                    // Convert plain text with newlines to HTML paragraphs
+                    const htmlContent = template.content
+                      .split('\n\n')
+                      .map(paragraph => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
+                      .join('')
+                    setContent(htmlContent)
                   }
                 }}
               >
