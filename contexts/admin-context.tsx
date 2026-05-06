@@ -471,6 +471,53 @@ PLEASE FAX FORM BACK TO:
 {{caseManagerWithCredentials}}, Medical Case Manager
 419-325-0319`,
     },
+    {
+      id: "8",
+      code: "cm-wc-cover-ltr",
+      name: "CM-WC Cover Letter",
+      description: "Workers' Compensation cover letter for disability management",
+      active: true,
+      content: `{{today}}
+{{employeeFirstName}} {{employeeLastName}}
+{{employeeStreet1}} {{employeeStreet2}}
+{{employeeCity}}, {{employeeState}} {{employeeZip}}
+
+Dear {{employeeFirstName}},
+
+(Only choose one of the applicable paragraphs from the first two listed below)
+
+(If WC claim being accepted):
+The Disability Management Program is aware you are off work related to your Workers' Compensation claim. Your date of disability is: {{dateOfDisability}}. Although you are receiving Workers' Compensation wages, your leave is managed under the Short Term Disability Plan. Please complete Parts 1 and 2 of the enclosed Short Term Disability Benefits Application and the Reimbursement agreement.
+
+(If questioning the WC claim):
+The Disability Management Program is aware you are off work and a Workers' Compensation claim has been filed. While decisions are being made about your Workers' Compensation claim, you may be eligible for Short Term Disability Benefits. To apply for Short Term Disability Benefits, please complete Parts 1 and 2 of the enclosed Short Term Disability Benefits Application and the Reimbursement Agreement. If your Workers' Compensation claim is approved, you will need to reimburse Owens Corning Short Term Disability Benefits paid to you.
+
+The time you are off work will be applied to your eligibility for family and medical leave (for up to twelve weeks) in accordance with the Family and Medical Leave Act (FMLA). If approved for FMLA leave, you will be granted return to work to the same or equivalent job.
+
+After you have been on a Workers' Compensation disability leave for 30 days, you are required to pay your healthcare premiums. Medical coverage, for the injury or illness which caused you to be off work, will be included as part of your Workers' Compensation claim. You will need to maintain your present healthcare coverage in case any other injury or illness requires you or your covered family members to seek medical treatment. You will receive a letter from Owens Corning's Benefits Department notifying you of the amount and due date of your monthly premium. If you have questions, please contact Benefits at 1-800-725-9335. Failure to make the required premium payments may result in discontinuation of your healthcare coverage. The estimated amount of your monthly premium is $_______.
+
+Be sure to review your letter from Owens Corning Benefit Service Center and mail your monthly healthcare premium payment to:
+
+Owens Corning
+Attn: Benefits Service Center 1B1
+One Owens Corning Parkway
+Toledo, OH 43659
+
+You may be covered under the Short Term Disability Plan for up to 18 months, as long as you remain disabled from performing your own job. Prior to the end of the 18 months, if you are still unable to perform your own job at Owens Corning, you may be required to apply for Long Term Disability benefits. You are not to derive any new source of income from any source (activity) on your own, while receiving disability benefits. Disability benefits are offset by other sources of disability and/or retirement.
+
+Workers' Compensation disability benefits are paid based on state regulations. Your claims adjuster is {{adjuster}} and can be reached at {{adjusterPhone}}. The only deduction withheld from Workers' Compensation benefits is child support.
+
+In addition to the Short Term Disability Application, we recommend you complete the Health Assessment through Personify Health. If you have not completed the Health Assessment this year, please complete by following the enclosed instructions. The Health Assessment can be taken on a computer or a smartphone.
+
+If you have any questions, I may be reached at {{caseManagerPhone}}.
+
+Sincerely,
+
+{{caseManagerWithCredentials}}
+Medical Case Manager
+
+Cc: Benefits`,
+    },
   ],
   caseNoteTemplates: [
     {
