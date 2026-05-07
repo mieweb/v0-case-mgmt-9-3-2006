@@ -436,7 +436,7 @@ export function LettersTab() {
               ) : (
                 letters.map((letter) => (
                   <TableRow key={letter.id}>
-                    <TableCell>{new Date(letter.createdDate).toLocaleDateString()}</TableCell>
+                    <TableCell>{(() => { const d = new Date(letter.createdDate); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })()}</TableCell>
                     <TableCell>{letter.template || "—"}</TableCell>
                     <TableCell className="pii-data">{letter.sentFrom}</TableCell>
                     <TableCell>
@@ -472,7 +472,7 @@ export function LettersTab() {
                   <div className="flex items-center gap-6">
                     <div>
                       <div className="text-xs text-muted-foreground mb-1">Date</div>
-                      <div className="font-medium">{new Date(letter.createdDate).toLocaleDateString()}</div>
+                      <div className="font-medium">{(() => { const d = new Date(letter.createdDate); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })()}</div>
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground mb-1">Template</div>

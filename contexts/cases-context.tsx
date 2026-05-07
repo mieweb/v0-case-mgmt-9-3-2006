@@ -998,7 +998,7 @@ export function CasesProvider({ children }: { children: ReactNode }) {
     const randomNum = Math.floor(1000 + Math.random() * 9000)
     const caseNumber = `${dateStr}-${randomNum}`
 
-    const timestamp = now.toLocaleDateString("en-US")
+    const timestamp = `${String(now.getMonth() + 1).padStart(2, "0")}/${String(now.getDate()).padStart(2, "0")}/${now.getFullYear()}`
 
     const newCase: Case = {
       caseNumber,
@@ -1141,7 +1141,7 @@ export function CasesProvider({ children }: { children: ReactNode }) {
           return {
             ...c,
             ...updates,
-            lastUpdated: new Date().toLocaleDateString("en-US"),
+            lastUpdated: (() => { const d = new Date(); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })(),
             activityLog,
           }
         }

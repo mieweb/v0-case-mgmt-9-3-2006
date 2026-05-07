@@ -535,7 +535,7 @@ export function CaseNotesTab() {
                 notes.map((note) => (
                   <TableRow key={note.id} className={note.lineout ? "opacity-60" : ""}>
                     <TableCell className={`font-medium ${note.lineout ? "line-through" : ""}`}>
-                      {new Date(note.noteDate).toLocaleDateString()}
+                      {(() => { const d = new Date(note.noteDate); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })()}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -620,7 +620,7 @@ export function CaseNotesTab() {
                     <div>
                       <div className="text-xs text-muted-foreground mb-1">Date</div>
                       <div className={`font-medium ${note.lineout ? "line-through" : ""}`}>
-                        {new Date(note.noteDate).toLocaleDateString()}
+                        {(() => { const d = new Date(note.noteDate); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })()}
                       </div>
                     </div>
                     <div>
@@ -650,7 +650,7 @@ export function CaseNotesTab() {
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground mb-1">Entered</div>
-                      <div>{new Date(note.dateEntered).toLocaleDateString()}</div>
+                      <div>{(() => { const d = new Date(note.dateEntered); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })()}</div>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -765,7 +765,7 @@ export function CaseNotesTab() {
                         v{getDiffContent()?.oldVersionNumber}
                       </Badge>
                       <div className="text-muted-foreground mt-1">
-                        {new Date(getDiffContent()?.oldDate || "").toLocaleString()}
+                        {(() => { const d = new Date(getDiffContent()?.oldDate || ""); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()} ${d.toLocaleTimeString()}`; })()}
                       </div>
                       <div className="pii-data text-xs">{getDiffContent()?.oldEditor}</div>
                     </div>
@@ -773,7 +773,7 @@ export function CaseNotesTab() {
                     <div>
                       <Badge className="font-mono">v{getDiffContent()?.newVersionNumber}</Badge>
                       <div className="text-muted-foreground mt-1">
-                        {new Date(getDiffContent()?.newDate || "").toLocaleString()}
+                        {(() => { const d = new Date(getDiffContent()?.newDate || ""); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()} ${d.toLocaleTimeString()}`; })()}
                       </div>
                       <div className="pii-data text-xs">{getDiffContent()?.newEditor}</div>
                     </div>
@@ -807,7 +807,7 @@ export function CaseNotesTab() {
                       <Badge className="font-mono">v{selectedNoteForHistory.currentVersion}</Badge>
                       <Badge variant="secondary">Current</Badge>
                       <span className="text-sm text-muted-foreground">
-                        {new Date(selectedNoteForHistory.dateEntered).toLocaleString()}
+                        {(() => { const d = new Date(selectedNoteForHistory.dateEntered); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()} ${d.toLocaleTimeString()}`; })()}
                       </span>
                       <span className="text-sm pii-data">by {selectedNoteForHistory.caseManager}</span>
                     </div>
@@ -833,7 +833,7 @@ export function CaseNotesTab() {
                               v{versionNumber}
                             </Badge>
                             <span className="text-sm text-muted-foreground">
-                              {new Date(version.editedAt).toLocaleString()}
+                              {(() => { const d = new Date(version.editedAt); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()} ${d.toLocaleTimeString()}`; })()}
                             </span>
                             <span className="text-sm pii-data">by {version.editedBy}</span>
                           </div>

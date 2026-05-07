@@ -257,7 +257,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
 
     const nextTodo = upcomingTodos[0]
     const dueDate = new Date(nextTodo.dateScheduled!)
-    const formattedDate = dueDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+    const formattedDate = `${String(dueDate.getMonth() + 1).padStart(2, "0")}/${String(dueDate.getDate()).padStart(2, "0")}/${dueDate.getFullYear()}`
     return `${nextTodo.activity} (${formattedDate})`
   }
 

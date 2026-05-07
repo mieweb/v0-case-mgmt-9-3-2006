@@ -368,7 +368,7 @@ export function DiagnosisTab() {
                   </TableCell>
                   <TableCell className="font-mono font-semibold">{diagnosis.icd10Code}</TableCell>
                   <TableCell>{diagnosis.icd10Description}</TableCell>
-                  <TableCell>{new Date(diagnosis.diagnosisDate).toLocaleDateString()}</TableCell>
+                  <TableCell>{(() => { const d = new Date(diagnosis.diagnosisDate); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })()}</TableCell>
                   <TableCell>
                     <Badge variant={diagnosis.isActive ? "default" : "secondary"}>
                       {diagnosis.isActive ? "Active" : "Inactive"}
