@@ -262,11 +262,16 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
                     <SelectValue placeholder="Select case type..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {caseTypes.map((ct) => (
-                      <SelectItem key={ct.id} value={ct.name}>
-                        {ct.name}
-                      </SelectItem>
-                    ))}
+                    {caseTypes
+                      .filter((ct) => 
+                        ct.name === "Occupational injury / illness" || 
+                        ct.name === "Non-occupational injury / illness"
+                      )
+                      .map((ct) => (
+                        <SelectItem key={ct.id} value={ct.name}>
+                          {ct.name}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
