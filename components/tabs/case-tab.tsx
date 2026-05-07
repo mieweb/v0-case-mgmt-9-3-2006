@@ -523,14 +523,19 @@ export function CaseTab() {
                 <SelectValue placeholder="Select type..." />
               </SelectTrigger>
               <SelectContent>
-                {caseTypes.map((type) => {
-                  const displayName = type.name.includes(" — ") ? type.name.split(" — ")[1] : type.name
-                  return (
-                    <SelectItem key={type.id} value={type.name}>
-                      {displayName}
-                    </SelectItem>
+                {caseTypes
+                  .filter((type) => 
+                    type.name === "Occupational injury / illness" || 
+                    type.name === "Non-occupational injury / illness"
                   )
-                })}
+                  .map((type) => {
+                    const displayName = type.name.includes(" — ") ? type.name.split(" — ")[1] : type.name
+                    return (
+                      <SelectItem key={type.id} value={type.name}>
+                        {displayName}
+                      </SelectItem>
+                    )
+                  })}
               </SelectContent>
             </Select>
           </div>
