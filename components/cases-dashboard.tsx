@@ -543,7 +543,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
             </div>
 
             <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 pt-2">
-              <Button variant="outline" onClick={() => setShowMoreFilters(false)}>
+              <Button onClick={() => setShowMoreFilters(false)}>
                 Show Less
               </Button>
               <div className="flex gap-2">
