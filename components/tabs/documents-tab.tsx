@@ -254,6 +254,7 @@ export function DocumentsTab() {
               <SelectContent className="max-h-80 overflow-y-auto">
                 {codes.documentType
                   .filter((type) => type.active)
+                  .sort((a, b) => (a.description || a.code).localeCompare(b.description || b.code))
                   .map((type) => (
                     <SelectItem key={type.id} value={type.code}>
                       {type.description || type.code}
@@ -359,6 +360,7 @@ export function DocumentsTab() {
                         <SelectContent>
                           {codes.documentType
                             .filter((type) => type.active)
+                            .sort((a, b) => (a.description || a.code).localeCompare(b.description || b.code))
                             .map((type) => (
                               <SelectItem key={type.id} value={type.code}>
                                 {type.description || type.code}
