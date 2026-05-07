@@ -677,7 +677,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   <TableCell>{caseItem.caseType}</TableCell>
                   <TableCell className="text-muted-foreground">{caseItem.caseManager}</TableCell>
                   <TableCell className="text-muted-foreground">{caseItem.employeeLocation}</TableCell>
-                  <TableCell className="text-muted-foreground">{caseItem.dateOfDisability || "—"}</TableCell>
+                  <TableCell className="text-muted-foreground">{caseItem.dateOfDisability ? (() => { const d = new Date(caseItem.dateOfDisability); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })() : "—"}</TableCell>
                   <TableCell className="text-muted-foreground text-sm" suppressHydrationWarning>{getNextTodo(caseItem)}</TableCell>
                 </TableRow>
               ))
