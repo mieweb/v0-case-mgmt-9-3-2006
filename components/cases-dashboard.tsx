@@ -687,16 +687,16 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
       </div>
 
       {/* Summary Stats */}
-      <div className="dashboard-stats grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-        <div className="bg-card rounded-lg shadow-sm border p-4">
+      <div className="dashboard-stats grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 w-full">
+        <div className="bg-card rounded-lg shadow-sm border p-6 flex-1">
           <p className="text-sm text-muted-foreground mb-1">Total Cases</p>
           <p className="text-2xl font-bold">{cases.length}</p>
         </div>
-        <div className="bg-card rounded-lg shadow-sm border p-4">
+        <div className="bg-card rounded-lg shadow-sm border p-6 flex-1">
           <p className="text-sm text-muted-foreground mb-1">Open Cases</p>
           <p className="text-2xl font-bold">{cases.filter((c) => c.status === "Open").length}</p>
         </div>
-        <div className="bg-card rounded-lg shadow-sm border p-4">
+        <div className="bg-card rounded-lg shadow-sm border p-6 flex-1">
           <p className="text-sm text-muted-foreground mb-1">Unassigned Cases</p>
           <p className="text-2xl font-bold">{cases.filter((c) => c.caseManager === "Unassigned").length}</p>
         </div>
