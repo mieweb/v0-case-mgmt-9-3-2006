@@ -462,11 +462,16 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Case Types</SelectItem>
-                    {uniqueCaseTypes.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
+                    {uniqueCaseTypes
+                      .filter((type) => 
+                        type === "Occupational injury / illness" || 
+                        type === "Non-occupational injury / illness"
+                      )
+                      .map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
