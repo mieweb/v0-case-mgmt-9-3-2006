@@ -697,10 +697,6 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
           <p className="text-2xl font-bold">{cases.filter((c) => c.status === "Open").length}</p>
         </div>
         <div className="bg-card rounded-lg shadow-sm border p-4">
-          <p className="text-sm text-muted-foreground mb-1">Pending Cases</p>
-          <p className="text-2xl font-bold">{cases.filter((c) => c.status === "Pending").length}</p>
-        </div>
-        <div className="bg-card rounded-lg shadow-sm border p-4">
           <p className="text-sm text-muted-foreground mb-1">Unassigned Cases</p>
           <p className="text-2xl font-bold">{cases.filter((c) => c.caseManager === "Unassigned").length}</p>
         </div>
