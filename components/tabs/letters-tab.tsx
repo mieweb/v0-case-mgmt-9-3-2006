@@ -42,6 +42,7 @@ interface Letter {
   sentDate?: string
   status: "Draft" | "Sent"
   attachments?: LetterAttachment[]
+  additionalItems?: string
 }
 
 export function LettersTab() {
@@ -71,6 +72,7 @@ export function LettersTab() {
   const [template, setTemplate] = useState("")
   const [content, setContent] = useState("")
   const [attachments, setAttachments] = useState<LetterAttachment[]>([])
+  const [additionalItems, setAdditionalItems] = useState("")
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -128,6 +130,7 @@ export function LettersTab() {
     setTemplate("")
     setContent("")
     setAttachments([])
+    setAdditionalItems("")
     setIsDialogOpen(true)
     setIsMinimized(false)
   }
@@ -139,6 +142,7 @@ export function LettersTab() {
     setTemplate(letter.template)
     setContent(letter.content)
     setAttachments(letter.attachments || [])
+    setAdditionalItems(letter.additionalItems || "")
     setIsDialogOpen(true)
     setIsMinimized(false)
   }
@@ -153,7 +157,7 @@ export function LettersTab() {
 
     if (editingLetter) {
       setLetters((prev) =>
-        prev.map((l) => (l.id === editingLetter.id ? { ...l, sentFrom, letterType: templateName, template, content: evaluatedContent, attachments } : l)),
+        prev.map((l) => (l.id === editingLetter.id ? { ...l, sentFrom, letterType: templateName, template, content: evaluatedContent, attachments, additionalItems } : l)),
       )
       updateCase(
         currentCase.caseNumber,
@@ -178,6 +182,7 @@ export function LettersTab() {
         createdDate: now,
         status: "Draft",
         attachments,
+        additionalItems,
       }
       setLetters((prev) => [...prev, newLetter])
       
@@ -206,6 +211,7 @@ export function LettersTab() {
 
     setIsDialogOpen(false)
     setAttachments([])
+    setAdditionalItems("")
   }
 
   const handleSendLetterAction = () => {
@@ -220,7 +226,7 @@ export function LettersTab() {
       setLetters((prev) =>
         prev.map((l) =>
           l.id === editingLetter.id
-            ? { ...l, sentFrom, letterType: templateName, template, content: evaluatedContent, status: "Sent" as const, sentDate: now, attachments }
+            ? { ...l, sentFrom, letterType: templateName, template, content: evaluatedContent, status: "Sent" as const, sentDate: now, attachments, additionalItems }
             : l,
         ),
       )
@@ -247,6 +253,7 @@ export function LettersTab() {
         sentDate: now,
         status: "Sent",
         attachments,
+        additionalItems,
       }
       setLetters((prev) => [...prev, newLetter])
       updateCase(
@@ -263,6 +270,7 @@ export function LettersTab() {
 
     setIsDialogOpen(false)
     setAttachments([])
+    setAdditionalItems("")
   }
 
   const handleDeleteLetter = (id: string) => {
@@ -583,6 +591,16 @@ export function LettersTab() {
               onChange={setContent}
               placeholder="Type your letter content here or select a template..."
               className="phi-data"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-xs">Additional Items to Include</Label>
+            <textarea
+              value={additionalItems}
+              onChange={(e) => setAdditionalItems(e.target.value)}
+              placeholder="Enter any additional items to include with this letter..."
+              className="w-full min-h-[80px] p-2 text-sm border rounded-md bg-background resize-y"
             />
           </div>
 
