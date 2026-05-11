@@ -855,7 +855,7 @@ export function CaseTab() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="fica-date" className="text-sm text-muted-foreground">
-              FICA tracking date <span className="text-xs italic">(auto-calculated)</span>
+              FICA Date <span className="text-xs italic">(auto-calculated)</span>
             </Label>
             <Input id="fica-date" type="date" className="bg-muted/50" value={ficaDate} readOnly />
             <p className="text-xs text-muted-foreground mt-1">
