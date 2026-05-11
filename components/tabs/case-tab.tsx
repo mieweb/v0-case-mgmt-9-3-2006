@@ -927,36 +927,6 @@ export function CaseTab() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="expected-confinement" className="text-sm text-muted-foreground">
-              Expected Date of Confinement
-            </Label>
-            <Input
-              id="expected-confinement"
-              type="date"
-              className="bg-background"
-              value={expectedConfinementDate}
-              onChange={(e) => {
-                setExpectedConfinementDate(e.target.value)
-                handleFieldUpdate("expectedConfinementDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="delivery-date" className="text-sm text-muted-foreground">
-              Actual delivery date
-            </Label>
-            <Input
-              id="delivery-date"
-              type="date"
-              className="bg-background"
-              value={deliveryDate}
-              onChange={(e) => {
-                setDeliveryDate(e.target.value)
-                handleFieldUpdate("deliveryDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="std-start" className="text-sm text-muted-foreground">
               STD (Pay) start date
             </Label>
