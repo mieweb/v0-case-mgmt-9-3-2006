@@ -1049,37 +1049,7 @@ export function CaseTab() {
             </Label>
             <Input id="days-restricted" className="bg-muted/50" readOnly />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="ppi" className="text-sm text-muted-foreground">
-              Permanent partial impairment (PPI)
-            </Label>
-            <Input
-              id="ppi"
-              placeholder="Enter PPI..."
-              className="bg-background"
-              value={permanentPartialImpairment}
-              onChange={(e) => {
-                setPermanentPartialImpairment(e.target.value)
-                handleFieldUpdate("permanentPartialImpairment", e.target.value)
-              }}
-            />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="percentage-impaired" className="text-sm text-muted-foreground">
-              Percentage impaired
-            </Label>
-            <Input
-              id="percentage-impaired"
-              placeholder="Enter percentage..."
-              className="bg-background"
-              value={percentageImpaired}
-              onChange={(e) => {
-                setPercentageImpaired(e.target.value)
-                handleFieldUpdate("percentageImpaired", e.target.value)
-              }}
-            />
-          </div>
-        </div>
       </CollapsibleSection>
 
       
