@@ -947,6 +947,58 @@ export function CaseTab() {
             </p>
           </div>
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+          <div className="space-y-2">
+            <Label htmlFor="rate-of-pay" className="text-sm text-muted-foreground">
+              Rate of Pay (Mo/Hrly)
+            </Label>
+            <Input
+              id="rate-of-pay"
+              placeholder="Enter rate..."
+              className="bg-background"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="std-offset-type" className="text-sm text-muted-foreground">
+              STD Offset Type
+            </Label>
+            <Select>
+              <SelectTrigger id="std-offset-type">
+                <SelectValue placeholder="Select type..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ssdi">SSDI</SelectItem>
+                <SelectItem value="comp">Workers Comp</SelectItem>
+                <SelectItem value="pers">PERS</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="std-offset-amount" className="text-sm text-muted-foreground">
+              STD Offset Amount
+            </Label>
+            <Input
+              id="std-offset-amount"
+              placeholder="Enter amount..."
+              className="bg-background"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="std-offset-frequency" className="text-sm text-muted-foreground">
+              STD Offset Frequency
+            </Label>
+            <Select>
+              <SelectTrigger id="std-offset-frequency">
+                <SelectValue placeholder="Select frequency..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </CollapsibleSection>
 
       <CollapsibleSection title="Short-Term Disability (STD)" icon={<Clock className="h-4 w-4" />} defaultOpen={true}>
