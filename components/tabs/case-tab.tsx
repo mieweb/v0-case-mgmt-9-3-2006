@@ -959,6 +959,48 @@ export function CaseTab() {
         </div>
       </CollapsibleSection>
 
+      <CollapsibleSection title="Pay Information" icon={<DollarSign className="h-4 w-4" />} defaultOpen={true}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="pay-rate" className="text-sm text-muted-foreground">
+              Pay Rate
+            </Label>
+            <Input
+              id="pay-rate"
+              placeholder="Enter pay rate..."
+              className="bg-background"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="pay-frequency" className="text-sm text-muted-foreground">
+              Pay Frequency
+            </Label>
+            <Select>
+              <SelectTrigger id="pay-frequency">
+                <SelectValue placeholder="Select frequency..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="biweekly">Bi-Weekly</SelectItem>
+                <SelectItem value="semimonthly">Semi-Monthly</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
+                <SelectItem value="annual">Annual</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="annual-salary" className="text-sm text-muted-foreground">
+              Annual Salary
+            </Label>
+            <Input
+              id="annual-salary"
+              placeholder="Enter annual salary..."
+              className="bg-background"
+            />
+          </div>
+        </div>
+      </CollapsibleSection>
+
       <CollapsibleSection title="Short-Term Disability (STD)" icon={<Clock className="h-4 w-4" />} defaultOpen={true}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -1050,48 +1092,6 @@ export function CaseTab() {
             <Input id="days-restricted" className="bg-muted/50" readOnly />
           </div>
           </div>
-      </CollapsibleSection>
-
-      <CollapsibleSection title="Pay Information" icon={<DollarSign className="h-4 w-4" />} defaultOpen={true}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="pay-rate" className="text-sm text-muted-foreground">
-              Pay Rate
-            </Label>
-            <Input
-              id="pay-rate"
-              placeholder="Enter pay rate..."
-              className="bg-background"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="pay-frequency" className="text-sm text-muted-foreground">
-              Pay Frequency
-            </Label>
-            <Select>
-              <SelectTrigger id="pay-frequency">
-                <SelectValue placeholder="Select frequency..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="biweekly">Bi-Weekly</SelectItem>
-                <SelectItem value="semimonthly">Semi-Monthly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="annual">Annual</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="annual-salary" className="text-sm text-muted-foreground">
-              Annual Salary
-            </Label>
-            <Input
-              id="annual-salary"
-              placeholder="Enter annual salary..."
-              className="bg-background"
-            />
-          </div>
-        </div>
       </CollapsibleSection>
 
       <CollapsibleSection title="Occupational Injury Information" icon={<HardHat className="h-4 w-4" />} defaultOpen={hasOccupationalInjuryData()}>
