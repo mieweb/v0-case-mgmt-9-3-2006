@@ -76,7 +76,6 @@ export function AbsenceRestrictionsTab() {
   const [restrictionEditingId, setRestrictionEditingId] = useState<string | null>(null)
   const [restrictionFilterActive, setRestrictionFilterActive] = useState<"all" | "active" | "inactive">("active")
   const [restrictionFilterCase, setRestrictionFilterCase] = useState<"all" | "current">("current")
-  const [quickEntryMode, setQuickEntryMode] = useState(false)
   const [quickEntryData, setQuickEntryData] = useState({
     restriction: "",
     startDate: new Date().toISOString().split('T')[0],
@@ -433,15 +432,6 @@ export function AbsenceRestrictionsTab() {
       isActive: true,
       notes: "",
     })
-  }
-
-  const handleQuickEntrySaveAndNew = () => {
-    if (!quickEntryData.restriction || !quickEntryData.startDate || !currentCase) return
-    addRestriction({
-      ...quickEntryData,
-      caseNumber: currentCase.caseNumber,
-    })
-    resetQuickEntry()
   }
 
   const handleQuickEntrySubmit = () => {
@@ -826,128 +816,12 @@ export function AbsenceRestrictionsTab() {
           )}
         </div>
         
-        <div className="flex justify-between items-center">
-          <p className="text-sm text-muted-foreground">Restrictions for {currentCase.employeeName}</p>
-            <div className="flex gap-2">
-              <Button 
-                variant={quickEntryMode ? "default" : "outline"} 
-                size="sm"
-                onClick={() => setQuickEntryMode(!quickEntryMode)}
-              >
-                {quickEntryMode ? "Exit Quick Entry" : "Quick Entry Mode"}
-              </Button>
-              <Dialog open={showDialog} onOpenChange={(open) => {
-                setShowDialog(open)
-                if (!open) resetForm()
-              }}>
-                <DialogTrigger asChild>
-                  <Button size="sm">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Restriction
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl">
-                  <DialogHeader>
-                    <DialogTitle>{restrictionEditingId ? "Edit" : "Add"} Restriction</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Restriction Type</Label>
-                      <Select value={formData.restriction} onValueChange={(value) => setFormData({ ...formData, restriction: value })}>
-                        <SelectTrigger className="bg-background">
-                          <SelectValue placeholder="Select restriction..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {restrictionOptions.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="is-active" 
-                        checked={formData.isActive}
-                        onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked as boolean })}
-                      />
-                      <Label htmlFor="is-active" className="font-normal">
-                        Currently Active
-                      </Label>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <Label>Start Date</Label>
-                        <Input 
-                          type="date" 
-                          className="bg-background"
-                          value={formData.startDate}
-                          onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>End Date</Label>
-                        <Input 
-                          type="date" 
-                          className="bg-background"
-                          value={formData.endDate}
-                          onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                          disabled={formData.isPermanent}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Review Date</Label>
-                        <Input 
-                          type="date" 
-                          className="bg-background"
-                          value={formData.reviewDate}
-                          onChange={(e) => setFormData({ ...formData, reviewDate: e.target.value })}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="permanent" 
-                        checked={formData.isPermanent}
-                        onCheckedChange={(checked) => setFormData({ ...formData, isPermanent: checked as boolean, endDate: checked ? "" : formData.endDate })}
-                      />
-                      <Label htmlFor="permanent" className="font-normal">
-                        Permanent Restriction
-                      </Label>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Notes</Label>
-                      <Textarea 
-                        className="bg-background"
-                        placeholder="Additional notes about this restriction..."
-                        value={formData.notes}
-                        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                        rows={3}
-                      />
-                    </div>
-
-                    <div className="flex justify-end gap-2">
-                      <Button variant="outline" onClick={() => setShowDialog(false)}>
-                        Cancel
-                      </Button>
-                      <Button onClick={handleSubmit} disabled={!formData.restriction || !formData.startDate}>
-                        {restrictionEditingId ? "Update" : "Add"} Restriction
-                      </Button>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
-
-          {/* Filters */}
-          <div className="flex gap-4 items-center bg-muted/30 p-4 rounded-lg">
+        {/* Filters */}
+          <div className="grid grid-cols-3 gap-4 items-center bg-muted/30 py-3 px-4 rounded-lg">
             <div className="flex gap-2 items-center">
-              <Label className="text-sm">Status:</Label>
+              <Label className="text-sm whitespace-nowrap">Status:</Label>
               <Select value={restrictionFilterActive} onValueChange={(value: any) => setRestrictionFilterActive(value)}>
-                <SelectTrigger className="w-[140px] bg-background">
+                <SelectTrigger className="flex-1 bg-background">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -958,7 +832,7 @@ export function AbsenceRestrictionsTab() {
               </Select>
             </div>
             <div className="flex gap-2 items-center">
-              <Label className="text-sm">Case:</Label>
+              <Label className="text-sm whitespace-nowrap">Case:</Label>
               <Select value={restrictionFilterCase} onValueChange={(value: any) => setRestrictionFilterCase(value)}>
                 <SelectTrigger className="w-[180px] bg-background">
                   <SelectValue />
@@ -969,10 +843,174 @@ export function AbsenceRestrictionsTab() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="ml-auto text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground text-right">
               Showing {filteredRestrictions.length} of {employeeRestrictions.length} restrictions
             </div>
           </div>
+
+          {/* Inline Add Restriction Form */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+            <div className="space-y-2">
+              <Label htmlFor="restriction-type" className="text-sm text-muted-foreground">
+                Restriction:
+              </Label>
+              <Select value={quickEntryData.restriction} onValueChange={(value) => setQuickEntryData({ ...quickEntryData, restriction: value })}>
+                <SelectTrigger id="restriction-type" className="bg-background w-full">
+                  <SelectValue placeholder="Select restriction..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {restrictionOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="restriction-start-date" className="text-sm text-muted-foreground">
+                Start date:
+              </Label>
+              <Input
+                id="restriction-start-date"
+                type="date"
+                className="bg-background w-full"
+                value={quickEntryData.startDate}
+                onChange={(e) => setQuickEntryData({ ...quickEntryData, startDate: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="restriction-end-date" className="text-sm text-muted-foreground">
+                End date:
+              </Label>
+              <Input
+                id="restriction-end-date"
+                type="date"
+                className="bg-background w-full"
+                value={quickEntryData.endDate}
+                onChange={(e) => setQuickEntryData({ ...quickEntryData, endDate: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="restriction-review-date" className="text-sm text-muted-foreground">
+                Review date:
+              </Label>
+              <Input
+                id="restriction-review-date"
+                type="date"
+                className="bg-background w-full"
+                value={quickEntryData.reviewDate}
+                onChange={(e) => setQuickEntryData({ ...quickEntryData, reviewDate: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground invisible">Action</Label>
+              <Button 
+                onClick={handleQuickEntrySubmit} 
+                className="w-full"
+                disabled={!quickEntryData.restriction || !quickEntryData.startDate}
+              >
+                Add Restriction
+              </Button>
+            </div>
+          </div>
+
+          {/* Edit Dialog - kept for editing existing restrictions */}
+          <Dialog open={showDialog} onOpenChange={(open) => {
+            setShowDialog(open)
+            if (!open) resetForm()
+          }}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Edit Restriction</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Restriction Type</Label>
+                  <Select value={formData.restriction} onValueChange={(value) => setFormData({ ...formData, restriction: value })}>
+                    <SelectTrigger className="bg-background">
+                      <SelectValue placeholder="Select restriction..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {restrictionOptions.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="is-active" 
+                    checked={formData.isActive}
+                    onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked as boolean })}
+                  />
+                  <Label htmlFor="is-active" className="font-normal">
+                    Currently Active
+                  </Label>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>Start Date</Label>
+                    <Input 
+                      type="date" 
+                      className="bg-background"
+                      value={formData.startDate}
+                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>End Date</Label>
+                    <Input 
+                      type="date" 
+                      className="bg-background"
+                      value={formData.endDate}
+                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                      disabled={formData.isPermanent}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Review Date</Label>
+                    <Input 
+                      type="date" 
+                      className="bg-background"
+                      value={formData.reviewDate}
+                      onChange={(e) => setFormData({ ...formData, reviewDate: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="permanent" 
+                    checked={formData.isPermanent}
+                    onCheckedChange={(checked) => setFormData({ ...formData, isPermanent: checked as boolean, endDate: checked ? "" : formData.endDate })}
+                  />
+                  <Label htmlFor="permanent" className="font-normal">
+                    Permanent Restriction
+                  </Label>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Notes</Label>
+                  <Textarea 
+                    className="bg-background"
+                    placeholder="Additional notes about this restriction..."
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" onClick={() => setShowDialog(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSubmit} disabled={!formData.restriction || !formData.startDate}>
+                    Update Restriction
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Restrictions Table */}
           <div className="border rounded-lg">
@@ -989,92 +1027,6 @@ export function AbsenceRestrictionsTab() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {quickEntryMode && (
-                  <TableRow className="bg-blue-50 dark:bg-blue-950/20 border-2 border-blue-200 dark:border-blue-800">
-                    <TableCell>
-                      <Select 
-                        value={quickEntryData.restriction} 
-                        onValueChange={(value) => setQuickEntryData({ ...quickEntryData, restriction: value })}
-                      >
-                        <SelectTrigger className="bg-background h-9">
-                          <SelectValue placeholder="Select..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {restrictionOptions.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {currentCase.caseNumber}
-                    </TableCell>
-                    <TableCell>
-                      <Input 
-                        type="date"
-                        className="bg-background h-9"
-                        value={quickEntryData.startDate}
-                        onChange={(e) => setQuickEntryData({ ...quickEntryData, startDate: e.target.value })}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input 
-                        type="date"
-                        className="bg-background h-9"
-                        value={quickEntryData.endDate}
-                        onChange={(e) => setQuickEntryData({ ...quickEntryData, endDate: e.target.value })}
-                        disabled={quickEntryData.isPermanent}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input 
-                        type="date"
-                        className="bg-background h-9"
-                        value={quickEntryData.reviewDate}
-                        onChange={(e) => setQuickEntryData({ ...quickEntryData, reviewDate: e.target.value })}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input 
-                        className="bg-background h-9"
-                        placeholder="Notes..."
-                        value={quickEntryData.notes}
-                        onChange={(e) => setQuickEntryData({ ...quickEntryData, notes: e.target.value })}
-                      />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={handleQuickEntrySaveAndNew}
-                          disabled={!quickEntryData.restriction || !quickEntryData.startDate}
-                          title="Save and add new (Tab here to continue)"
-                          className="text-green-600 hover:text-green-700"
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={handleQuickEntrySubmit}
-                          disabled={!quickEntryData.restriction || !quickEntryData.startDate}
-                          title="Save restriction"
-                        >
-                          <Check className="h-4 w-4 text-green-600" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={resetQuickEntry}
-                          title="Clear fields"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
                 {filteredRestrictions.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
