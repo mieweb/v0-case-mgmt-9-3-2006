@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useCases, type Diagnosis } from "@/contexts/cases-context"
 import { useUser } from "@/contexts/user-context"
 import { Input } from "@/components/ui/input"
@@ -13,27 +13,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { Plus, ArrowUp, ArrowDown, Trash2, Edit, GripVertical } from "lucide-react"
+import { Plus, ArrowUp, ArrowDown, Trash2, Edit, GripVertical, Loader2, Search } from "lucide-react"
 import { debug } from "@/lib/debug"
 
-// Common ICD-10 codes for case management
-const ICD10_CODES = [
-  { code: "M54.5", description: "Low back pain" },
-  { code: "M25.511", description: "Pain in right shoulder" },
-  { code: "M25.512", description: "Pain in left shoulder" },
-  { code: "M79.3", description: "Myalgia/muscle pain" },
-  { code: "S93.40", description: "Sprain of ankle" },
-  { code: "S83.50", description: "Sprain of knee" },
-  { code: "J06.9", description: "Acute upper respiratory infection" },
-  { code: "F32.9", description: "Major depressive disorder, single episode" },
-  { code: "F41.9", description: "Anxiety disorder, unspecified" },
-  { code: "G43.909", description: "Migraine, unspecified" },
-  { code: "M51.26", description: "Other intervertebral disc displacement, lumbar region" },
-  { code: "M17.0", description: "Bilateral primary osteoarthritis of knee" },
-  { code: "I10", description: "Essential (primary) hypertension" },
-  { code: "E11.9", description: "Type 2 diabetes mellitus without complications" },
-  { code: "Z51.81", description: "Encounter for therapeutic drug level monitoring" },
-]
+interface ICD10Code {
+  code: string
+  description: string
+}
 
 export function DiagnosisTab() {
   const { currentCase, updateCase } = useCases()
@@ -46,12 +32,55 @@ export function DiagnosisTab() {
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
 
   // Form state
-  const [selectedCode, setSelectedCode] = useState("")
   const [customCode, setCustomCode] = useState("")
   const [customDescription, setCustomDescription] = useState("")
   const [diagnosisDate, setDiagnosisDate] = useState(new Date().toISOString().split("T")[0])
   const [notes, setNotes] = useState("")
   const [isActive, setIsActive] = useState(true)
+
+  // ICD-10 search state
+  const [icd10SearchResults, setIcd10SearchResults] = useState<ICD10Code[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [showSearchResults, setShowSearchResults] = useState(false)
+
+  // Debounced ICD-10 search
+  const searchICD10 = useCallback(async (query: string) => {
+    if (query.length < 2) {
+      setIcd10SearchResults([])
+      setShowSearchResults(false)
+      return
+    }
+
+    setIsSearching(true)
+    try {
+      const response = await fetch(`/api/icd10?q=${encodeURIComponent(query)}&maxList=15`)
+      const data = await response.json()
+      setIcd10SearchResults(data.results || [])
+      setShowSearchResults(true)
+    } catch (error) {
+      console.error("ICD-10 search error:", error)
+      setIcd10SearchResults([])
+    } finally {
+      setIsSearching(false)
+    }
+  }, [])
+
+  // Debounce the search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (customCode) {
+        searchICD10(customCode)
+      }
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [customCode, searchICD10])
+
+  const handleSelectICD10 = (code: ICD10Code) => {
+    setCustomCode(code.code)
+    setCustomDescription(code.description)
+    setShowSearchResults(false)
+  }
 
   const diagnoses = currentCase?.diagnoses || []
 
@@ -66,23 +95,24 @@ export function DiagnosisTab() {
   const sortedDiagnoses = [...filteredDiagnoses].sort((a, b) => a.priority - b.priority)
 
   const resetForm = () => {
-    setSelectedCode("")
     setCustomCode("")
     setCustomDescription("")
     setDiagnosisDate(new Date().toISOString().split("T")[0])
     setNotes("")
     setIsActive(true)
     setEditingDiagnosis(null)
+    setIcd10SearchResults([])
+    setShowSearchResults(false)
   }
 
   const handleAddOrEditDiagnosis = () => {
     if (!currentCase || !currentUser) return
 
-    const icd10Code = customCode || selectedCode.split(" - ")[0]
-    const icd10Description = customDescription || selectedCode.split(" - ")[1] || ""
+    const icd10Code = customCode
+    const icd10Description = customDescription
 
     if (!icd10Code || !diagnosisDate) {
-      alert("Please select or enter an ICD-10 code and diagnosis date")
+      alert("Please enter an ICD-10 code and diagnosis date")
       return
     }
 
@@ -421,44 +451,63 @@ export function DiagnosisTab() {
           </DialogHeader>
 
           <div className="space-y-4">
-            {/* Select from common codes */}
-            <div className="space-y-2">
-              <Label>Select ICD-10 Code</Label>
-              <Select value={selectedCode} onValueChange={setSelectedCode}>
-                <SelectTrigger className="bg-background">
-                  <SelectValue placeholder="Select a common diagnosis code..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {ICD10_CODES.map((icd) => (
-                    <SelectItem key={icd.code} value={`${icd.code} - ${icd.description}`}>
-                      <span className="font-mono font-semibold">{icd.code}</span> - {icd.description}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Or enter custom code */}
-            <div className="text-sm text-foreground font-bold">Or</div>
+            {/* ICD-10 Code Search */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Enter ICD-10 Code</Label>
-                <Input
-                  value={customCode}
-                  onChange={(e) => {
-                    setCustomCode(e.target.value)
-                    setSelectedCode("")
-                  }}
-                  placeholder="e.g., M54.5"
-                  className="font-mono"
-                />
+              <div className="space-y-2 relative">
+                <Label>ICD-10 Code *</Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    value={customCode}
+                    onChange={(e) => {
+                      setCustomCode(e.target.value.toUpperCase())
+                      if (e.target.value.length < 2) {
+                        setCustomDescription("")
+                      }
+                    }}
+                    onFocus={() => {
+                      if (icd10SearchResults.length > 0) setShowSearchResults(true)
+                    }}
+                    onBlur={() => {
+                      // Delay to allow click on search result
+                      setTimeout(() => setShowSearchResults(false), 200)
+                    }}
+                    placeholder="Search ICD-10 code or description..."
+                    className="font-mono pl-10"
+                  />
+                  {isSearching && (
+                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+                  )}
+                </div>
+                {/* Search Results Dropdown */}
+                {showSearchResults && icd10SearchResults.length > 0 && (
+                  <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    {icd10SearchResults.map((result) => (
+                      <button
+                        key={result.code}
+                        type="button"
+                        className="w-full px-3 py-2 text-left hover:bg-muted flex items-start gap-2 border-b last:border-b-0"
+                        onClick={() => handleSelectICD10(result)}
+                      >
+                        <span className="font-mono font-semibold text-primary shrink-0">{result.code}</span>
+                        <span className="text-sm text-muted-foreground truncate">{result.description}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {showSearchResults && icd10SearchResults.length === 0 && customCode.length >= 2 && !isSearching && (
+                  <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg p-3 text-sm text-muted-foreground">
+                    No ICD-10 codes found. You can enter a custom code and description.
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
                 <Label>Description</Label>
                 <Input
                   value={customDescription}
                   onChange={(e) => setCustomDescription(e.target.value)}
-                  placeholder="e.g., Low back pain"
+                  placeholder="Auto-populated from ICD-10 lookup"
+                  className="bg-muted/30"
                 />
               </div>
             </div>
