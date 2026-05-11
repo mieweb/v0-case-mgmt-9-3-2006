@@ -86,7 +86,7 @@ export function ContactAutocomplete({ onSelect, className }: ContactAutocomplete
   }
 
   const handleAddNewContact = () => {
-    if (newContactName && newContactEmail && newContactType) {
+    if (newContactName && newContactType) {
       const contactId = addContact({
         name: newContactName,
         email: newContactEmail,
