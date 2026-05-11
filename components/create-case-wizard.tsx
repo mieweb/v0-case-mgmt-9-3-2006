@@ -238,7 +238,7 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
                       ))}
                     </div>
                     <p className="mt-3 text-sm">
-                      If this is a <strong>new injury or absence</strong>, continue to create a new case.
+                      If this is a <strong>new absence</strong>, continue to create a new case.
                     </p>
                   </AlertDescription>
                 </Alert>
