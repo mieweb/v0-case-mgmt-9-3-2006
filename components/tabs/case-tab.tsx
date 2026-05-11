@@ -888,21 +888,6 @@ export function CaseTab() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="std-start" className="text-sm text-muted-foreground">
-              STD (Pay) start date
-            </Label>
-            <Input
-              id="std-start"
-              type="date"
-              className="bg-background"
-              value={stdStartDate}
-              onChange={(e) => {
-                setStdStartDate(e.target.value)
-                handleFieldUpdate("stdStartDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="mmi" className="text-sm text-muted-foreground">
               Maximum medical improvement (MMI)
             </Label>
