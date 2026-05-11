@@ -95,17 +95,17 @@ export function ContactAutocomplete({ onSelect, className }: ContactAutocomplete
         isEmployee: false,
       })
 
-      // Find the newly added contact and select it
-      const newContact = contacts.find((c) => c.id === contactId) || {
+      // Create the new contact object directly and select it
+      const newContact: Contact = {
         id: contactId,
         name: newContactName,
         email: newContactEmail,
         phone: newContactPhone,
-        type: newContactTypes,
+        type: [newContactType],
         isEmployee: false,
       }
 
-      onSelect(newContact as Contact)
+      onSelect(newContact)
 
       // Reset form
       setNewContactName("")
