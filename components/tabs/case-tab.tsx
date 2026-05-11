@@ -823,45 +823,6 @@ export function CaseTab() {
               }}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="pay-start" className="text-sm text-muted-foreground">
-              Pay start date
-            </Label>
-            <Input
-              id="pay-start"
-              type="date"
-              className="bg-background"
-              value={payStartDate}
-              onChange={(e) => {
-                setPayStartDate(e.target.value)
-                handleFieldUpdate("payStartDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="pay-end" className="text-sm text-muted-foreground">
-              Pay end date
-            </Label>
-            <Input
-              id="pay-end"
-              type="date"
-              className="bg-background"
-              value={payEndDate}
-              onChange={(e) => {
-                setPayEndDate(e.target.value)
-                handleFieldUpdate("payEndDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="fica-date" className="text-sm text-muted-foreground">
-              FICA Date <span className="text-xs italic">(auto-calculated)</span>
-            </Label>
-            <Input id="fica-date" type="date" className="bg-muted/50" value={ficaDate} readOnly />
-            <p className="text-xs text-muted-foreground mt-1">
-              Date of disability + 6 months + first day of next month
-            </p>
-          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-2">
@@ -962,41 +923,43 @@ export function CaseTab() {
       <CollapsibleSection title="Pay Information" icon={<DollarSign className="h-4 w-4" />} defaultOpen={true}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="pay-rate" className="text-sm text-muted-foreground">
-              Pay Rate
+            <Label htmlFor="pay-start" className="text-sm text-muted-foreground">
+              Pay start date
             </Label>
             <Input
-              id="pay-rate"
-              placeholder="Enter pay rate..."
+              id="pay-start"
+              type="date"
               className="bg-background"
+              value={payStartDate}
+              onChange={(e) => {
+                setPayStartDate(e.target.value)
+                handleFieldUpdate("payStartDate", e.target.value)
+              }}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="pay-frequency" className="text-sm text-muted-foreground">
-              Pay Frequency
-            </Label>
-            <Select>
-              <SelectTrigger id="pay-frequency">
-                <SelectValue placeholder="Select frequency..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="biweekly">Bi-Weekly</SelectItem>
-                <SelectItem value="semimonthly">Semi-Monthly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="annual">Annual</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="annual-salary" className="text-sm text-muted-foreground">
-              Annual Salary
+            <Label htmlFor="pay-end" className="text-sm text-muted-foreground">
+              Pay end date
             </Label>
             <Input
-              id="annual-salary"
-              placeholder="Enter annual salary..."
+              id="pay-end"
+              type="date"
               className="bg-background"
+              value={payEndDate}
+              onChange={(e) => {
+                setPayEndDate(e.target.value)
+                handleFieldUpdate("payEndDate", e.target.value)
+              }}
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="fica-date" className="text-sm text-muted-foreground">
+              FICA Date <span className="text-xs italic">(auto-calculated)</span>
+            </Label>
+            <Input id="fica-date" type="date" className="bg-muted/50" value={ficaDate} readOnly />
+            <p className="text-xs text-muted-foreground mt-1">
+              Date of disability + 6 months + first day of next month
+            </p>
           </div>
         </div>
       </CollapsibleSection>
