@@ -118,6 +118,68 @@ export function TodosTab() {
     }
   }
 
+  // Update a todo's date and cascade the change to all subsequent todos
+  const updateTodoDateWithCascade = (id: string, newDate: string) => {
+    const todoIndex = todos.findIndex((t) => t.id === id)
+    if (todoIndex === -1) return
+
+    const oldTodo = todos[todoIndex]
+    const oldDate = oldTodo.dateScheduled
+
+    // If no old date or no new date, just do a regular update
+    if (!oldDate || !newDate) {
+      updateTodo(id, { dateScheduled: newDate })
+      return
+    }
+
+    // Calculate the difference in days
+    const oldDateObj = new Date(oldDate)
+    const newDateObj = new Date(newDate)
+    const daysDifference = Math.round((newDateObj.getTime() - oldDateObj.getTime()) / (1000 * 60 * 60 * 24))
+
+    // If no difference, just update normally
+    if (daysDifference === 0) {
+      updateTodo(id, { dateScheduled: newDate })
+      return
+    }
+
+    // Update the changed todo and cascade to all todos below it
+    const updatedTodos = todos.map((todo, index) => {
+      if (index < todoIndex) {
+        // Todos above - keep unchanged
+        return todo
+      } else if (index === todoIndex) {
+        // The changed todo - use the new date
+        return { ...todo, dateScheduled: newDate }
+      } else {
+        // Todos below - shift by the same number of days
+        if (todo.dateScheduled) {
+          const todoDate = new Date(todo.dateScheduled)
+          todoDate.setDate(todoDate.getDate() + daysDifference)
+          return { ...todo, dateScheduled: todoDate.toISOString().split("T")[0] }
+        }
+        return todo
+      }
+    })
+
+    setTodos(updatedTodos)
+
+    if (currentCase) {
+      const affectedCount = todos.length - todoIndex
+      updateCase(
+        currentCase.caseNumber,
+        { todos: updatedTodos },
+        {
+          action: "updated",
+          field: "todo",
+          oldValue: oldDate,
+          newValue: newDate,
+          description: `Updated date for "${oldTodo.activity || "Untitled"}" and cascaded ${daysDifference > 0 ? "+" : ""}${daysDifference} days to ${affectedCount - 1} subsequent todo(s)`,
+        },
+      )
+    }
+  }
+
   const deleteTodo = (id: string) => {
     const todo = todos.find((t) => t.id === id)
     const updatedTodos = todos.filter((todo) => todo.id !== id)
@@ -519,7 +581,8 @@ export function TodosTab() {
                       <Input
                         type="date"
                         value={todo.dateScheduled || ""}
-                        onChange={(e) => updateTodo(todo.id, { dateScheduled: e.target.value })}
+                        onChange={(e) => updateTodoDateWithCascade(todo.id, e.target.value)}
+                        title="Changing this date will shift all subsequent todo dates by the same amount"
                       />
                     </TableCell>
                     <TableCell>
