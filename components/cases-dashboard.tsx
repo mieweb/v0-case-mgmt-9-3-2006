@@ -522,30 +522,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                 </div>
               )}
 
-              <div className="space-y-2">
-                <Label htmlFor="adv-date-from" className="text-sm">
-                  Created From
-                </Label>
-                <Input
-                  id="adv-date-from"
-                  type="date"
-                  value={advancedFilters.dateCreatedFrom}
-                  onChange={(e) => setAdvancedFilters({ ...advancedFilters, dateCreatedFrom: e.target.value })}
-                />
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="adv-date-to" className="text-sm">
-                  Created To
-                </Label>
-                <Input
-                  id="adv-date-to"
-                  type="date"
-                  value={advancedFilters.dateCreatedTo}
-                  onChange={(e) => setAdvancedFilters({ ...advancedFilters, dateCreatedTo: e.target.value })}
-                />
-              </div>
-            </div>
 
             <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 pt-2">
               <Button onClick={() => setShowMoreFilters(false)}>
