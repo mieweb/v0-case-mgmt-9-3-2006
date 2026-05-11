@@ -413,8 +413,8 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="flex flex-col md:flex-row gap-4 w-full">
-              <div className="space-y-2 flex-1">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full">
+              <div className="space-y-2">
                 <Label htmlFor="adv-search" className="text-sm">
                   Search Cases
                 </Label>
@@ -425,12 +425,12 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                     placeholder="Search by name, case number, or employee number..."
                     value={advancedFilters.search}
                     onChange={(e) => setAdvancedFilters({ ...advancedFilters, search: e.target.value })}
-                    className="pl-10"
+                    className="pl-10 w-full"
                   />
                 </div>
               </div>
 
-              <div className="space-y-2 flex-1">
+              <div className="space-y-2">
                 <Label htmlFor="adv-status" className="text-sm">
                   Status
                 </Label>
@@ -438,18 +438,18 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   value={advancedFilters.status}
                   onValueChange={(value) => setAdvancedFilters({ ...advancedFilters, status: value })}
                 >
-                  <SelectTrigger id="adv-status">
+                  <SelectTrigger id="adv-status" className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-<SelectItem value="all">All Statuses</SelectItem>
-                        <SelectItem value="open">Open</SelectItem>
-                        <SelectItem value="closed">Closed</SelectItem>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="open">Open</SelectItem>
+                    <SelectItem value="closed">Closed</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="space-y-2 flex-1">
+              <div className="space-y-2">
                 <Label htmlFor="adv-case-type" className="text-sm">
                   Case Type
                 </Label>
@@ -457,7 +457,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   value={advancedFilters.caseType}
                   onValueChange={(value) => setAdvancedFilters({ ...advancedFilters, caseType: value })}
                 >
-                  <SelectTrigger id="adv-case-type">
+                  <SelectTrigger id="adv-case-type" className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -476,7 +476,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                 </Select>
               </div>
 
-              <div className="space-y-2 flex-1">
+              <div className="space-y-2">
                 <Label htmlFor="adv-manager" className="text-sm">
                   Case Manager
                 </Label>
@@ -484,7 +484,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   value={advancedFilters.caseManager}
                   onValueChange={(value) => setAdvancedFilters({ ...advancedFilters, caseManager: value })}
                 >
-                  <SelectTrigger id="adv-manager">
+                  <SelectTrigger id="adv-manager" className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
