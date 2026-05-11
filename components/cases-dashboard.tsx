@@ -413,7 +413,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
               <div className="space-y-2">
                 <Label htmlFor="adv-search" className="text-sm">
                   Search Cases
