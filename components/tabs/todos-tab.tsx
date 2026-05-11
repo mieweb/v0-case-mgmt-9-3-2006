@@ -29,7 +29,7 @@ export function TodosTab() {
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [showGenerateDialog, setShowGenerateDialog] = useState(false)
   const [anchorDates, setAnchorDates] = useState({
-    caseCreation: new Date().toISOString().split("T")[0],
+    dateOfDisability: "",
     surgeryDate: "",
     deliveryDate: "",
   })
@@ -53,6 +53,16 @@ export function TodosTab() {
       setTodos(currentCase.todos)
     }
   }, [currentCase?.caseNumber]) // Only re-run when case number changes
+
+  // Populate dateOfDisability from case when dialog opens
+  useEffect(() => {
+    if (showGenerateDialog && currentCase?.dateOfDisability) {
+      setAnchorDates(prev => ({
+        ...prev,
+        dateOfDisability: currentCase.dateOfDisability || ""
+      }))
+    }
+  }, [showGenerateDialog, currentCase?.dateOfDisability])
 
   const addTodo = () => {
     const newTodo: TodoItem = {
@@ -136,8 +146,8 @@ export function TodosTab() {
     }
 
     const dates = {
-      caseCreation: new Date(anchorDates.caseCreation || new Date()),
-      dateOfDisability: currentCase?.dateOfDisability ? new Date(currentCase.dateOfDisability) : new Date(anchorDates.caseCreation || new Date()),
+      caseCreation: new Date(anchorDates.dateOfDisability || new Date()),
+      dateOfDisability: new Date(anchorDates.dateOfDisability || new Date()),
     }
 
     const parsedTodos = generateTodosFromTemplates(caseType.defaultTodos, dates)
@@ -572,18 +582,18 @@ export function TodosTab() {
           <DialogHeader>
             <DialogTitle>Generate Todos from Template</DialogTitle>
             <DialogDescription>
-              Set anchor dates to calculate due dates for todo items. Default is case creation date.
+              Set anchor dates to calculate due dates for todo items. Auto-populated from Case Dates if available.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="caseCreation">Case Creation Date</Label>
+              <Label htmlFor="dateOfDisability">Date of Disability</Label>
               <Input
-                id="caseCreation"
+                id="dateOfDisability"
                 type="date"
-                value={anchorDates.caseCreation}
-                onChange={(e) => setAnchorDates({ ...anchorDates, caseCreation: e.target.value })}
+                value={anchorDates.dateOfDisability}
+                onChange={(e) => setAnchorDates({ ...anchorDates, dateOfDisability: e.target.value })}
               />
             </div>
 
