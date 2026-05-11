@@ -413,8 +413,8 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-              <div className="space-y-2">
+            <div className="flex flex-col md:flex-row gap-4 w-full">
+              <div className="space-y-2 flex-1">
                 <Label htmlFor="adv-search" className="text-sm">
                   Search Cases
                 </Label>
@@ -430,7 +430,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 flex-1">
                 <Label htmlFor="adv-status" className="text-sm">
                   Status
                 </Label>
@@ -449,7 +449,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                 </Select>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 flex-1">
                 <Label htmlFor="adv-case-type" className="text-sm">
                   Case Type
                 </Label>
@@ -476,7 +476,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                 </Select>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 flex-1">
                 <Label htmlFor="adv-manager" className="text-sm">
                   Case Manager
                 </Label>
