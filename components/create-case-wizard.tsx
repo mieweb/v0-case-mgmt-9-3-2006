@@ -277,27 +277,6 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="case-category">Case Category</Label>
-                <Select
-                  value={formData.caseCategory}
-                  onValueChange={(val) => setFormData((prev) => ({ ...prev, caseCategory: val }))}
-                >
-                  <SelectTrigger id="case-category">
-                    <SelectValue placeholder="Select category..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {codes.caseCategory
-                      .filter((cat) => cat.active)
-                      .map((cat) => (
-                        <SelectItem key={cat.id} value={cat.code}>
-                          {cat.description || cat.code}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="case-manager">Assign Case Manager</Label>
                 <Select
                   value={formData.caseManager}
@@ -445,9 +424,6 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
                 <div className="space-y-1 text-sm">
                   <p>
                     <span className="text-muted-foreground">Case Type:</span> {formData.caseType || "[Not selected]"}
-                  </p>
-                  <p>
-                    <span className="text-muted-foreground">Category:</span> {formData.caseCategory || "[Not selected]"}
                   </p>
                   <p>
                     <span className="text-muted-foreground">Case Manager:</span> {formData.caseManager || "Unassigned"}
