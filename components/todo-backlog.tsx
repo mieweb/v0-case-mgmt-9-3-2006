@@ -511,7 +511,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
         </div>
         <div class="filters">
           Filters: Status: ${filterStatus} | Case Manager: ${filterCaseManager} | Case Type: ${filterCaseType}${searchTerm ? ` | Search: "${searchTerm}"` : ""}
-          <br/>Showing ${filteredTodos.length} of ${allTodos.length} todos
+          <br/>Showing ${filteredTodos.length} of ${allTodos.length} To-Dos
         </div>
         <table>
           <thead>
@@ -601,7 +601,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
           </Button>
           <div>
             <h1 className="text-2xl font-bold">To Do</h1>
-            <p className="text-muted-foreground">All todos across all cases</p>
+            <p className="text-muted-foreground">All To-Dos across all cases</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -888,7 +888,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
               </div>
             )}
             <div className="ml-auto text-sm text-muted-foreground">
-              Showing {filteredTodos.length} of {allTodos.length} todos
+              Showing {filteredTodos.length} of {allTodos.length} To-Dos
             </div>
           </div>
         </CardContent>
@@ -928,7 +928,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
                 {filteredTodos.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
-                      No todos found matching filters.
+                      No To-Dos found matching filters.
                     </TableCell>
                   </TableRow>
                 ) : (
