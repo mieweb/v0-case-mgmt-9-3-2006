@@ -60,6 +60,7 @@ interface Letter {
   status: "Draft" | "Sent"
   attachments?: LetterAttachment[]
   additionalItems?: string
+  attachmentItemTypes?: string[] // Items that need to be attached to the letter
 }
 
 export function LettersTab() {
@@ -163,6 +164,7 @@ export function LettersTab() {
     setContent(letter.content)
     setAttachments(letter.attachments || [])
     setAdditionalItems(letter.additionalItems || "")
+    setSelectedAttachmentTypes(letter.attachmentItemTypes || [])
     setIsDialogOpen(true)
     setIsMinimized(false)
   }
@@ -177,7 +179,7 @@ export function LettersTab() {
 
     if (editingLetter) {
       setLetters((prev) =>
-        prev.map((l) => (l.id === editingLetter.id ? { ...l, sentFrom, letterType: templateName, template, content: evaluatedContent, attachments, additionalItems } : l)),
+        prev.map((l) => (l.id === editingLetter.id ? { ...l, sentFrom, letterType: templateName, template, content: evaluatedContent, attachments, additionalItems, attachmentItemTypes: selectedAttachmentTypes } : l)),
       )
       updateCase(
         currentCase.caseNumber,
@@ -203,11 +205,15 @@ export function LettersTab() {
         status: "Draft",
         attachments,
         additionalItems,
+        attachmentItemTypes: selectedAttachmentTypes,
       }
       setLetters((prev) => [...prev, newLetter])
       
+      // Create todos array to add
+      const newTodos: TodoItem[] = []
+      
       // Create a TODO for a Case Manager Leader to complete the letter (linked to the letter)
-      const newTodo: TodoItem = {
+      const letterTodo: TodoItem = {
         id: `todo-letter-${Date.now()}`,
         activity: `Complete draft letter: ${templateName}`,
         caseManager: getCaseManagerLeader(),
@@ -215,7 +221,26 @@ export function LettersTab() {
         completed: false,
         linkedLetterId: letterId,
       }
-      const updatedTodos = [...(currentCase.todos || []), newTodo]
+      newTodos.push(letterTodo)
+      
+      // Create a TODO for each attachment item type that needs to be added
+      if (selectedAttachmentTypes.length > 0) {
+        const attachmentLabels = selectedAttachmentTypes
+          .map((typeId) => ATTACHMENT_ITEM_TYPES.find((t) => t.id === typeId)?.label || typeId)
+          .join(", ")
+        
+        const attachmentTodo: TodoItem = {
+          id: `todo-attachment-${Date.now()}`,
+          activity: `Attach files to letter "${templateName}": ${attachmentLabels}`,
+          caseManager: getCaseManagerLeader(),
+          dateScheduled: new Date().toISOString().split("T")[0],
+          completed: false,
+          linkedLetterId: letterId,
+        }
+        newTodos.push(attachmentTodo)
+      }
+      
+      const updatedTodos = [...(currentCase.todos || []), ...newTodos]
       
       updateCase(
         currentCase.caseNumber,
@@ -224,7 +249,7 @@ export function LettersTab() {
           action: "added",
           field: "letter",
           newValue: templateName,
-          description: `Added draft letter: ${templateName} (TODO assigned to Case Manager Leader)`,
+          description: `Added draft letter: ${templateName} (${newTodos.length} TODO${newTodos.length > 1 ? "s" : ""} assigned to Case Manager Leader)`,
         },
       )
     }
@@ -232,6 +257,7 @@ export function LettersTab() {
     setIsDialogOpen(false)
     setAttachments([])
     setAdditionalItems("")
+    setSelectedAttachmentTypes([])
   }
 
   const handleSendLetterAction = () => {
@@ -246,7 +272,7 @@ export function LettersTab() {
       setLetters((prev) =>
         prev.map((l) =>
           l.id === editingLetter.id
-            ? { ...l, sentFrom, letterType: templateName, template, content: evaluatedContent, status: "Sent" as const, sentDate: now, attachments, additionalItems }
+            ? { ...l, sentFrom, letterType: templateName, template, content: evaluatedContent, status: "Sent" as const, sentDate: now, attachments, additionalItems, attachmentItemTypes: selectedAttachmentTypes }
             : l,
         ),
       )
@@ -274,6 +300,7 @@ export function LettersTab() {
         status: "Sent",
         attachments,
         additionalItems,
+        attachmentItemTypes: selectedAttachmentTypes,
       }
       setLetters((prev) => [...prev, newLetter])
       updateCase(
@@ -291,6 +318,7 @@ export function LettersTab() {
     setIsDialogOpen(false)
     setAttachments([])
     setAdditionalItems("")
+    setSelectedAttachmentTypes([])
   }
 
   const handleDeleteLetter = (id: string) => {
@@ -450,6 +478,7 @@ export function LettersTab() {
                 <TableHead>Date</TableHead>
                 <TableHead>Template</TableHead>
                 <TableHead>From</TableHead>
+                <TableHead>Files to Attach</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -457,7 +486,7 @@ export function LettersTab() {
             <TableBody>
               {letters.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                     No letters created yet. Click "Create Letter" to get started.
                   </TableCell>
                 </TableRow>
@@ -467,6 +496,25 @@ export function LettersTab() {
                     <TableCell>{(() => { const d = new Date(letter.createdDate); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })()}</TableCell>
                     <TableCell>{letter.template || "—"}</TableCell>
                     <TableCell className="pii-data">{letter.sentFrom}</TableCell>
+                    <TableCell>
+                      {letter.attachmentItemTypes && letter.attachmentItemTypes.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {letter.attachmentItemTypes.slice(0, 2).map((typeId) => {
+                            const typeLabel = ATTACHMENT_ITEM_TYPES.find((t) => t.id === typeId)?.label || typeId
+                            return (
+                              <span key={typeId} className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800">
+                                {typeLabel}
+                              </span>
+                            )
+                          })}
+                          {letter.attachmentItemTypes.length > 2 && (
+                            <span className="text-xs text-muted-foreground">+{letter.attachmentItemTypes.length - 2} more</span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Badge variant={letter.status === "Sent" ? "default" : "secondary"}>{letter.status}</Badge>
                     </TableCell>
