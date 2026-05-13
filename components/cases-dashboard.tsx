@@ -17,6 +17,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Search, Filter, Save, Trash2, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { useCases } from "@/contexts/cases-context"
+import { useCodes } from "@/contexts/codes-context"
 import { useState } from "react"
 
 interface CasesDashboardProps {
@@ -53,6 +54,7 @@ type SortDirection = "asc" | "desc" | null
 
 export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
   const { cases, setCurrentCase } = useCases()
+  const { codes } = useCodes()
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [activeFilterId, setActiveFilterId] = useState<string | null>("my-cases")
@@ -484,11 +486,13 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Managers</SelectItem>
-                    {uniqueManagers.map((manager) => (
-                      <SelectItem key={manager} value={manager.toLowerCase()}>
-                        {manager}
-                      </SelectItem>
-                    ))}
+                    {codes.caseManager
+                      .filter((manager) => manager.active)
+                      .map((manager) => (
+                        <SelectItem key={manager.id} value={manager.code.toLowerCase()}>
+                          {manager.description || manager.code}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
