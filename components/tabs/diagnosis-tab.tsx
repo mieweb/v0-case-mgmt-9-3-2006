@@ -655,7 +655,6 @@ export function DiagnosisTab() {
           <Button 
             onClick={handleAddICD11Diagnosis} 
             className="w-full"
-            variant="outline"
             disabled={!icd11Code || !icd11Date}
           >
             Add ICD-11 Diagnosis
