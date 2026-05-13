@@ -954,11 +954,27 @@ export function CaseTab() {
             <Label htmlFor="rate-of-pay" className="text-sm text-muted-foreground">
               Rate of Pay (Mo/Hrly)
             </Label>
-            <Input
-              id="rate-of-pay"
-              placeholder="Enter rate..."
-              className="bg-background"
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+              <Input
+                id="rate-of-pay"
+                type="text"
+                inputMode="decimal"
+                placeholder="0.00"
+                className="bg-background pl-7"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9.]/g, '')
+                  const parts = value.split('.')
+                  if (parts.length > 2) {
+                    e.target.value = parts[0] + '.' + parts.slice(1).join('')
+                  } else if (parts[1]?.length > 2) {
+                    e.target.value = parts[0] + '.' + parts[1].slice(0, 2)
+                  } else {
+                    e.target.value = value
+                  }
+                }}
+              />
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="std-offset-type" className="text-sm text-muted-foreground">
