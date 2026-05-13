@@ -55,6 +55,9 @@ export function DiagnosisTab() {
   const [icd11Code, setIcd11Code] = useState("")
   const [icd11Description, setIcd11Description] = useState("")
   const [icd11Date, setIcd11Date] = useState(new Date().toISOString().split("T")[0])
+  const [icd11SearchResults, setIcd11SearchResults] = useState<ICD10Code[]>([])
+  const [isIcd11Searching, setIsIcd11Searching] = useState(false)
+  const [showIcd11Results, setShowIcd11Results] = useState(false)
 
   // Debounced ICD-10 search
   const searchICD10 = useCallback(async (query: string) => {
@@ -93,6 +96,45 @@ export function DiagnosisTab() {
     setCustomCode(code.code)
     setCustomDescription(code.description)
     setShowSearchResults(false)
+  }
+
+  // ICD-11 search function
+  const searchICD11 = useCallback(async (query: string) => {
+    if (query.length < 2) {
+      setIcd11SearchResults([])
+      setShowIcd11Results(false)
+      return
+    }
+
+    setIsIcd11Searching(true)
+    try {
+      const response = await fetch(`/api/icd11?q=${encodeURIComponent(query)}&maxList=15`)
+      const data = await response.json()
+      setIcd11SearchResults(data.results || [])
+      setShowIcd11Results(true)
+    } catch (error) {
+      console.error("ICD-11 search error:", error)
+      setIcd11SearchResults([])
+    } finally {
+      setIsIcd11Searching(false)
+    }
+  }, [])
+
+  // Debounce ICD-11 search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (icd11Code) {
+        searchICD11(icd11Code)
+      }
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [icd11Code, searchICD11])
+
+  const handleSelectICD11 = (code: ICD10Code) => {
+    setIcd11Code(code.code)
+    setIcd11Description(code.description)
+    setShowIcd11Results(false)
   }
 
   // Quick add ICD-10 search
@@ -548,27 +590,51 @@ export function DiagnosisTab() {
 
       {/* ICD-11 Quick Add Row (International Only) */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end mt-4 pt-4 border-t border-dashed">
-        <div className="space-y-2">
+        <div className="space-y-2 relative">
           <Label htmlFor="icd11-code" className="text-sm text-muted-foreground">
             ICD-11 Code: <span className="text-xs text-amber-600">(international only)</span>
           </Label>
-          <Input
-            id="icd11-code"
-            value={icd11Code}
-            onChange={(e) => setIcd11Code(e.target.value.toUpperCase())}
-            placeholder="Enter ICD-11 code..."
-            className="font-mono bg-background"
-          />
+          <div className="relative">
+            <Input
+              id="icd11-code"
+              value={icd11Code}
+              onChange={(e) => setIcd11Code(e.target.value.toUpperCase())}
+              placeholder="Search ICD-11..."
+              className="font-mono bg-background"
+              onFocus={() => icd11SearchResults.length > 0 && setShowIcd11Results(true)}
+              onBlur={() => setTimeout(() => setShowIcd11Results(false), 200)}
+            />
+            {isIcd11Searching && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              </div>
+            )}
+          </div>
+          {showIcd11Results && icd11SearchResults.length > 0 && (
+            <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-60 overflow-y-auto">
+              {icd11SearchResults.map((result) => (
+                <button
+                  key={result.code}
+                  type="button"
+                  className="w-full px-3 py-2 text-left hover:bg-muted flex items-start gap-2"
+                  onMouseDown={() => handleSelectICD11(result)}
+                >
+                  <span className="font-mono text-sm font-medium shrink-0">{result.code}</span>
+                  <span className="text-sm text-muted-foreground">{result.description}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="icd11-description" className="text-sm text-muted-foreground">
-            Description:
+            Description: <span className="text-xs text-muted-foreground">(auto-filled)</span>
           </Label>
           <Input
             id="icd11-description"
             value={icd11Description}
             onChange={(e) => setIcd11Description(e.target.value)}
-            placeholder="Enter description"
+            placeholder="Auto-filled from search"
             className="bg-background"
           />
         </div>

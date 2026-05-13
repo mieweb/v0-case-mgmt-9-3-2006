@@ -1,0 +1,187 @@
+import { NextRequest, NextResponse } from "next/server"
+
+// ICD-11 codes database (common codes for disability case management)
+// ICD-11 uses a different coding structure than ICD-10
+const ICD11_CODES: { code: string; description: string }[] = [
+  // Musculoskeletal disorders
+  { code: "FA20", description: "Fracture of bone" },
+  { code: "FA24.0", description: "Fracture of cervical vertebra" },
+  { code: "FA24.1", description: "Fracture of thoracic vertebra" },
+  { code: "FA24.2", description: "Fracture of lumbar vertebra" },
+  { code: "FA70", description: "Sprain or strain of joint or ligament" },
+  { code: "FA70.0", description: "Sprain of cervical spine" },
+  { code: "FA70.1", description: "Sprain of lumbar spine" },
+  { code: "FA72", description: "Strain of muscle or tendon" },
+  { code: "FB40", description: "Degenerative condition of spine" },
+  { code: "FB40.0", description: "Cervical disc degeneration" },
+  { code: "FB40.1", description: "Thoracic disc degeneration" },
+  { code: "FB40.2", description: "Lumbar disc degeneration" },
+  { code: "FB41", description: "Spondylosis" },
+  { code: "FB42", description: "Intervertebral disc disorders" },
+  { code: "FB50", description: "Osteoarthritis of joint" },
+  { code: "FB50.0", description: "Osteoarthritis of hip" },
+  { code: "FB50.1", description: "Osteoarthritis of knee" },
+  { code: "FB51", description: "Rheumatoid arthritis" },
+  { code: "FB54", description: "Gout" },
+  { code: "FB70", description: "Soft tissue disorders" },
+  { code: "FB71", description: "Bursitis" },
+  { code: "FB72", description: "Tendinitis" },
+  { code: "FB73", description: "Carpal tunnel syndrome" },
+  { code: "FB80", description: "Low back pain" },
+  { code: "FB81", description: "Neck pain" },
+  { code: "FB82", description: "Radiculopathy" },
+  { code: "FB83", description: "Sciatica" },
+  
+  // Mental and behavioral disorders
+  { code: "6A70", description: "Single episode depressive disorder" },
+  { code: "6A71", description: "Recurrent depressive disorder" },
+  { code: "6A72", description: "Dysthymic disorder" },
+  { code: "6A80", description: "Generalized anxiety disorder" },
+  { code: "6A81", description: "Panic disorder" },
+  { code: "6B00", description: "Post traumatic stress disorder" },
+  { code: "6B20", description: "Adjustment disorder" },
+  { code: "6B40", description: "Obsessive-compulsive disorder" },
+  { code: "6C40", description: "Alcohol dependence" },
+  { code: "6C41", description: "Opioid dependence" },
+  { code: "6D10", description: "Personality disorder" },
+  { code: "6D70", description: "Neurocognitive disorders" },
+  { code: "QD80", description: "Burnout" },
+  
+  // Cardiovascular conditions
+  { code: "BA00", description: "Hypertensive heart disease" },
+  { code: "BA01", description: "Essential hypertension" },
+  { code: "BA40", description: "Ischaemic heart disease" },
+  { code: "BA41", description: "Acute myocardial infarction" },
+  { code: "BA42", description: "Chronic ischaemic heart disease" },
+  { code: "BA43", description: "Angina pectoris" },
+  { code: "BA80", description: "Heart failure" },
+  { code: "BA81", description: "Cardiomyopathy" },
+  { code: "BB00", description: "Cardiac arrhythmia" },
+  { code: "BB01", description: "Atrial fibrillation" },
+  { code: "BD10", description: "Cerebrovascular disease" },
+  { code: "BD11", description: "Stroke" },
+  
+  // Respiratory conditions
+  { code: "CA20", description: "Pneumonia" },
+  { code: "CA21", description: "Bronchitis" },
+  { code: "CA22", description: "Acute bronchitis" },
+  { code: "CA23", description: "Chronic bronchitis" },
+  { code: "CA40", description: "Chronic obstructive pulmonary disease" },
+  { code: "CA80", description: "Asthma" },
+  { code: "CB00", description: "Pulmonary fibrosis" },
+  { code: "CB01", description: "Respiratory failure" },
+  
+  // Neoplasms
+  { code: "2B60", description: "Malignant neoplasm of breast" },
+  { code: "2B70", description: "Malignant neoplasm of lung" },
+  { code: "2B90", description: "Malignant neoplasm of colon" },
+  { code: "2C00", description: "Malignant neoplasm of prostate" },
+  { code: "2C80", description: "Malignant neoplasm of skin" },
+  { code: "2D00", description: "Benign neoplasm" },
+  { code: "2E00", description: "Neoplasm of uncertain behavior" },
+  
+  // Neurological conditions
+  { code: "8A00", description: "Epilepsy" },
+  { code: "8A20", description: "Migraine" },
+  { code: "8A21", description: "Tension-type headache" },
+  { code: "8A40", description: "Multiple sclerosis" },
+  { code: "8A60", description: "Parkinson disease" },
+  { code: "8B00", description: "Peripheral neuropathy" },
+  { code: "8B20", description: "Trigeminal neuralgia" },
+  { code: "8B60", description: "Myasthenia gravis" },
+  { code: "8D00", description: "Alzheimer disease" },
+  { code: "MB40", description: "Chronic pain" },
+  { code: "MB41", description: "Fibromyalgia" },
+  
+  // Digestive disorders
+  { code: "DA40", description: "Gastritis" },
+  { code: "DA41", description: "Gastric ulcer" },
+  { code: "DA42", description: "Duodenal ulcer" },
+  { code: "DA90", description: "Irritable bowel syndrome" },
+  { code: "DA91", description: "Inflammatory bowel disease" },
+  { code: "DA92", description: "Crohn disease" },
+  { code: "DA93", description: "Ulcerative colitis" },
+  { code: "DB10", description: "Cirrhosis of liver" },
+  { code: "DB30", description: "Pancreatitis" },
+  { code: "DB70", description: "Gallbladder disease" },
+  { code: "ME80", description: "Hernia" },
+  
+  // Endocrine disorders
+  { code: "5A10", description: "Type 1 diabetes mellitus" },
+  { code: "5A11", description: "Type 2 diabetes mellitus" },
+  { code: "5A20", description: "Hyperthyroidism" },
+  { code: "5A21", description: "Hypothyroidism" },
+  { code: "5B80", description: "Obesity" },
+  { code: "5C50", description: "Adrenal insufficiency" },
+  
+  // Genitourinary disorders
+  { code: "GB40", description: "Acute kidney injury" },
+  { code: "GB60", description: "Chronic kidney disease" },
+  { code: "GB90", description: "Kidney stones" },
+  { code: "GC00", description: "Urinary tract infection" },
+  { code: "GC10", description: "Cystitis" },
+  { code: "GA30", description: "Endometriosis" },
+  { code: "GA31", description: "Uterine fibroids" },
+  
+  // Infectious diseases
+  { code: "1A00", description: "Cholera" },
+  { code: "1C00", description: "Tuberculosis" },
+  { code: "1E00", description: "Hepatitis" },
+  { code: "1F00", description: "HIV disease" },
+  { code: "1G00", description: "Influenza" },
+  { code: "RA01", description: "COVID-19" },
+  
+  // Injuries
+  { code: "NA00", description: "Traumatic brain injury" },
+  { code: "NA01", description: "Concussion" },
+  { code: "NA70", description: "Spinal cord injury" },
+  { code: "NB00", description: "Burn injury" },
+  { code: "NC00", description: "Frostbite" },
+  { code: "PB00", description: "Transport accident injury" },
+  { code: "PD00", description: "Fall injury" },
+  { code: "PG00", description: "Occupational injury" },
+  
+  // Blood disorders
+  { code: "3A00", description: "Anaemia" },
+  { code: "3A01", description: "Iron deficiency anaemia" },
+  { code: "3A70", description: "Coagulation disorders" },
+  { code: "3B00", description: "Leukaemia" },
+  { code: "3B60", description: "Lymphoma" },
+  
+  // Skin conditions
+  { code: "EA80", description: "Dermatitis" },
+  { code: "EA81", description: "Eczema" },
+  { code: "EA90", description: "Psoriasis" },
+  { code: "EB00", description: "Urticaria" },
+  { code: "EB40", description: "Acne" },
+  
+  // Eye and ear conditions
+  { code: "9A00", description: "Cataract" },
+  { code: "9A40", description: "Glaucoma" },
+  { code: "9B00", description: "Retinal disorders" },
+  { code: "9B70", description: "Vision impairment" },
+  { code: "AA00", description: "Otitis media" },
+  { code: "AA40", description: "Hearing loss" },
+  { code: "AB00", description: "Vertigo" },
+  { code: "AB30", description: "Tinnitus" },
+]
+
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams
+  const query = searchParams.get("q") || ""
+
+  if (!query || query.length < 2) {
+    return NextResponse.json({ results: [] })
+  }
+
+  const searchLower = query.toLowerCase()
+  
+  // Search both code and description
+  const results = ICD11_CODES.filter(
+    (item) =>
+      item.code.toLowerCase().includes(searchLower) ||
+      item.description.toLowerCase().includes(searchLower)
+  ).slice(0, 15)
+
+  return NextResponse.json({ results })
+}
