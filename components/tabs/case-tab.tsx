@@ -182,6 +182,7 @@ export function CaseTab() {
   const [injuryCause, setInjuryCause] = useState("")
   const [dateOfDeath, setDateOfDeath] = useState("")
   const [oshaRecordable, setOshaRecordable] = useState("")
+  const [ppiRating, setPpiRating] = useState("")
   const [oshaClassification, setOshaClassification] = useState("")
   const [recordabilityRationale, setRecordabilityRationale] = useState("")
   const [psmIncident, setPsmIncident] = useState("")
@@ -287,6 +288,7 @@ export function CaseTab() {
       setInjuryCause(currentCase.injuryCause || "")
       setDateOfDeath(currentCase.dateOfDeath || "")
       setOshaRecordable(currentCase.oshaRecordable || "")
+      setPpiRating(currentCase.ppiRating || "")
       setOshaClassification(currentCase.oshaClassification || "")
       setRecordabilityRationale(currentCase.recordabilityRationale || "")
       setPsmIncident(currentCase.psmIncident || "")
@@ -1492,6 +1494,21 @@ export function CaseTab() {
                 <SelectItem value="No">No</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="ppi-rating" className="text-sm text-muted-foreground">
+              Permanent Partial Impairment (PPI)
+            </Label>
+            <Input
+              id="ppi-rating"
+              placeholder="Enter PPI rating..."
+              className="bg-background"
+              value={ppiRating}
+              onChange={(e) => {
+                setPpiRating(e.target.value)
+                handleFieldUpdate("ppiRating", e.target.value)
+              }}
+            />
           </div>
           {oshaRecordable === "Yes" && (
             <>
