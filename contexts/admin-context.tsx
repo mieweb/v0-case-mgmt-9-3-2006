@@ -362,35 +362,35 @@ CC: Laura Higginbotham, Benefits Leader
 
 Please find the LTD Application for:
 
-NAME	{{employeeFirstName}} {{employeeLastName}}
-EMPLOYEE ID	{{employeeNumber}}
-SOCIAL SECURITY #	{{employeeSSN}}
-DATE OF BIRTH	{{dateOfBirth}}
-RACE	{{employeeEthnicGroup}}
-LOCATION	{{employeeLocation}}
-UNUM POLICY #	
-LTD COVERAGE	60%
-DATE OF HIRE	{{dateOfHire}}
-YEARS OF SERVICE	
-DATE OF INJURY-INJ/ILL	{{dateOfDisability}}
-OCCUPATIONAL/NON-OCCUPATIONAL	
-JOB TITLE/DUTIES	{{position}}
-LAST DAY WORKED	
-FIRST DAY OF STD/WC	{{stdStartDate}}
-LAST DAY OF STD/WC	
-FIRST DAY OF LTD if approved	
-RATE OF PAY on last day worked	
-INCENTIVE if Salary employee	
-FULL/PART TIME STATUS	{{employmentType}}
-LTD BENEFIT-based on 40 hours	40 hours
-WORK COMP Pay and Begin/End Date(s)	
-DATE OF INITIAL APPLICATION FOR SSDI	
-DATE SSDI RECONSIDERATION FILED	
-SSDI ENTITLEMENT/DENIAL DATE WITH DOLLAR AMOUNT	
-DEPENDENT SSDI-AMOUNT AND EFFECTIVE DATE	
-STD OVERPAYMENT Amount/Status	
-MEDICAL CASE MANAGER	{{caseManagerWithCredentials}}
-CASE MANAGER PHONE	{{caseManagerPhone}}
+NAME:	{{employeeFirstName}} {{employeeLastName}}
+EMPLOYEE ID:	{{employeeNumber}}
+SOCIAL SECURITY #:	{{employeeSSN}}
+DATE OF BIRTH:	{{dateOfBirth}}
+RACE:	{{employeeEthnicGroup}}
+LOCATION:	{{employeeLocation}}
+UNUM POLICY #:	
+LTD COVERAGE:	60%
+DATE OF HIRE:	{{dateOfHire}}
+YEARS OF SERVICE:	
+DATE OF INJURY-INJ/ILL:	{{dateOfDisability}}
+OCCUPATIONAL/NON-OCCUPATIONAL:	
+JOB TITLE/DUTIES:	{{position}}
+LAST DAY WORKED:	
+FIRST DAY OF STD/WC:	{{stdStartDate}}
+LAST DAY OF STD/WC:	
+FIRST DAY OF LTD if approved:	
+RATE OF PAY on last day worked:	
+INCENTIVE if Salary employee:	
+FULL/PART TIME STATUS:	{{employmentType}}
+LTD BENEFIT-based on 40 hours:	40 hours
+WORK COMP Pay and Begin/End Date(s):	
+DATE OF INITIAL APPLICATION FOR SSDI:	
+DATE SSDI RECONSIDERATION FILED:	
+SSDI ENTITLEMENT/DENIAL DATE WITH DOLLAR AMOUNT:	
+DEPENDENT SSDI-AMOUNT AND EFFECTIVE DATE:	
+STD OVERPAYMENT Amount/Status:	
+MEDICAL CASE MANAGER:	{{caseManagerWithCredentials}}
+CASE MANAGER PHONE:	{{caseManagerPhone}}
 
 If you need any additional information, please do not hesitate to call.
 
@@ -431,9 +431,9 @@ FUTURE VISITS, PROCEDURES, TESTS, ETC:
 
 {{today}}
 
-Re: {{employeeFirstName}} {{employeeLastName}}
-SSN: {{employeeSSN}}
-DOB: {{dateOfBirth}}
+Re:	{{employeeFirstName}} {{employeeLastName}}
+SSN:	{{employeeSSN}}
+DOB:	{{dateOfBirth}}
 
 WORK RESTRICTIONS
 

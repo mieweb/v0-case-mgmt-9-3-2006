@@ -321,9 +321,8 @@ export function DiagnosisTab() {
 
   const handleEditClick = (diagnosis: Diagnosis) => {
     setEditingDiagnosis(diagnosis)
-    setSelectedCode(`${diagnosis.icd10Code} - ${diagnosis.icd10Description}`)
     setCustomCode(diagnosis.icd10Code)
-    setCustomDescription(diagnosis.icd10Description)
+    setCustomDescription(diagnosis.icd10Description || "")
     setDiagnosisDate(diagnosis.diagnosisDate)
     setNotes(diagnosis.notes || "")
     setIsActive(diagnosis.isActive)
