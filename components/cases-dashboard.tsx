@@ -256,7 +256,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
     }
 
     const nextTodo = upcomingTodos[0]
-    const dueDate = new Date(nextTodo.dateScheduled!)
+    const dueDate = new Date(nextTodo.dateScheduled! + "T00:00:00")
     const formattedDate = `${String(dueDate.getMonth() + 1).padStart(2, "0")}/${String(dueDate.getDate()).padStart(2, "0")}/${dueDate.getFullYear()}`
     return `${nextTodo.activity} (${formattedDate})`
   }
@@ -654,7 +654,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   <TableCell>{caseItem.caseType}</TableCell>
                   <TableCell className="text-muted-foreground">{caseItem.caseManager}</TableCell>
                   <TableCell className="text-muted-foreground">{caseItem.employeeLocation}</TableCell>
-                  <TableCell className="text-muted-foreground">{caseItem.dateOfDisability ? (() => { const d = new Date(caseItem.dateOfDisability); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })() : "—"}</TableCell>
+                  <TableCell className="text-muted-foreground">{caseItem.dateOfDisability ? (() => { const d = new Date(caseItem.dateOfDisability + "T00:00:00"); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })() : "—"}</TableCell>
                   <TableCell className="text-muted-foreground text-sm" suppressHydrationWarning>{getNextTodo(caseItem)}</TableCell>
                 </TableRow>
               ))
