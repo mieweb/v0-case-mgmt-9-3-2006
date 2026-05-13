@@ -621,11 +621,18 @@ export function AbsenceRestrictionsTab() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="reason" className="text-sm text-muted-foreground">
+              <Label htmlFor="reason" className={`text-sm ${selectedStatus.startsWith("OTH") ? "text-muted-foreground" : "text-muted-foreground/50"}`}>
                 Reason:{selectedStatus.startsWith("OTH") && <span className="text-destructive ml-1">*</span>}
               </Label>
-              <Select value={selectedReason} onValueChange={setSelectedReason}>
-                <SelectTrigger id="reason" className={`bg-background w-full ${selectedStatus.startsWith("OTH") && !selectedReason ? "border-destructive" : ""}`}>
+              <Select 
+                value={selectedReason} 
+                onValueChange={setSelectedReason}
+                disabled={!selectedStatus.startsWith("OTH")}
+              >
+                <SelectTrigger 
+                  id="reason" 
+                  className={`w-full ${selectedStatus.startsWith("OTH") ? "bg-background" : "bg-muted/50 opacity-60"} ${selectedStatus.startsWith("OTH") && !selectedReason ? "border-destructive" : ""}`}
+                >
                   <SelectValue placeholder="Select reason..." />
                 </SelectTrigger>
                 <SelectContent>

@@ -17,6 +17,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Search, Filter, Save, Trash2, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { useCases } from "@/contexts/cases-context"
+import { useAdmin } from "@/contexts/admin-context"
 import { useState } from "react"
 
 interface CasesDashboardProps {
@@ -53,6 +54,7 @@ type SortDirection = "asc" | "desc" | null
 
 export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
   const { cases, setCurrentCase } = useCases()
+  const { caseManagers } = useAdmin()
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [activeFilterId, setActiveFilterId] = useState<string | null>("my-cases")
@@ -462,16 +464,11 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Case Types</SelectItem>
-                    {uniqueCaseTypes
-                      .filter((type) => 
-                        type === "Occupational injury / illness" || 
-                        type === "Non-occupational injury / illness"
-                      )
-                      .map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
-                        </SelectItem>
-                      ))}
+                    {uniqueCaseTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -489,11 +486,13 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Managers</SelectItem>
-                    {uniqueManagers.map((manager) => (
-                      <SelectItem key={manager} value={manager.toLowerCase()}>
-                        {manager}
-                      </SelectItem>
-                    ))}
+                    {caseManagers
+                      .filter((manager) => manager.active)
+                      .map((manager) => (
+                        <SelectItem key={manager.id} value={manager.name.toLowerCase()}>
+                          {manager.name}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>

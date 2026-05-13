@@ -949,23 +949,50 @@ export function CaseTab() {
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
           <div className="space-y-2">
             <Label htmlFor="rate-of-pay" className="text-sm text-muted-foreground">
-              Rate of Pay (Mo/Hrly)
+              Rate of Pay
             </Label>
-            <Input
-              id="rate-of-pay"
-              placeholder="Enter rate..."
-              className="bg-background"
-            />
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                <Input
+                  id="rate-of-pay"
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="0.00"
+                  className="bg-background pl-7"
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9.]/g, '')
+                    const parts = value.split('.')
+                    if (parts.length > 2) {
+                      e.target.value = parts[0] + '.' + parts.slice(1).join('')
+                    } else if (parts[1]?.length > 2) {
+                      e.target.value = parts[0] + '.' + parts[1].slice(0, 2)
+                    } else {
+                      e.target.value = value
+                    }
+                  }}
+                />
+              </div>
+              <Select>
+                <SelectTrigger id="rate-type" className="bg-background w-[120px]">
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="hourly">Hourly</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="std-offset-type" className="text-sm text-muted-foreground">
               STD Offset Type
             </Label>
             <Select>
-              <SelectTrigger id="std-offset-type">
+              <SelectTrigger id="std-offset-type" className="bg-background">
                 <SelectValue placeholder="Select type..." />
               </SelectTrigger>
               <SelectContent>
@@ -980,25 +1007,38 @@ export function CaseTab() {
             <Label htmlFor="std-offset-amount" className="text-sm text-muted-foreground">
               STD Offset Amount
             </Label>
-            <Input
-              id="std-offset-amount"
-              placeholder="Enter amount..."
-              className="bg-background"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="std-offset-frequency" className="text-sm text-muted-foreground">
-              STD Offset Frequency
-            </Label>
-            <Select>
-              <SelectTrigger id="std-offset-frequency">
-                <SelectValue placeholder="Select frequency..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                <Input
+                  id="std-offset-amount"
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="0.00"
+                  className="bg-background pl-7"
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9.]/g, '')
+                    const parts = value.split('.')
+                    if (parts.length > 2) {
+                      e.target.value = parts[0] + '.' + parts.slice(1).join('')
+                    } else if (parts[1]?.length > 2) {
+                      e.target.value = parts[0] + '.' + parts[1].slice(0, 2)
+                    } else {
+                      e.target.value = value
+                    }
+                  }}
+                />
+              </div>
+              <Select>
+                <SelectTrigger id="std-offset-frequency" className="bg-background w-[120px]">
+                  <SelectValue placeholder="Freq" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
       </CollapsibleSection>
