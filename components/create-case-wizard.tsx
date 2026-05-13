@@ -27,7 +27,7 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
     employeeName: "",
     employeeNumber: "",
     employeeLocation: "",
-    caseType: "",
+    caseType: "Non-occupational injury / illness",
     caseCategory: "",
     caseManager: "",
     initialNotes: "",
