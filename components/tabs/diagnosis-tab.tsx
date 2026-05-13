@@ -191,14 +191,14 @@ export function DiagnosisTab() {
     const newDiagnosis: Diagnosis = {
       id: `diag-${Date.now()}`,
       icd10Code: quickAddCode,
-      description: quickAddDescription,
+      icd10Description: quickAddDescription,
       diagnosisDate: quickAddDate,
       notes: "",
       isActive: true,
       priority: diagnoses.length + 1,
       caseNumber: currentCase.caseNumber,
-      addedBy: currentUser.name,
-      addedAt: new Date().toISOString(),
+      createdBy: currentUser.name,
+      createdAt: new Date().toISOString(),
     }
 
     const updatedDiagnoses = [...diagnoses, newDiagnosis]
