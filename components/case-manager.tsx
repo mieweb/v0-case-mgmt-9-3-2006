@@ -259,7 +259,7 @@ export function CaseManager() {
 
             <Button size="sm" variant="outline" onClick={handleQuickAddNote} className="h-8 gap-2 bg-transparent">
               <Plus className="h-4 w-4" />
-              Add Note
+              Add Case Note
             </Button>
 
             <div className="expand-toggle flex items-center gap-2">
