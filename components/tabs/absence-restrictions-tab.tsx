@@ -536,34 +536,6 @@ export function AbsenceRestrictionsTab() {
             </div>
           </div>
 
-          {/* Audit Issues Section */}
-          {auditIssues.length > 0 && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <AlertTriangle className="h-4 w-4 text-amber-500" />
-                Timeline Audit ({auditIssues.length} issue{auditIssues.length !== 1 ? "s" : ""})
-              </div>
-              <div className="space-y-2">
-                {auditIssues.filter((i) => i.severity === "error").map((issue, idx) => (
-                  <Alert key={`error-${idx}`} variant="destructive" className="py-2">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertDescription className="text-sm">
-                      {issue.message}
-                    </AlertDescription>
-                  </Alert>
-                ))}
-                {auditIssues.filter((i) => i.severity === "warning").map((issue, idx) => (
-                  <Alert key={`warning-${idx}`} className="py-2 border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20">
-                    <Info className="h-4 w-4 text-amber-600" />
-                    <AlertDescription className="text-sm text-amber-800 dark:text-amber-200">
-                      {issue.message}
-                    </AlertDescription>
-                  </Alert>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Validation Error */}
           {validationError && (
             <Alert variant="destructive" className="py-2">
