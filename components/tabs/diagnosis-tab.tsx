@@ -726,7 +726,20 @@ export function DiagnosisTab() {
                   </TableCell>
                   <TableCell className="font-mono font-semibold">{diagnosis.icd10Code}</TableCell>
                   <TableCell className="font-mono font-semibold">{diagnosis.icd11Code || "-"}</TableCell>
-                  <TableCell>{diagnosis.icd11Description ? `${diagnosis.icd10Description}${diagnosis.icd11Description ? ` / ${diagnosis.icd11Description}` : ''}` : diagnosis.icd10Description}</TableCell>
+                  <TableCell>
+                    {(() => {
+                      const icd10Desc = diagnosis.icd10Description || ""
+                      const icd11Desc = diagnosis.icd11Description || ""
+                      if (icd10Desc && icd11Desc) {
+                        return `${icd10Desc} / ${icd11Desc}`
+                      } else if (icd10Desc) {
+                        return icd10Desc
+                      } else if (icd11Desc) {
+                        return icd11Desc
+                      }
+                      return "-"
+                    })()}
+                  </TableCell>
                   <TableCell>{(() => { const d = new Date(diagnosis.diagnosisDate); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })()}</TableCell>
                   <TableCell>
                     <Badge variant={diagnosis.isActive ? "default" : "secondary"}>
