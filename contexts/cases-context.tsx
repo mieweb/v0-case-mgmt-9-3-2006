@@ -83,6 +83,8 @@ export interface Diagnosis {
   caseNumber: string
   icd10Code: string
   icd10Description: string
+  icd11Code?: string
+  icd11Description?: string
   diagnosisDate: string
   priority: number // 1 = primary, 2 = secondary, etc.
   isActive: boolean

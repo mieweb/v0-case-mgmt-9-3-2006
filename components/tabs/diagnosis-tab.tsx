@@ -218,16 +218,17 @@ export function DiagnosisTab() {
 
     const newDiagnosis: Diagnosis = {
       id: `diag-icd11-${Date.now()}`,
-      icd10Code: icd11Code, // Store ICD-11 in the same field for now
-      icd10Description: icd11Description,
-      description: icd11Description,
+      icd10Code: "",
+      icd10Description: "",
+      icd11Code: icd11Code,
+      icd11Description: icd11Description,
       diagnosisDate: icd11Date,
       notes: "ICD-11 (International)",
       isActive: true,
       priority: diagnoses.length + 1,
       caseNumber: currentCase.caseNumber,
-      addedBy: currentUser.name,
-      addedAt: new Date().toISOString(),
+      createdBy: currentUser.name,
+      createdAt: new Date().toISOString(),
     }
 
     const updatedDiagnoses = [...diagnoses, newDiagnosis]
@@ -670,6 +671,7 @@ export function DiagnosisTab() {
               <TableHead className="w-[50px]"></TableHead>
               <TableHead className="w-[80px]">Priority</TableHead>
               <TableHead>ICD-10 Code</TableHead>
+              <TableHead>ICD-11 Code</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Diagnosis Date</TableHead>
               <TableHead>Status</TableHead>
@@ -680,7 +682,7 @@ export function DiagnosisTab() {
           <TableBody>
             {sortedDiagnoses.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
                   No diagnoses found. Click "Add Diagnosis" to get started.
                 </TableCell>
               </TableRow>
@@ -709,7 +711,8 @@ export function DiagnosisTab() {
                     </div>
                   </TableCell>
                   <TableCell className="font-mono font-semibold">{diagnosis.icd10Code}</TableCell>
-                  <TableCell>{diagnosis.icd10Description}</TableCell>
+                  <TableCell className="font-mono font-semibold">{diagnosis.icd11Code || "-"}</TableCell>
+                  <TableCell>{diagnosis.icd11Description ? `${diagnosis.icd10Description}${diagnosis.icd11Description ? ` / ${diagnosis.icd11Description}` : ''}` : diagnosis.icd10Description}</TableCell>
                   <TableCell>{(() => { const d = new Date(diagnosis.diagnosisDate); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })()}</TableCell>
                   <TableCell>
                     <Badge variant={diagnosis.isActive ? "default" : "secondary"}>
