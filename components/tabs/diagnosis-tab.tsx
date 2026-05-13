@@ -43,6 +43,14 @@ export function DiagnosisTab() {
   const [isSearching, setIsSearching] = useState(false)
   const [showSearchResults, setShowSearchResults] = useState(false)
 
+  // Quick add form state
+  const [quickAddCode, setQuickAddCode] = useState("")
+  const [quickAddDescription, setQuickAddDescription] = useState("")
+  const [quickAddDate, setQuickAddDate] = useState(new Date().toISOString().split("T")[0])
+  const [quickAddSearchResults, setQuickAddSearchResults] = useState<ICD10Code[]>([])
+  const [isQuickAddSearching, setIsQuickAddSearching] = useState(false)
+  const [showQuickAddResults, setShowQuickAddResults] = useState(false)
+
   // Debounced ICD-10 search
   const searchICD10 = useCallback(async (query: string) => {
     if (query.length < 2) {
@@ -80,6 +88,82 @@ export function DiagnosisTab() {
     setCustomCode(code.code)
     setCustomDescription(code.description)
     setShowSearchResults(false)
+  }
+
+  // Quick add ICD-10 search
+  const searchQuickAddICD10 = useCallback(async (query: string) => {
+    if (query.length < 2) {
+      setQuickAddSearchResults([])
+      setShowQuickAddResults(false)
+      return
+    }
+
+    setIsQuickAddSearching(true)
+    try {
+      const response = await fetch(`/api/icd10?q=${encodeURIComponent(query)}&maxList=10`)
+      const data = await response.json()
+      setQuickAddSearchResults(data.results || [])
+      setShowQuickAddResults(true)
+    } catch (error) {
+      console.error("ICD-10 search error:", error)
+      setQuickAddSearchResults([])
+    } finally {
+      setIsQuickAddSearching(false)
+    }
+  }, [])
+
+  // Debounce quick add search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (quickAddCode) {
+        searchQuickAddICD10(quickAddCode)
+      }
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [quickAddCode, searchQuickAddICD10])
+
+  const handleSelectQuickAddICD10 = (code: ICD10Code) => {
+    setQuickAddCode(code.code)
+    setQuickAddDescription(code.description)
+    setShowQuickAddResults(false)
+  }
+
+  const handleQuickAddDiagnosis = () => {
+    if (!currentCase || !currentUser || !quickAddCode || !quickAddDate) return
+
+    const newDiagnosis: Diagnosis = {
+      id: `diag-${Date.now()}`,
+      icd10Code: quickAddCode,
+      description: quickAddDescription,
+      diagnosisDate: quickAddDate,
+      notes: "",
+      isActive: true,
+      priority: diagnoses.length + 1,
+      caseNumber: currentCase.caseNumber,
+      addedBy: currentUser.name,
+      addedAt: new Date().toISOString(),
+    }
+
+    const updatedDiagnoses = [...diagnoses, newDiagnosis]
+
+    updateCase(
+      currentCase.caseNumber,
+      { diagnoses: updatedDiagnoses },
+      {
+        action: "added",
+        field: "diagnosis",
+        newValue: `${quickAddCode} - ${quickAddDescription}`,
+        description: `Added diagnosis: ${quickAddCode} - ${quickAddDescription}`,
+      }
+    )
+
+    // Reset quick add form
+    setQuickAddCode("")
+    setQuickAddDescription("")
+    setQuickAddDate(new Date().toISOString().split("T")[0])
+    setQuickAddSearchResults([])
+    setShowQuickAddResults(false)
   }
 
   const diagnoses = currentCase?.diagnoses || []
@@ -347,6 +431,89 @@ export function DiagnosisTab() {
         </div>
         <div className="ml-auto text-sm text-muted-foreground">
           Showing {filteredDiagnoses.length} of {diagnoses.length} diagnoses
+        </div>
+      </div>
+
+      {/* Quick Add Diagnosis Form */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div className="space-y-2 relative">
+          <Label htmlFor="quick-add-code" className="text-sm text-muted-foreground">
+            ICD-10 Code:
+          </Label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              id="quick-add-code"
+              value={quickAddCode}
+              onChange={(e) => {
+                setQuickAddCode(e.target.value.toUpperCase())
+                if (e.target.value.length < 2) {
+                  setQuickAddDescription("")
+                }
+              }}
+              onFocus={() => {
+                if (quickAddSearchResults.length > 0) setShowQuickAddResults(true)
+              }}
+              onBlur={() => {
+                setTimeout(() => setShowQuickAddResults(false), 200)
+              }}
+              placeholder="Search ICD-10..."
+              className="font-mono pl-10 bg-background"
+            />
+            {isQuickAddSearching && (
+              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+            )}
+          </div>
+          {/* Search Results Dropdown */}
+          {showQuickAddResults && quickAddSearchResults.length > 0 && (
+            <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
+              {quickAddSearchResults.map((result) => (
+                <button
+                  key={result.code}
+                  type="button"
+                  className="w-full px-3 py-2 text-left hover:bg-muted flex items-start gap-2 border-b last:border-b-0"
+                  onClick={() => handleSelectQuickAddICD10(result)}
+                >
+                  <span className="font-mono font-semibold text-primary shrink-0">{result.code}</span>
+                  <span className="text-sm text-muted-foreground truncate">{result.description}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="quick-add-description" className="text-sm text-muted-foreground">
+            Description:
+          </Label>
+          <Input
+            id="quick-add-description"
+            value={quickAddDescription}
+            onChange={(e) => setQuickAddDescription(e.target.value)}
+            placeholder="Auto-populated from ICD-10"
+            className="bg-muted/30"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="quick-add-date" className="text-sm text-muted-foreground">
+            Diagnosis Date:
+          </Label>
+          <Input
+            id="quick-add-date"
+            type="date"
+            value={quickAddDate}
+            onChange={(e) => setQuickAddDate(e.target.value)}
+            className="bg-background"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label className="text-sm text-muted-foreground invisible">Action</Label>
+          <Button 
+            onClick={handleQuickAddDiagnosis} 
+            className="w-full"
+            disabled={!quickAddCode || !quickAddDate}
+          >
+            Add Diagnosis
+          </Button>
         </div>
       </div>
 
