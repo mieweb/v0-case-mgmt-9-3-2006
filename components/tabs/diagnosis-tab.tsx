@@ -43,13 +43,18 @@ export function DiagnosisTab() {
   const [isSearching, setIsSearching] = useState(false)
   const [showSearchResults, setShowSearchResults] = useState(false)
 
-  // Quick add form state
+  // Quick add form state (ICD-10)
   const [quickAddCode, setQuickAddCode] = useState("")
   const [quickAddDescription, setQuickAddDescription] = useState("")
   const [quickAddDate, setQuickAddDate] = useState(new Date().toISOString().split("T")[0])
   const [quickAddSearchResults, setQuickAddSearchResults] = useState<ICD10Code[]>([])
   const [isQuickAddSearching, setIsQuickAddSearching] = useState(false)
   const [showQuickAddResults, setShowQuickAddResults] = useState(false)
+
+  // ICD-11 form state (international only)
+  const [icd11Code, setIcd11Code] = useState("")
+  const [icd11Description, setIcd11Description] = useState("")
+  const [icd11Date, setIcd11Date] = useState(new Date().toISOString().split("T")[0])
 
   // Debounced ICD-10 search
   const searchICD10 = useCallback(async (query: string) => {
@@ -164,6 +169,42 @@ export function DiagnosisTab() {
     setQuickAddDate(new Date().toISOString().split("T")[0])
     setQuickAddSearchResults([])
     setShowQuickAddResults(false)
+  }
+
+  const handleAddICD11Diagnosis = () => {
+    if (!currentCase || !currentUser || !icd11Code || !icd11Date) return
+
+    const newDiagnosis: Diagnosis = {
+      id: `diag-icd11-${Date.now()}`,
+      icd10Code: icd11Code, // Store ICD-11 in the same field for now
+      icd10Description: icd11Description,
+      description: icd11Description,
+      diagnosisDate: icd11Date,
+      notes: "ICD-11 (International)",
+      isActive: true,
+      priority: diagnoses.length + 1,
+      caseNumber: currentCase.caseNumber,
+      addedBy: currentUser.name,
+      addedAt: new Date().toISOString(),
+    }
+
+    const updatedDiagnoses = [...diagnoses, newDiagnosis]
+
+    updateCase(
+      currentCase.caseNumber,
+      { diagnoses: updatedDiagnoses },
+      {
+        action: "added",
+        field: "diagnosis",
+        newValue: `${icd11Code} - ${icd11Description} (ICD-11)`,
+        description: `Added ICD-11 diagnosis: ${icd11Code} - ${icd11Description}`,
+      }
+    )
+
+    // Reset ICD-11 form
+    setIcd11Code("")
+    setIcd11Description("")
+    setIcd11Date(new Date().toISOString().split("T")[0])
   }
 
   const diagnoses = currentCase?.diagnoses || []
@@ -501,6 +542,57 @@ export function DiagnosisTab() {
             disabled={!quickAddCode || !quickAddDate}
           >
             Add Diagnosis
+          </Button>
+        </div>
+      </div>
+
+      {/* ICD-11 Quick Add Row (International Only) */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end mt-4 pt-4 border-t border-dashed">
+        <div className="space-y-2">
+          <Label htmlFor="icd11-code" className="text-sm text-muted-foreground">
+            ICD-11 Code: <span className="text-xs text-amber-600">(international only)</span>
+          </Label>
+          <Input
+            id="icd11-code"
+            value={icd11Code}
+            onChange={(e) => setIcd11Code(e.target.value.toUpperCase())}
+            placeholder="Enter ICD-11 code..."
+            className="font-mono bg-background"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="icd11-description" className="text-sm text-muted-foreground">
+            Description:
+          </Label>
+          <Input
+            id="icd11-description"
+            value={icd11Description}
+            onChange={(e) => setIcd11Description(e.target.value)}
+            placeholder="Enter description"
+            className="bg-background"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="icd11-date" className="text-sm text-muted-foreground">
+            Diagnosis Date:
+          </Label>
+          <Input
+            id="icd11-date"
+            type="date"
+            value={icd11Date}
+            onChange={(e) => setIcd11Date(e.target.value)}
+            className="bg-background"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label className="text-sm text-muted-foreground invisible">Action</Label>
+          <Button 
+            onClick={handleAddICD11Diagnosis} 
+            className="w-full"
+            variant="outline"
+            disabled={!icd11Code || !icd11Date}
+          >
+            Add ICD-11 Diagnosis
           </Button>
         </div>
       </div>
