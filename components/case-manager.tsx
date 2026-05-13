@@ -20,7 +20,7 @@ import { DocumentsTab } from "@/components/tabs/documents-tab"
 import { ActivityTab } from "@/components/tabs/activity-tab"
 import { useCases, type CaseNote } from "@/contexts/cases-context"
 import { useAdmin } from "@/contexts/admin-context"
-import { ChevronDown, Pin, Plus, AlertCircle, Calendar, ShieldAlert, ChevronLeft, ChevronRight, ArrowUp } from "lucide-react"
+import { ChevronDown, Plus, AlertCircle, Calendar, ShieldAlert, ChevronLeft, ChevronRight, ArrowUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { NoteWindow, MinimizedNoteWindow } from "@/components/note-window"
 import { RichTextEditor } from "@/components/rich-text-editor"
@@ -105,7 +105,7 @@ export function CaseManager() {
     return `${month}/${day}/${year}`
   }
 
-  const shouldShowDetails = isHeaderExpanded || isHeaderHovered
+  const shouldShowDetails = isHeaderExpanded
 
   // Get active restrictions for this employee
   const activeRestrictions = currentCase 
@@ -262,8 +262,7 @@ export function CaseManager() {
               Add Case Note
             </Button>
 
-            <div className="expand-toggle flex items-center gap-2">
-              {isHeaderExpanded && <Pin className="h-4 w-4 text-primary fill-primary" />}
+            <div className="expand-toggle flex items-center">
               <div
                 className={`flex items-center justify-center rounded-full p-1 transition-colors ${
                   isHeaderExpanded ? "bg-primary/10" : ""
