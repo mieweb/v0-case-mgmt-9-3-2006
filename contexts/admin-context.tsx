@@ -431,9 +431,9 @@ FUTURE VISITS, PROCEDURES, TESTS, ETC:
 
 {{today}}
 
-Re: {{employeeFirstName}} {{employeeLastName}}
-SSN: {{employeeSSN}}
-DOB: {{dateOfBirth}}
+Re:	{{employeeFirstName}} {{employeeLastName}}
+SSN:	{{employeeSSN}}
+DOB:	{{dateOfBirth}}
 
 WORK RESTRICTIONS
 
