@@ -949,10 +949,10 @@ export function CaseTab() {
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-4">
           <div className="space-y-2">
             <Label htmlFor="rate-of-pay" className="text-sm text-muted-foreground">
-              Rate of Pay (Mo/Hrly)
+              Rate of Pay
             </Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
@@ -975,6 +975,20 @@ export function CaseTab() {
                 }}
               />
             </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="rate-type" className="text-sm text-muted-foreground">
+              Rate Type
+            </Label>
+            <Select>
+              <SelectTrigger id="rate-type" className="bg-background">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hourly">Hourly</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="std-offset-type" className="text-sm text-muted-foreground">
