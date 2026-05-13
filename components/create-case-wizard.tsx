@@ -69,14 +69,20 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
     if (step < totalSteps) {
       setStep(step + 1)
     } else {
+      const now = new Date().toISOString()
       const initialCaseNote = formData.initialNotes?.trim() ? [{
           id: `note-${Date.now()}`,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          content: formData.initialNotes,
-          author: formData.caseManager || "System",
-          noteType: "General" as const,
+          caseNumber: "", // Will be set when case is created
+          noteDate: now.split('T')[0],
+          activity: "Case Created",
+          caseManager: formData.caseManager || "System",
+          notes: formData.initialNotes,
+          createdBy: formData.caseManager || "System",
+          dateEntered: now,
+          lineout: false,
+          isLocked: false,
           versions: [],
+          currentVersion: 0,
         }] : []
 
       addCase({
