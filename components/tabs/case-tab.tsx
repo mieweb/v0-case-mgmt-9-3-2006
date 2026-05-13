@@ -358,7 +358,7 @@ export function CaseTab() {
   }
 
   // Helper functions to check if sections have data
-  const hasOccupationalInjuryData = () => Boolean(siteCaseNumber || injuryDate || injuryTime || injuryLocation || injuryShift || shiftStartTime || injurySupervisor || supervisorNotifiedDate)
+  const hasOccupationalInjuryData = () => Boolean(siteCaseNumber || injuryDate || injuryTime || injuryLocation || injuryShift || shiftStartTime || injurySupervisor || supervisorNotifiedDate || ppiRating)
   const hasWorkRelatedData = () => Boolean(isCaseWorkRelated || typeOfInjuryOrIllness || significantInjuryIllness || workersCompClaim || oshaRecordable || psmIncident || sharpsCase || caseExtent)
   const hasLocationData = () => Boolean(incidentOnsiteOffsite || workstation || locationAddress || locationCity || locationState || locationZip || locationCountry || locationDescription)
   const hasIncidentDescriptionData = () => Boolean(siteCaseNumber || accidentType || jsaReference || objectSubstanceCaused || howInjuryHappened || employeeDoingBefore)
@@ -1343,6 +1343,27 @@ export function CaseTab() {
                 handleFieldUpdate("supervisorNotifiedDate", e.target.value)
               }}
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="ppi-rating" className="text-sm text-muted-foreground">
+              Permanent Partial Impairment (PPI)
+            </Label>
+            <div className="flex gap-2">
+              <Input
+                id="ppi-rating"
+                type="text"
+                inputMode="decimal"
+                placeholder="0"
+                className="bg-background flex-1"
+                value={ppiRating}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9.]/g, '')
+                  setPpiRating(value)
+                  handleFieldUpdate("ppiRating", value)
+                }}
+              />
+              <span className="flex items-center text-sm text-muted-foreground">%</span>
+            </div>
           </div>
         </div>
       </CollapsibleSection>
