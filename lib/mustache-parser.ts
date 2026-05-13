@@ -120,8 +120,14 @@ export function evaluateMustacheTemplate(template: string, caseData: Case): stri
     actualReturnDate: caseData.actualReturnDate || "",
     deliveryDate: caseData.deliveryDate || "",
 
-    // Current date
-    today: new Date().toLocaleDateString(),
+    // Current date (mm/dd/yyyy format)
+    today: (() => {
+      const d = new Date()
+      const month = String(d.getMonth() + 1).padStart(2, "0")
+      const day = String(d.getDate()).padStart(2, "0")
+      const year = d.getFullYear()
+      return `${month}/${day}/${year}`
+    })(),
     currentYear: new Date().getFullYear(),
   }
 

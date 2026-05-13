@@ -96,10 +96,13 @@ export function CaseManager() {
   const [noteContent, setNoteContent] = useState("")
   const [validationError, setValidationError] = useState<string>("")
 
-  const formatDate = (dateStr?: string) => {
+  const formatDateDisplay = (dateStr?: string) => {
     if (!dateStr) return "—"
     const date = new Date(dateStr)
-    return date.toLocaleDateString("en-US")
+    const month = String(date.getMonth() + 1).padStart(2, "0")
+    const day = String(date.getDate()).padStart(2, "0")
+    const year = date.getFullYear()
+    return `${month}/${day}/${year}`
   }
 
   const shouldShowDetails = isHeaderExpanded || isHeaderHovered
@@ -290,7 +293,7 @@ export function CaseManager() {
             </div>
             <div className="date-of-birth-field phi-data pii-data">
               <div className="text-muted-foreground mb-0.5">Date of Birth</div>
-              <div className="font-medium">{formatDate(currentCase?.dateOfBirth)}</div>
+              <div className="font-medium">{formatDateDisplay(currentCase?.dateOfBirth)}</div>
             </div>
             <div className="age-field phi-data">
               <div className="text-muted-foreground mb-0.5">Age</div>
@@ -324,19 +327,19 @@ export function CaseManager() {
             </div>
             <div className="hire-date-field">
               <div className="text-muted-foreground mb-0.5">Original Hire Date</div>
-              <div className="font-medium">{formatDate(currentCase?.originalHireDate)}</div>
+              <div className="font-medium">{formatDateDisplay(currentCase?.originalHireDate)}</div>
             </div>
             <div className="entry-date-field">
               <div className="text-muted-foreground mb-0.5">Entry Date</div>
-              <div className="font-medium">{formatDate(currentCase?.entryDate)}</div>
+              <div className="font-medium">{formatDateDisplay(currentCase?.entryDate)}</div>
             </div>
             <div className="service-date-field">
               <div className="text-muted-foreground mb-0.5">Adjusted Service Date</div>
-              <div className="font-medium">{formatDate(currentCase?.adjustedServiceDate)}</div>
+              <div className="font-medium">{formatDateDisplay(currentCase?.adjustedServiceDate)}</div>
             </div>
             <div className="termination-date-field">
               <div className="text-muted-foreground mb-0.5">Termination Date</div>
-              <div className="font-medium">{formatDate(currentCase?.terminationDate)}</div>
+              <div className="font-medium">{formatDateDisplay(currentCase?.terminationDate)}</div>
             </div>
 
             <div className="cell-phone-field pii-data">

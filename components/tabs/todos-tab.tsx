@@ -29,7 +29,7 @@ export function TodosTab() {
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [showGenerateDialog, setShowGenerateDialog] = useState(false)
   const [anchorDates, setAnchorDates] = useState({
-    caseCreation: new Date().toISOString().split("T")[0],
+    dateOfDisability: "",
     surgeryDate: "",
     deliveryDate: "",
   })
@@ -53,6 +53,16 @@ export function TodosTab() {
       setTodos(currentCase.todos)
     }
   }, [currentCase?.caseNumber]) // Only re-run when case number changes
+
+  // Populate dateOfDisability from case when dialog opens
+  useEffect(() => {
+    if (showGenerateDialog && currentCase?.dateOfDisability) {
+      setAnchorDates(prev => ({
+        ...prev,
+        dateOfDisability: currentCase.dateOfDisability || ""
+      }))
+    }
+  }, [showGenerateDialog, currentCase?.dateOfDisability])
 
   const addTodo = () => {
     const newTodo: TodoItem = {
@@ -108,6 +118,68 @@ export function TodosTab() {
     }
   }
 
+  // Update a todo's date and cascade the change to all subsequent todos
+  const updateTodoDateWithCascade = (id: string, newDate: string) => {
+    const todoIndex = todos.findIndex((t) => t.id === id)
+    if (todoIndex === -1) return
+
+    const oldTodo = todos[todoIndex]
+    const oldDate = oldTodo.dateScheduled
+
+    // If no old date or no new date, just do a regular update
+    if (!oldDate || !newDate) {
+      updateTodo(id, { dateScheduled: newDate })
+      return
+    }
+
+    // Calculate the difference in days
+    const oldDateObj = new Date(oldDate)
+    const newDateObj = new Date(newDate)
+    const daysDifference = Math.round((newDateObj.getTime() - oldDateObj.getTime()) / (1000 * 60 * 60 * 24))
+
+    // If no difference, just update normally
+    if (daysDifference === 0) {
+      updateTodo(id, { dateScheduled: newDate })
+      return
+    }
+
+    // Update the changed todo and cascade to all todos below it
+    const updatedTodos = todos.map((todo, index) => {
+      if (index < todoIndex) {
+        // Todos above - keep unchanged
+        return todo
+      } else if (index === todoIndex) {
+        // The changed todo - use the new date
+        return { ...todo, dateScheduled: newDate }
+      } else {
+        // Todos below - shift by the same number of days
+        if (todo.dateScheduled) {
+          const todoDate = new Date(todo.dateScheduled)
+          todoDate.setDate(todoDate.getDate() + daysDifference)
+          return { ...todo, dateScheduled: todoDate.toISOString().split("T")[0] }
+        }
+        return todo
+      }
+    })
+
+    setTodos(updatedTodos)
+
+    if (currentCase) {
+      const affectedCount = todos.length - todoIndex
+      updateCase(
+        currentCase.caseNumber,
+        { todos: updatedTodos },
+        {
+          action: "updated",
+          field: "todo",
+          oldValue: oldDate,
+          newValue: newDate,
+          description: `Updated date for "${oldTodo.activity || "Untitled"}" and cascaded ${daysDifference > 0 ? "+" : ""}${daysDifference} days to ${affectedCount - 1} subsequent todo(s)`,
+        },
+      )
+    }
+  }
+
   const deleteTodo = (id: string) => {
     const todo = todos.find((t) => t.id === id)
     const updatedTodos = todos.filter((todo) => todo.id !== id)
@@ -136,8 +208,8 @@ export function TodosTab() {
     }
 
     const dates = {
-      caseCreation: new Date(anchorDates.caseCreation || new Date()),
-      dateOfDisability: currentCase?.dateOfDisability ? new Date(currentCase.dateOfDisability) : new Date(anchorDates.caseCreation || new Date()),
+      caseCreation: new Date(anchorDates.dateOfDisability || new Date()),
+      dateOfDisability: new Date(anchorDates.dateOfDisability || new Date()),
     }
 
     const parsedTodos = generateTodosFromTemplates(caseType.defaultTodos, dates)
@@ -509,7 +581,8 @@ export function TodosTab() {
                       <Input
                         type="date"
                         value={todo.dateScheduled || ""}
-                        onChange={(e) => updateTodo(todo.id, { dateScheduled: e.target.value })}
+                        onChange={(e) => updateTodoDateWithCascade(todo.id, e.target.value)}
+                        title="Changing this date will shift all subsequent todo dates by the same amount"
                       />
                     </TableCell>
                     <TableCell>
@@ -572,18 +645,18 @@ export function TodosTab() {
           <DialogHeader>
             <DialogTitle>Generate Todos from Template</DialogTitle>
             <DialogDescription>
-              Set anchor dates to calculate due dates for todo items. Default is case creation date.
+              Set anchor dates to calculate due dates for todo items. Auto-populated from Case Dates if available.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="caseCreation">Case Creation Date</Label>
+              <Label htmlFor="dateOfDisability">Date of Disability</Label>
               <Input
-                id="caseCreation"
+                id="dateOfDisability"
                 type="date"
-                value={anchorDates.caseCreation}
-                onChange={(e) => setAnchorDates({ ...anchorDates, caseCreation: e.target.value })}
+                value={anchorDates.dateOfDisability}
+                onChange={(e) => setAnchorDates({ ...anchorDates, dateOfDisability: e.target.value })}
               />
             </div>
 

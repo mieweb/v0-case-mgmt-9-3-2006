@@ -476,7 +476,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>To Do Report - ${new Date().toLocaleDateString()}</title>
+        <title>To Do Report - ${(() => { const d = new Date(); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })()}</title>
         <style>
           body { font-family: Arial, sans-serif; padding: 20px; font-size: 12px; }
           h1 { font-size: 18px; margin-bottom: 5px; }
@@ -502,7 +502,7 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
       </head>
       <body>
         <h1>To Do Report</h1>
-        <div class="subtitle">Generated on ${new Date().toLocaleString()}</div>
+        <div class="subtitle">Generated on ${(() => { const d = new Date(); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()} ${d.toLocaleTimeString()}`; })()}</div>
         <div class="stats">
           <div class="stat"><div class="stat-label">Total</div><div class="stat-value">${stats.total}</div></div>
           <div class="stat stat-active"><div class="stat-label">Active</div><div class="stat-value">${stats.active}</div></div>

@@ -22,7 +22,7 @@ import { useEmployees } from "@/contexts/employees-context"
 import { generateTodosFromTemplates } from "@/lib/todo-parser"
 import { useState, useEffect } from "react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Briefcase, MapPin, FileText, Stethoscope, Shield, Activity, Info, FolderOpen, Calendar, Clock, BarChart3, HardHat } from "lucide-react"
+import { AlertCircle, Briefcase, MapPin, FileText, Stethoscope, Shield, Activity, Info, FolderOpen, Calendar, Clock, BarChart3, HardHat, DollarSign } from "lucide-react"
 import { CollapsibleSection } from "@/components/ui/collapsible-section"
 
 const adjusterData: Record<string, { name: string; phone: string; email: string }> = {
@@ -182,6 +182,7 @@ export function CaseTab() {
   const [injuryCause, setInjuryCause] = useState("")
   const [dateOfDeath, setDateOfDeath] = useState("")
   const [oshaRecordable, setOshaRecordable] = useState("")
+  const [ppiRating, setPpiRating] = useState("")
   const [oshaClassification, setOshaClassification] = useState("")
   const [recordabilityRationale, setRecordabilityRationale] = useState("")
   const [psmIncident, setPsmIncident] = useState("")
@@ -287,6 +288,7 @@ export function CaseTab() {
       setInjuryCause(currentCase.injuryCause || "")
       setDateOfDeath(currentCase.dateOfDeath || "")
       setOshaRecordable(currentCase.oshaRecordable || "")
+      setPpiRating(currentCase.ppiRating || "")
       setOshaClassification(currentCase.oshaClassification || "")
       setRecordabilityRationale(currentCase.recordabilityRationale || "")
       setPsmIncident(currentCase.psmIncident || "")
@@ -523,14 +525,19 @@ export function CaseTab() {
                 <SelectValue placeholder="Select type..." />
               </SelectTrigger>
               <SelectContent>
-                {caseTypes.map((type) => {
-                  const displayName = type.name.includes(" — ") ? type.name.split(" — ")[1] : type.name
-                  return (
-                    <SelectItem key={type.id} value={type.name}>
-                      {displayName}
-                    </SelectItem>
+                {caseTypes
+                  .filter((type) => 
+                    type.name === "Occupational injury / illness" || 
+                    type.name === "Non-occupational injury / illness"
                   )
-                })}
+                  .map((type) => {
+                    const displayName = type.name.includes(" — ") ? type.name.split(" — ")[1] : type.name
+                    return (
+                      <SelectItem key={type.id} value={type.name}>
+                        {displayName}
+                      </SelectItem>
+                    )
+                  })}
               </SelectContent>
             </Select>
           </div>
@@ -765,7 +772,7 @@ export function CaseTab() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="closure-reason" className="text-sm text-muted-foreground">
-              Plan name
+              Closure Reason
             </Label>
             <Select
               value={closureReason}
@@ -817,45 +824,6 @@ export function CaseTab() {
                 handleFieldUpdate("actualReturnDate", e.target.value)
               }}
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="pay-start" className="text-sm text-muted-foreground">
-              Pay start date
-            </Label>
-            <Input
-              id="pay-start"
-              type="date"
-              className="bg-background"
-              value={payStartDate}
-              onChange={(e) => {
-                setPayStartDate(e.target.value)
-                handleFieldUpdate("payStartDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="pay-end" className="text-sm text-muted-foreground">
-              Pay end date
-            </Label>
-            <Input
-              id="pay-end"
-              type="date"
-              className="bg-background"
-              value={payEndDate}
-              onChange={(e) => {
-                setPayEndDate(e.target.value)
-                handleFieldUpdate("payEndDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="fica-date" className="text-sm text-muted-foreground">
-              FICA tracking date <span className="text-xs italic">(auto-calculated)</span>
-            </Label>
-            <Input id="fica-date" type="date" className="bg-muted/50" value={ficaDate} readOnly />
-            <p className="text-xs text-muted-foreground mt-1">
-              Date of disability + 6 months + first day of next month
-            </p>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -922,51 +890,6 @@ export function CaseTab() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="expected-confinement" className="text-sm text-muted-foreground">
-              Expected Date of Confinement
-            </Label>
-            <Input
-              id="expected-confinement"
-              type="date"
-              className="bg-background"
-              value={expectedConfinementDate}
-              onChange={(e) => {
-                setExpectedConfinementDate(e.target.value)
-                handleFieldUpdate("expectedConfinementDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="delivery-date" className="text-sm text-muted-foreground">
-              Actual delivery date
-            </Label>
-            <Input
-              id="delivery-date"
-              type="date"
-              className="bg-background"
-              value={deliveryDate}
-              onChange={(e) => {
-                setDeliveryDate(e.target.value)
-                handleFieldUpdate("deliveryDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="std-start" className="text-sm text-muted-foreground">
-              STD (Pay) start date
-            </Label>
-            <Input
-              id="std-start"
-              type="date"
-              className="bg-background"
-              value={stdStartDate}
-              onChange={(e) => {
-                setStdStartDate(e.target.value)
-                handleFieldUpdate("stdStartDate", e.target.value)
-              }}
-            />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="mmi" className="text-sm text-muted-foreground">
               Maximum medical improvement (MMI)
             </Label>
@@ -980,6 +903,102 @@ export function CaseTab() {
                 handleFieldUpdate("maximumMedicalImprovement", e.target.value)
               }}
             />
+          </div>
+        </div>
+      </CollapsibleSection>
+
+      <CollapsibleSection title="Pay Information" icon={<DollarSign className="h-4 w-4" />} defaultOpen={true}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="pay-start" className="text-sm text-muted-foreground">
+              Pay start date
+            </Label>
+            <Input
+              id="pay-start"
+              type="date"
+              className="bg-background"
+              value={payStartDate}
+              onChange={(e) => {
+                setPayStartDate(e.target.value)
+                handleFieldUpdate("payStartDate", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="pay-end" className="text-sm text-muted-foreground">
+              Pay end date
+            </Label>
+            <Input
+              id="pay-end"
+              type="date"
+              className="bg-background"
+              value={payEndDate}
+              onChange={(e) => {
+                setPayEndDate(e.target.value)
+                handleFieldUpdate("payEndDate", e.target.value)
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="fica-date" className="text-sm text-muted-foreground">
+              FICA Date <span className="text-xs italic">(auto-calculated)</span>
+            </Label>
+            <Input id="fica-date" type="date" className="bg-muted/50" value={ficaDate} readOnly />
+            <p className="text-xs text-muted-foreground mt-1">
+              Date of disability + 6 months + first day of next month
+            </p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+          <div className="space-y-2">
+            <Label htmlFor="rate-of-pay" className="text-sm text-muted-foreground">
+              Rate of Pay (Mo/Hrly)
+            </Label>
+            <Input
+              id="rate-of-pay"
+              placeholder="Enter rate..."
+              className="bg-background"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="std-offset-type" className="text-sm text-muted-foreground">
+              STD Offset Type
+            </Label>
+            <Select>
+              <SelectTrigger id="std-offset-type">
+                <SelectValue placeholder="Select type..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ssdi">SSDI</SelectItem>
+                <SelectItem value="comp">Workers Comp</SelectItem>
+                <SelectItem value="pers">PERS</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="std-offset-amount" className="text-sm text-muted-foreground">
+              STD Offset Amount
+            </Label>
+            <Input
+              id="std-offset-amount"
+              placeholder="Enter amount..."
+              className="bg-background"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="std-offset-frequency" className="text-sm text-muted-foreground">
+              STD Offset Frequency
+            </Label>
+            <Select>
+              <SelectTrigger id="std-offset-frequency">
+                <SelectValue placeholder="Select frequency..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </CollapsibleSection>
@@ -1074,40 +1093,8 @@ export function CaseTab() {
             </Label>
             <Input id="days-restricted" className="bg-muted/50" readOnly />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="ppi" className="text-sm text-muted-foreground">
-              Permanent partial impairment (PPI)
-            </Label>
-            <Input
-              id="ppi"
-              placeholder="Enter PPI..."
-              className="bg-background"
-              value={permanentPartialImpairment}
-              onChange={(e) => {
-                setPermanentPartialImpairment(e.target.value)
-                handleFieldUpdate("permanentPartialImpairment", e.target.value)
-              }}
-            />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="percentage-impaired" className="text-sm text-muted-foreground">
-              Percentage impaired
-            </Label>
-            <Input
-              id="percentage-impaired"
-              placeholder="Enter percentage..."
-              className="bg-background"
-              value={percentageImpaired}
-              onChange={(e) => {
-                setPercentageImpaired(e.target.value)
-                handleFieldUpdate("percentageImpaired", e.target.value)
-              }}
-            />
-          </div>
-        </div>
       </CollapsibleSection>
-
-      
 
       <CollapsibleSection title="Occupational Injury Information" icon={<HardHat className="h-4 w-4" />} defaultOpen={hasOccupationalInjuryData()}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1507,6 +1494,21 @@ export function CaseTab() {
                 <SelectItem value="No">No</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="ppi-rating" className="text-sm text-muted-foreground">
+              Permanent Partial Impairment (PPI)
+            </Label>
+            <Input
+              id="ppi-rating"
+              placeholder="Enter PPI rating..."
+              className="bg-background"
+              value={ppiRating}
+              onChange={(e) => {
+                setPpiRating(e.target.value)
+                handleFieldUpdate("ppiRating", e.target.value)
+              }}
+            />
           </div>
           {oshaRecordable === "Yes" && (
             <>

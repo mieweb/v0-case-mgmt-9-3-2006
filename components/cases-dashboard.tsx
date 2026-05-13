@@ -256,8 +256,8 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
     }
 
     const nextTodo = upcomingTodos[0]
-    const dueDate = new Date(nextTodo.dateScheduled!)
-    const formattedDate = dueDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+    const dueDate = new Date(nextTodo.dateScheduled! + "T00:00:00")
+    const formattedDate = `${String(dueDate.getMonth() + 1).padStart(2, "0")}/${String(dueDate.getDate()).padStart(2, "0")}/${dueDate.getFullYear()}`
     return `${nextTodo.activity} (${formattedDate})`
   }
 
@@ -354,7 +354,6 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                 <SelectContent>
                   <SelectItem value="all">All Statuses</SelectItem>
                   <SelectItem value="open">Open</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="closed">Closed</SelectItem>
                 </SelectContent>
               </Select>
@@ -414,7 +413,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full">
               <div className="space-y-2">
                 <Label htmlFor="adv-search" className="text-sm">
                   Search Cases
@@ -426,7 +425,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                     placeholder="Search by name, case number, or employee number..."
                     value={advancedFilters.search}
                     onChange={(e) => setAdvancedFilters({ ...advancedFilters, search: e.target.value })}
-                    className="pl-10"
+                    className="pl-10 w-full"
                   />
                 </div>
               </div>
@@ -439,13 +438,12 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   value={advancedFilters.status}
                   onValueChange={(value) => setAdvancedFilters({ ...advancedFilters, status: value })}
                 >
-                  <SelectTrigger id="adv-status">
+                  <SelectTrigger id="adv-status" className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="open">Open</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="closed">Closed</SelectItem>
                   </SelectContent>
                 </Select>
@@ -459,16 +457,21 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   value={advancedFilters.caseType}
                   onValueChange={(value) => setAdvancedFilters({ ...advancedFilters, caseType: value })}
                 >
-                  <SelectTrigger id="adv-case-type">
+                  <SelectTrigger id="adv-case-type" className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Case Types</SelectItem>
-                    {uniqueCaseTypes.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
+                    {uniqueCaseTypes
+                      .filter((type) => 
+                        type === "Occupational injury / illness" || 
+                        type === "Non-occupational injury / illness"
+                      )
+                      .map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -481,7 +484,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   value={advancedFilters.caseManager}
                   onValueChange={(value) => setAdvancedFilters({ ...advancedFilters, caseManager: value })}
                 >
-                  <SelectTrigger id="adv-manager">
+                  <SelectTrigger id="adv-manager" className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -519,33 +522,10 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                 </div>
               )}
 
-              <div className="space-y-2">
-                <Label htmlFor="adv-date-from" className="text-sm">
-                  Created From
-                </Label>
-                <Input
-                  id="adv-date-from"
-                  type="date"
-                  value={advancedFilters.dateCreatedFrom}
-                  onChange={(e) => setAdvancedFilters({ ...advancedFilters, dateCreatedFrom: e.target.value })}
-                />
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="adv-date-to" className="text-sm">
-                  Created To
-                </Label>
-                <Input
-                  id="adv-date-to"
-                  type="date"
-                  value={advancedFilters.dateCreatedTo}
-                  onChange={(e) => setAdvancedFilters({ ...advancedFilters, dateCreatedTo: e.target.value })}
-                />
-              </div>
-            </div>
 
             <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 pt-2">
-              <Button variant="ghost" onClick={() => setShowMoreFilters(false)}>
+              <Button onClick={() => setShowMoreFilters(false)}>
                 Show Less
               </Button>
               <div className="flex gap-2">
@@ -674,7 +654,7 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   <TableCell>{caseItem.caseType}</TableCell>
                   <TableCell className="text-muted-foreground">{caseItem.caseManager}</TableCell>
                   <TableCell className="text-muted-foreground">{caseItem.employeeLocation}</TableCell>
-                  <TableCell className="text-muted-foreground">{caseItem.dateOfDisability || "—"}</TableCell>
+                  <TableCell className="text-muted-foreground">{caseItem.dateOfDisability ? (() => { const d = new Date(caseItem.dateOfDisability + "T00:00:00"); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })() : "—"}</TableCell>
                   <TableCell className="text-muted-foreground text-sm" suppressHydrationWarning>{getNextTodo(caseItem)}</TableCell>
                 </TableRow>
               ))
@@ -684,20 +664,16 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
       </div>
 
       {/* Summary Stats */}
-      <div className="dashboard-stats grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-        <div className="bg-card rounded-lg shadow-sm border p-4">
+      <div className="dashboard-stats grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 w-full">
+        <div className="bg-card rounded-lg shadow-sm border p-6 flex-1">
           <p className="text-sm text-muted-foreground mb-1">Total Cases</p>
           <p className="text-2xl font-bold">{cases.length}</p>
         </div>
-        <div className="bg-card rounded-lg shadow-sm border p-4">
+        <div className="bg-card rounded-lg shadow-sm border p-6 flex-1">
           <p className="text-sm text-muted-foreground mb-1">Open Cases</p>
           <p className="text-2xl font-bold">{cases.filter((c) => c.status === "Open").length}</p>
         </div>
-        <div className="bg-card rounded-lg shadow-sm border p-4">
-          <p className="text-sm text-muted-foreground mb-1">Pending Cases</p>
-          <p className="text-2xl font-bold">{cases.filter((c) => c.status === "Pending").length}</p>
-        </div>
-        <div className="bg-card rounded-lg shadow-sm border p-4">
+        <div className="bg-card rounded-lg shadow-sm border p-6 flex-1">
           <p className="text-sm text-muted-foreground mb-1">Unassigned Cases</p>
           <p className="text-2xl font-bold">{cases.filter((c) => c.caseManager === "Unassigned").length}</p>
         </div>
