@@ -22,7 +22,7 @@ import { useEmployees } from "@/contexts/employees-context"
 import { generateTodosFromTemplates } from "@/lib/todo-parser"
 import { useState, useEffect } from "react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Briefcase, MapPin, FileText, Stethoscope, Shield, Activity, Info, FolderOpen, Calendar, Clock, BarChart3, HardHat, DollarSign } from "lucide-react"
+import { AlertCircle, AlertTriangle, Briefcase, MapPin, FileText, Stethoscope, Shield, Activity, Info, FolderOpen, Calendar, Clock, BarChart3, HardHat, DollarSign } from "lucide-react"
 import { CollapsibleSection } from "@/components/ui/collapsible-section"
 
 const adjusterData: Record<string, { name: string; phone: string; email: string }> = {
@@ -112,6 +112,45 @@ export function CaseTab() {
   const [pendingStatus, setPendingStatus] = useState<string | null>(null)
   const [selectedTodosToClose, setSelectedTodosToClose] = useState<string[]>([])
   const [selectedRestrictionsToClose, setSelectedRestrictionsToClose] = useState<string[]>([])
+  
+  // Money validation warnings
+  const [rateOfPayWarning, setRateOfPayWarning] = useState<string | null>(null)
+  const [stdOffsetAmountWarning, setStdOffsetAmountWarning] = useState<string | null>(null)
+  const [rateOfPayValue, setRateOfPayValue] = useState("")
+  const [rateOfPayType, setRateOfPayType] = useState<"hourly" | "monthly">("hourly")
+  const [stdOffsetAmountValue, setStdOffsetAmountValue] = useState("")
+  
+  // Validate if amount looks like normal money
+  const validateMoneyAmount = (value: string, fieldType: "hourly" | "monthly" | "offset"): string | null => {
+    const numValue = parseFloat(value)
+    if (isNaN(numValue) || value === "") return null
+    
+    if (numValue < 0) {
+      return "Amount cannot be negative"
+    }
+    
+    if (fieldType === "hourly") {
+      if (numValue > 500) {
+        return "Hourly rate seems unusually high (over $500/hr)"
+      }
+      if (numValue > 0 && numValue < 7) {
+        return "Hourly rate seems unusually low (under minimum wage)"
+      }
+    } else if (fieldType === "monthly") {
+      if (numValue > 100000) {
+        return "Monthly rate seems unusually high (over $100,000/month)"
+      }
+      if (numValue > 0 && numValue < 1000) {
+        return "Monthly rate seems unusually low (under $1,000/month)"
+      }
+    } else if (fieldType === "offset") {
+      if (numValue > 50000) {
+        return "Offset amount seems unusually high (over $50,000)"
+      }
+    }
+    
+    return null
+  }
   // Close case dialog fields
   const [closeCaseDateClosed, setCloseCaseDateClosed] = useState(new Date().toISOString().split("T")[0])
   const [closeCaseClosureReason, setCloseCaseClosureReason] = useState("")
@@ -962,21 +1001,25 @@ export function CaseTab() {
                   type="text"
                   inputMode="decimal"
                   placeholder="0.00"
-                  className="bg-background pl-7"
+                  className={`bg-background pl-7 ${rateOfPayWarning ? "border-amber-500" : ""}`}
+                  value={rateOfPayValue}
                   onChange={(e) => {
-                    const value = e.target.value.replace(/[^0-9.]/g, '')
+                    let value = e.target.value.replace(/[^0-9.]/g, '')
                     const parts = value.split('.')
                     if (parts.length > 2) {
-                      e.target.value = parts[0] + '.' + parts.slice(1).join('')
+                      value = parts[0] + '.' + parts.slice(1).join('')
                     } else if (parts[1]?.length > 2) {
-                      e.target.value = parts[0] + '.' + parts[1].slice(0, 2)
-                    } else {
-                      e.target.value = value
+                      value = parts[0] + '.' + parts[1].slice(0, 2)
                     }
+                    setRateOfPayValue(value)
+                    setRateOfPayWarning(validateMoneyAmount(value, rateOfPayType))
                   }}
                 />
               </div>
-              <Select>
+              <Select value={rateOfPayType} onValueChange={(val: "hourly" | "monthly") => {
+                setRateOfPayType(val)
+                setRateOfPayWarning(validateMoneyAmount(rateOfPayValue, val))
+              }}>
                 <SelectTrigger id="rate-type" className="bg-background w-[120px]">
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
@@ -986,6 +1029,12 @@ export function CaseTab() {
                 </SelectContent>
               </Select>
             </div>
+            {rateOfPayWarning && (
+              <p className="text-xs text-amber-600 flex items-center gap-1">
+                <AlertTriangle className="h-3 w-3" />
+                {rateOfPayWarning}
+              </p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="std-offset-type" className="text-sm text-muted-foreground">
@@ -1015,17 +1064,18 @@ export function CaseTab() {
                   type="text"
                   inputMode="decimal"
                   placeholder="0.00"
-                  className="bg-background pl-7"
+                  className={`bg-background pl-7 ${stdOffsetAmountWarning ? "border-amber-500" : ""}`}
+                  value={stdOffsetAmountValue}
                   onChange={(e) => {
-                    const value = e.target.value.replace(/[^0-9.]/g, '')
+                    let value = e.target.value.replace(/[^0-9.]/g, '')
                     const parts = value.split('.')
                     if (parts.length > 2) {
-                      e.target.value = parts[0] + '.' + parts.slice(1).join('')
+                      value = parts[0] + '.' + parts.slice(1).join('')
                     } else if (parts[1]?.length > 2) {
-                      e.target.value = parts[0] + '.' + parts[1].slice(0, 2)
-                    } else {
-                      e.target.value = value
+                      value = parts[0] + '.' + parts[1].slice(0, 2)
                     }
+                    setStdOffsetAmountValue(value)
+                    setStdOffsetAmountWarning(validateMoneyAmount(value, "offset"))
                   }}
                 />
               </div>
@@ -1039,6 +1089,12 @@ export function CaseTab() {
                 </SelectContent>
               </Select>
             </div>
+            {stdOffsetAmountWarning && (
+              <p className="text-xs text-amber-600 flex items-center gap-1">
+                <AlertTriangle className="h-3 w-3" />
+                {stdOffsetAmountWarning}
+              </p>
+            )}
           </div>
         </div>
       </CollapsibleSection>
