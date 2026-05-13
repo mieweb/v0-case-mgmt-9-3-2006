@@ -1,5 +1,170 @@
 import { NextRequest, NextResponse } from "next/server"
 
+// ICD-11 to ICD-10 crosswalk mapping
+const ICD11_TO_ICD10_MAP: Record<string, { code: string; description: string }> = {
+  // Musculoskeletal disorders
+  "FA20": { code: "S00-T14", description: "Fracture" },
+  "FA24.0": { code: "S12", description: "Fracture of cervical vertebra" },
+  "FA24.1": { code: "S22.0", description: "Fracture of thoracic vertebra" },
+  "FA24.2": { code: "S32.0", description: "Fracture of lumbar vertebra" },
+  "FA70": { code: "S13-S93", description: "Sprain and strain" },
+  "FA70.0": { code: "S13.4", description: "Sprain of ligaments of cervical spine" },
+  "FA70.1": { code: "S33.5", description: "Sprain of ligaments of lumbar spine" },
+  "FA72": { code: "S46-S96", description: "Strain of muscle or tendon" },
+  "FB40": { code: "M47", description: "Spondylosis" },
+  "FB40.0": { code: "M50.3", description: "Cervical disc degeneration" },
+  "FB40.1": { code: "M51.3", description: "Thoracic disc degeneration" },
+  "FB40.2": { code: "M51.36", description: "Lumbar disc degeneration" },
+  "FB41": { code: "M47.8", description: "Other spondylosis" },
+  "FB42": { code: "M51", description: "Thoracic, thoracolumbar, and lumbosacral intervertebral disc disorders" },
+  "FB50": { code: "M19", description: "Other and unspecified osteoarthritis" },
+  "FB50.0": { code: "M16", description: "Osteoarthritis of hip" },
+  "FB50.1": { code: "M17", description: "Osteoarthritis of knee" },
+  "FB51": { code: "M06.9", description: "Rheumatoid arthritis, unspecified" },
+  "FB54": { code: "M10", description: "Gout" },
+  "FB70": { code: "M79", description: "Other and unspecified soft tissue disorders" },
+  "FB71": { code: "M71", description: "Other bursopathies" },
+  "FB72": { code: "M77", description: "Other enthesopathies" },
+  "FB73": { code: "G56.0", description: "Carpal tunnel syndrome" },
+  "FB80": { code: "M54.5", description: "Low back pain" },
+  "FB81": { code: "M54.2", description: "Cervicalgia" },
+  "FB82": { code: "M54.1", description: "Radiculopathy" },
+  "FB83": { code: "M54.3", description: "Sciatica" },
+  
+  // Mental and behavioral disorders
+  "6A70": { code: "F32", description: "Major depressive disorder, single episode" },
+  "6A71": { code: "F33", description: "Major depressive disorder, recurrent" },
+  "6A72": { code: "F34.1", description: "Dysthymic disorder" },
+  "6A80": { code: "F41.1", description: "Generalized anxiety disorder" },
+  "6A81": { code: "F41.0", description: "Panic disorder" },
+  "6B00": { code: "F43.1", description: "Post-traumatic stress disorder" },
+  "6B20": { code: "F43.2", description: "Adjustment disorders" },
+  "6B40": { code: "F42", description: "Obsessive-compulsive disorder" },
+  "6C40": { code: "F10.2", description: "Alcohol dependence" },
+  "6C41": { code: "F11.2", description: "Opioid dependence" },
+  "6D10": { code: "F60", description: "Specific personality disorders" },
+  "6D70": { code: "F06.7", description: "Mild cognitive disorder" },
+  "QD80": { code: "Z73.0", description: "Burn-out" },
+  
+  // Cardiovascular conditions
+  "BA00": { code: "I11", description: "Hypertensive heart disease" },
+  "BA01": { code: "I10", description: "Essential (primary) hypertension" },
+  "BA40": { code: "I25", description: "Chronic ischemic heart disease" },
+  "BA41": { code: "I21", description: "Acute myocardial infarction" },
+  "BA42": { code: "I25.9", description: "Chronic ischemic heart disease, unspecified" },
+  "BA43": { code: "I20", description: "Angina pectoris" },
+  "BA80": { code: "I50", description: "Heart failure" },
+  "BA81": { code: "I42", description: "Cardiomyopathy" },
+  "BB00": { code: "I49", description: "Other cardiac arrhythmias" },
+  "BB01": { code: "I48", description: "Atrial fibrillation and flutter" },
+  "BD10": { code: "I67", description: "Other cerebrovascular diseases" },
+  "BD11": { code: "I63", description: "Cerebral infarction" },
+  
+  // Respiratory conditions
+  "CA20": { code: "J18", description: "Pneumonia, unspecified organism" },
+  "CA21": { code: "J40", description: "Bronchitis, not specified as acute or chronic" },
+  "CA22": { code: "J20", description: "Acute bronchitis" },
+  "CA23": { code: "J42", description: "Unspecified chronic bronchitis" },
+  "CA40": { code: "J44", description: "Other chronic obstructive pulmonary disease" },
+  "CA80": { code: "J45", description: "Asthma" },
+  "CB00": { code: "J84.1", description: "Other interstitial pulmonary diseases with fibrosis" },
+  "CB01": { code: "J96", description: "Respiratory failure, not elsewhere classified" },
+  
+  // Neoplasms
+  "2B60": { code: "C50", description: "Malignant neoplasm of breast" },
+  "2B70": { code: "C34", description: "Malignant neoplasm of bronchus and lung" },
+  "2B90": { code: "C18", description: "Malignant neoplasm of colon" },
+  "2C00": { code: "C61", description: "Malignant neoplasm of prostate" },
+  "2C80": { code: "C44", description: "Other and unspecified malignant neoplasm of skin" },
+  "2D00": { code: "D10-D36", description: "Benign neoplasms" },
+  "2E00": { code: "D37-D48", description: "Neoplasms of uncertain behavior" },
+  
+  // Neurological conditions
+  "8A00": { code: "G40", description: "Epilepsy" },
+  "8A20": { code: "G43", description: "Migraine" },
+  "8A21": { code: "G44.2", description: "Tension-type headache" },
+  "8A40": { code: "G35", description: "Multiple sclerosis" },
+  "8A60": { code: "G20", description: "Parkinson's disease" },
+  "8B00": { code: "G62", description: "Other and unspecified polyneuropathies" },
+  "8B20": { code: "G50.0", description: "Trigeminal neuralgia" },
+  "8B60": { code: "G70.0", description: "Myasthenia gravis" },
+  "8D00": { code: "G30", description: "Alzheimer's disease" },
+  "MB40": { code: "G89", description: "Pain, not elsewhere classified" },
+  "MB41": { code: "M79.7", description: "Fibromyalgia" },
+  
+  // Digestive disorders
+  "DA40": { code: "K29", description: "Gastritis and duodenitis" },
+  "DA41": { code: "K25", description: "Gastric ulcer" },
+  "DA42": { code: "K26", description: "Duodenal ulcer" },
+  "DA90": { code: "K58", description: "Irritable bowel syndrome" },
+  "DA91": { code: "K50-K52", description: "Noninfective enteritis and colitis" },
+  "DA92": { code: "K50", description: "Crohn's disease" },
+  "DA93": { code: "K51", description: "Ulcerative colitis" },
+  "DB10": { code: "K74", description: "Fibrosis and cirrhosis of liver" },
+  "DB30": { code: "K85", description: "Acute pancreatitis" },
+  "DB70": { code: "K80", description: "Cholelithiasis" },
+  "ME80": { code: "K40-K46", description: "Hernia" },
+  
+  // Endocrine disorders
+  "5A10": { code: "E10", description: "Type 1 diabetes mellitus" },
+  "5A11": { code: "E11", description: "Type 2 diabetes mellitus" },
+  "5A20": { code: "E05", description: "Thyrotoxicosis [hyperthyroidism]" },
+  "5A21": { code: "E03", description: "Other hypothyroidism" },
+  "5B80": { code: "E66", description: "Overweight and obesity" },
+  "5C50": { code: "E27.1", description: "Primary adrenocortical insufficiency" },
+  
+  // Genitourinary disorders
+  "GB40": { code: "N17", description: "Acute kidney failure" },
+  "GB60": { code: "N18", description: "Chronic kidney disease" },
+  "GB90": { code: "N20", description: "Calculus of kidney and ureter" },
+  "GC00": { code: "N39.0", description: "Urinary tract infection, site not specified" },
+  "GC10": { code: "N30", description: "Cystitis" },
+  "GA30": { code: "N80", description: "Endometriosis" },
+  "GA31": { code: "D25", description: "Leiomyoma of uterus" },
+  
+  // Infectious diseases
+  "1A00": { code: "A00", description: "Cholera" },
+  "1C00": { code: "A15-A19", description: "Tuberculosis" },
+  "1E00": { code: "B15-B19", description: "Viral hepatitis" },
+  "1F00": { code: "B20", description: "Human immunodeficiency virus [HIV] disease" },
+  "1G00": { code: "J09-J11", description: "Influenza" },
+  "RA01": { code: "U07.1", description: "COVID-19" },
+  
+  // Injuries
+  "NA00": { code: "S06", description: "Intracranial injury" },
+  "NA01": { code: "S06.0", description: "Concussion" },
+  "NA70": { code: "S14-S34", description: "Injury of nerves and spinal cord" },
+  "NB00": { code: "T20-T32", description: "Burns and corrosions" },
+  "NC00": { code: "T33-T35", description: "Frostbite" },
+  "PB00": { code: "V00-V99", description: "Transport accidents" },
+  "PD00": { code: "W00-W19", description: "Falls" },
+  "PG00": { code: "W20-W49", description: "Exposure to inanimate mechanical forces" },
+  
+  // Blood disorders
+  "3A00": { code: "D64.9", description: "Anemia, unspecified" },
+  "3A01": { code: "D50", description: "Iron deficiency anemia" },
+  "3A70": { code: "D68", description: "Other coagulation defects" },
+  "3B00": { code: "C91-C95", description: "Leukemia" },
+  "3B60": { code: "C81-C86", description: "Lymphoma" },
+  
+  // Skin conditions
+  "EA80": { code: "L30.9", description: "Dermatitis, unspecified" },
+  "EA81": { code: "L20", description: "Atopic dermatitis" },
+  "EA90": { code: "L40", description: "Psoriasis" },
+  "EB00": { code: "L50", description: "Urticaria" },
+  "EB40": { code: "L70", description: "Acne" },
+  
+  // Eye and ear conditions
+  "9A00": { code: "H25-H26", description: "Cataract" },
+  "9A40": { code: "H40", description: "Glaucoma" },
+  "9B00": { code: "H35", description: "Other retinal disorders" },
+  "9B70": { code: "H54", description: "Blindness and low vision" },
+  "AA00": { code: "H66", description: "Suppurative and unspecified otitis media" },
+  "AA40": { code: "H90-H91", description: "Hearing loss" },
+  "AB00": { code: "H81", description: "Disorders of vestibular function" },
+  "AB30": { code: "H93.1", description: "Tinnitus" },
+}
+
 // ICD-11 codes database (common codes for disability case management)
 // ICD-11 uses a different coding structure than ICD-10
 const ICD11_CODES: { code: string; description: string }[] = [
@@ -176,12 +341,19 @@ export async function GET(request: NextRequest) {
 
   const searchLower = query.toLowerCase()
   
-  // Search both code and description
+  // Search both code and description and include ICD-10 mapping
   const results = ICD11_CODES.filter(
     (item) =>
       item.code.toLowerCase().includes(searchLower) ||
       item.description.toLowerCase().includes(searchLower)
-  ).slice(0, 15)
+  ).slice(0, 15).map((item) => {
+    const icd10Match = ICD11_TO_ICD10_MAP[item.code]
+    return {
+      ...item,
+      icd10Code: icd10Match?.code || "",
+      icd10Description: icd10Match?.description || "",
+    }
+  })
 
   return NextResponse.json({ results })
 }

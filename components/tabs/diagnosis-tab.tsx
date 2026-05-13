@@ -21,6 +21,13 @@ interface ICD10Code {
   description: string
 }
 
+interface ICD11Code {
+  code: string
+  description: string
+  icd10Code?: string
+  icd10Description?: string
+}
+
 export function DiagnosisTab() {
   const { currentCase, updateCase } = useCases()
   const { currentUser } = useUser()
@@ -55,9 +62,10 @@ export function DiagnosisTab() {
   const [icd11Code, setIcd11Code] = useState("")
   const [icd11Description, setIcd11Description] = useState("")
   const [icd11Date, setIcd11Date] = useState(new Date().toISOString().split("T")[0])
-  const [icd11SearchResults, setIcd11SearchResults] = useState<ICD10Code[]>([])
+  const [icd11SearchResults, setIcd11SearchResults] = useState<ICD11Code[]>([])
   const [isIcd11Searching, setIsIcd11Searching] = useState(false)
   const [showIcd11Results, setShowIcd11Results] = useState(false)
+  const [selectedIcd11Result, setSelectedIcd11Result] = useState<ICD11Code | null>(null)
 
   // Debounced ICD-10 search
   const searchICD10 = useCallback(async (query: string) => {
@@ -131,9 +139,10 @@ export function DiagnosisTab() {
     return () => clearTimeout(timer)
   }, [icd11Code, searchICD11])
 
-  const handleSelectICD11 = (code: ICD10Code) => {
+  const handleSelectICD11 = (code: ICD11Code) => {
     setIcd11Code(code.code)
     setIcd11Description(code.description)
+    setSelectedIcd11Result(code) // Store the full result including ICD-10 mapping
     setShowIcd11Results(false)
   }
 
@@ -216,14 +225,18 @@ export function DiagnosisTab() {
   const handleAddICD11Diagnosis = () => {
     if (!currentCase || !currentUser || !icd11Code || !icd11Date) return
 
+    // Get the ICD-10 code from the selected result (auto-translated)
+    const icd10Code = selectedIcd11Result?.icd10Code || ""
+    const icd10Description = selectedIcd11Result?.icd10Description || ""
+
     const newDiagnosis: Diagnosis = {
       id: `diag-icd11-${Date.now()}`,
-      icd10Code: "",
-      icd10Description: "",
+      icd10Code: icd10Code,
+      icd10Description: icd10Description,
       icd11Code: icd11Code,
       icd11Description: icd11Description,
       diagnosisDate: icd11Date,
-      notes: "ICD-11 (International)",
+      notes: icd10Code ? `ICD-11 (International) - Auto-translated to ICD-10: ${icd10Code}` : "ICD-11 (International)",
       isActive: true,
       priority: diagnoses.length + 1,
       caseNumber: currentCase.caseNumber,
@@ -239,8 +252,8 @@ export function DiagnosisTab() {
       {
         action: "added",
         field: "diagnosis",
-        newValue: `${icd11Code} - ${icd11Description} (ICD-11)`,
-        description: `Added ICD-11 diagnosis: ${icd11Code} - ${icd11Description}`,
+        newValue: `${icd11Code} - ${icd11Description} (ICD-11)${icd10Code ? ` [ICD-10: ${icd10Code}]` : ""}`,
+        description: `Added ICD-11 diagnosis: ${icd11Code} - ${icd11Description}${icd10Code ? ` (Auto-translated to ICD-10: ${icd10Code})` : ""}`,
       }
     )
 
@@ -248,6 +261,7 @@ export function DiagnosisTab() {
     setIcd11Code("")
     setIcd11Description("")
     setIcd11Date(new Date().toISOString().split("T")[0])
+    setSelectedIcd11Result(null)
   }
 
   const diagnoses = currentCase?.diagnoses || []
