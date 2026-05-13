@@ -96,7 +96,7 @@ export function CaseTab() {
   const [adjuster, setAdjuster] = useState("")
   const [ddgDays, setDdgDays] = useState("")
   const [ddgReturnDate, setDdgReturnDate] = useState("")
-  const [hcpContacted, setHcpContacted] = useState(false)
+  
   const [expectedReturnDate, setExpectedReturnDate] = useState("")
   const [actualReturnDate, setActualReturnDate] = useState("")
   const [payStartDate, setPayStartDate] = useState("")
@@ -265,7 +265,7 @@ export function CaseTab() {
       setAdjuster(currentCase.adjuster || "")
       setDdgDays(currentCase.ddgDays || "")
       setDdgReturnDate(currentCase.ddgReturnDate || "")
-      setHcpContacted(currentCase.hcpContacted || false)
+      
       setExpectedReturnDate(currentCase.expectedReturnDate || "")
       setActualReturnDate(currentCase.actualReturnDate || "")
       setPayStartDate(currentCase.payStartDate || "")
@@ -1151,25 +1151,7 @@ export function CaseTab() {
               </Alert>
             )}
           </div>
-          <div className="space-y-2">
-            <Label className="text-sm text-muted-foreground">HCP contacted within 7 days?</Label>
-            <div className="flex items-center space-x-2 pt-2">
-              <Checkbox
-                id="hcp-contacted"
-                checked={hcpContacted}
-                onCheckedChange={(checked) => {
-                  setHcpContacted(checked as boolean)
-                  handleFieldUpdate("hcpContacted", checked)
-                }}
-              />
-              <label
-                htmlFor="hcp-contacted"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Yes
-              </label>
-            </div>
-          </div>
+          
         </div>
       </CollapsibleSection>
 
