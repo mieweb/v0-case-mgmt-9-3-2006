@@ -629,13 +629,13 @@ export function DiagnosisTab() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="icd11-description" className="text-sm text-muted-foreground">
-            Description: <span className="text-xs text-muted-foreground">(auto-filled)</span>
+            Description:
           </Label>
           <Input
             id="icd11-description"
             value={icd11Description}
             onChange={(e) => setIcd11Description(e.target.value)}
-            placeholder="Auto-filled from search"
+            placeholder="Auto-populated from ICD-11"
             className="bg-background"
           />
         </div>
