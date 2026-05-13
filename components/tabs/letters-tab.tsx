@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Pencil, Trash2, List, LayoutList, Paperclip, X, FileText, Upload, Check } from "lucide-react"
+import { Plus, Pencil, Trash2, List, LayoutList, Paperclip, X, FileText } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RichTextEditor } from "@/components/rich-text-editor"
 import { useCases, type TodoItem } from "@/contexts/cases-context"
@@ -93,8 +93,6 @@ export function LettersTab() {
   
   // Attachment item selection state
   const [selectedAttachmentTypes, setSelectedAttachmentTypes] = useState<string[]>([])
-  const [isAttachmentUploadDialogOpen, setIsAttachmentUploadDialogOpen] = useState(false)
-  const [currentAttachmentType, setCurrentAttachmentType] = useState<string | null>(null)
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -119,59 +117,7 @@ export function LettersTab() {
   }
 
   const handleRemoveAttachment = (id: string) => {
-    const attachment = attachments.find((att) => att.id === id)
-    if (attachment?.attachmentType) {
-      setSelectedAttachmentTypes((prev) => prev.filter((t) => t !== attachment.attachmentType))
-    }
     setAttachments((prev) => prev.filter((att) => att.id !== id))
-  }
-
-  const handleAttachmentTypeToggle = (typeId: string, checked: boolean) => {
-    if (checked) {
-      // Open dialog to upload document for this type
-      setCurrentAttachmentType(typeId)
-      setIsAttachmentUploadDialogOpen(true)
-    } else {
-      // Remove the type and any attachments of that type
-      setSelectedAttachmentTypes((prev) => prev.filter((t) => t !== typeId))
-      setAttachments((prev) => prev.filter((att) => att.attachmentType !== typeId))
-    }
-  }
-
-  const handleAttachmentTypeFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files || !currentAttachmentType) return
-
-    const typeLabel = ATTACHMENT_ITEM_TYPES.find((t) => t.id === currentAttachmentType)?.label || currentAttachmentType
-
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        const newAttachment: LetterAttachment = {
-          id: `att-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          dataUrl: event.target?.result as string,
-          attachmentType: currentAttachmentType,
-        }
-        setAttachments((prev) => [...prev, newAttachment])
-        setSelectedAttachmentTypes((prev) => 
-          prev.includes(currentAttachmentType) ? prev : [...prev, currentAttachmentType]
-        )
-      }
-      reader.readAsDataURL(file)
-    })
-
-    // Close dialog and reset
-    setIsAttachmentUploadDialogOpen(false)
-    setCurrentAttachmentType(null)
-    e.target.value = ""
-  }
-
-  const handleCancelAttachmentUpload = () => {
-    setIsAttachmentUploadDialogOpen(false)
-    setCurrentAttachmentType(null)
   }
 
   const formatFileSize = (bytes: number) => {
@@ -669,54 +615,29 @@ export function LettersTab() {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs">Items to Include (select to attach documents)</Label>
+            <Label className="text-xs">Items that need to be attached to the letter</Label>
             <div className="border rounded-md p-3 space-y-2 max-h-[180px] overflow-y-auto bg-muted/20">
               {ATTACHMENT_ITEM_TYPES.map((type) => {
                 const isSelected = selectedAttachmentTypes.includes(type.id)
-                const typeAttachments = attachments.filter((a) => a.attachmentType === type.id)
                 return (
-                  <div key={type.id} className="space-y-1">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`attachment-type-${type.id}`}
-                        checked={isSelected}
-                        onCheckedChange={(checked) => handleAttachmentTypeToggle(type.id, checked as boolean)}
-                      />
-                      <label
-                        htmlFor={`attachment-type-${type.id}`}
-                        className="text-sm font-medium leading-none cursor-pointer flex-1"
-                      >
-                        {type.label}
-                      </label>
-                      {isSelected && typeAttachments.length > 0 && (
-                        <span className="text-xs text-muted-foreground">
-                          ({typeAttachments.length} file{typeAttachments.length > 1 ? "s" : ""})
-                        </span>
-                      )}
-                    </div>
-                    {/* Show attached files for this type */}
-                    {typeAttachments.length > 0 && (
-                      <div className="ml-6 space-y-1">
-                        {typeAttachments.map((att) => (
-                          <div key={att.id} className="flex items-center justify-between text-xs bg-background rounded px-2 py-1">
-                            <div className="flex items-center gap-1">
-                              <FileText className="h-3 w-3 text-muted-foreground" />
-                              <span className="truncate max-w-[200px]">{att.name}</span>
-                              <span className="text-muted-foreground">({formatFileSize(att.size)})</span>
-                            </div>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="h-5 w-5 p-0"
-                              onClick={() => handleRemoveAttachment(att.id)}
-                            >
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                  <div key={type.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`attachment-type-${type.id}`}
+                      checked={isSelected}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedAttachmentTypes((prev) => [...prev, type.id])
+                        } else {
+                          setSelectedAttachmentTypes((prev) => prev.filter((t) => t !== type.id))
+                        }
+                      }}
+                    />
+                    <label
+                      htmlFor={`attachment-type-${type.id}`}
+                      className="text-sm font-medium leading-none cursor-pointer flex-1"
+                    >
+                      {type.label}
+                    </label>
                   </div>
                 )
               })}
@@ -773,52 +694,6 @@ export function LettersTab() {
           </div>
         </div>
       </LetterWindow>
-
-      {/* Attachment Type Upload Dialog */}
-      <Dialog open={isAttachmentUploadDialogOpen} onOpenChange={(open) => {
-        if (!open) handleCancelAttachmentUpload()
-      }}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Attach Document</DialogTitle>
-            <DialogDescription>
-              Upload a document for: <strong>{ATTACHMENT_ITEM_TYPES.find((t) => t.id === currentAttachmentType)?.label}</strong>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
-              <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-              <p className="text-sm text-muted-foreground mb-3">
-                Drag and drop your file here, or click to browse
-              </p>
-              <label htmlFor="attachment-type-file-upload" className="cursor-pointer">
-                <Button type="button" variant="outline" asChild>
-                  <span>
-                    <Paperclip className="mr-2 h-4 w-4" />
-                    Select File
-                  </span>
-                </Button>
-                <input
-                  id="attachment-type-file-upload"
-                  type="file"
-                  multiple
-                  className="hidden"
-                  onChange={handleAttachmentTypeFileUpload}
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.png,.jpg,.jpeg"
-                />
-              </label>
-            </div>
-            <p className="text-xs text-muted-foreground text-center">
-              Supported formats: PDF, Word, Excel, Text, Images
-            </p>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={handleCancelAttachmentUpload}>
-              Cancel
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={isSaveTemplateDialogOpen} onOpenChange={setIsSaveTemplateDialogOpen}>
         <DialogContent>
