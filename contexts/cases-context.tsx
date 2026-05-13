@@ -315,6 +315,7 @@ const initialCases: Case[] = [
       { id: "todo-ar-4", dateScheduled: getRelativeDate(3), activity: "Follow up on pending documentation", caseManager: "Arlene Rosario, CPDM", completed: false },
       { id: "todo-ar-5", dateScheduled: getRelativeDate(5), activity: "Schedule RTW planning meeting", caseManager: "Arlene Rosario, CPDM", completed: false },
       { id: "todo-ar-6", dateScheduled: getRelativeDate(7), activity: "Review FCE results", caseManager: "Arlene Rosario, CPDM", completed: false },
+      { id: "todo-ar-7", dateScheduled: getRelativeDate(0), activity: 'Attach files to letter "LTD Cover Summary": Medical Records, FMLA Forms, ADA Documentation', caseManager: "Arlene Rosario, CPDM", completed: false, linkedLetterId: "letter-ltd-cover-summary" },
     ],
     caseNotes: [],
     activityLog: [
