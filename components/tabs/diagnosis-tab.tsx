@@ -25,7 +25,7 @@ export function DiagnosisTab() {
   const { currentCase, updateCase } = useCases()
   const { currentUser } = useUser()
   const [filterActive, setFilterActive] = useState<"all" | "active" | "inactive">("active")
-  const [filterCase, setFilterCase] = useState<"all" | "current">("current")
+  
   const [isAddingDiagnosis, setIsAddingDiagnosis] = useState(false)
   const [editingDiagnosis, setEditingDiagnosis] = useState<Diagnosis | null>(null)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
@@ -168,11 +168,11 @@ export function DiagnosisTab() {
 
   const diagnoses = currentCase?.diagnoses || []
 
-  // Filter diagnoses
+  // Filter diagnoses - always show only current case
   const filteredDiagnoses = diagnoses.filter((diag) => {
     if (filterActive === "active" && !diag.isActive) return false
     if (filterActive === "inactive" && diag.isActive) return false
-    if (filterCase === "current" && diag.caseNumber !== currentCase?.caseNumber) return false
+    if (diag.caseNumber !== currentCase?.caseNumber) return false
     return true
   })
 
@@ -416,18 +416,7 @@ export function DiagnosisTab() {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex gap-2 items-center">
-          <Label className="text-sm">Case:</Label>
-          <Select value={filterCase} onValueChange={(value: any) => setFilterCase(value)}>
-            <SelectTrigger className="w-[160px] bg-background">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Cases</SelectItem>
-              <SelectItem value="current">Current Case Only</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        
         <div className="ml-auto text-sm text-muted-foreground">
           Showing {filteredDiagnoses.length} of {diagnoses.length} diagnoses
         </div>
