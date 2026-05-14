@@ -7,8 +7,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { AlertCircle, Download, FileSpreadsheet, Upload } from "lucide-react"
+import { AlertCircle, Download, FileSpreadsheet, Upload, Search, Plus, X, Database } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
+import { useCases, Case } from "@/contexts/cases-context"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 // Types
 type EmployeeCase = {
@@ -236,6 +240,72 @@ export default function PayrollExportPage() {
   const [jsonInput, setJsonInput] = useState("")
   const [cases, setCases] = useState<ProcessedCase[]>([])
   const [parseError, setParseError] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedCaseNumbers, setSelectedCaseNumbers] = useState<Set<string>>(new Set())
+  
+  const { cases: systemCases } = useCases()
+  
+  // Filter for Short-term Disability cases only
+  const stdCases = systemCases.filter(c => c.caseType === "Short-term Disability" && c.status === "Open")
+  
+  // Search filter
+  const filteredStdCases = stdCases.filter(c => 
+    c.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.caseNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.employeeNumber.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+  
+  // Convert system case to EmployeeCase format
+  const convertSystemCase = (systemCase: Case): EmployeeCase => {
+    return {
+      employeeName: systemCase.employeeName,
+      employeeId: systemCase.employeeNumber,
+      caseManager: systemCase.caseManager,
+      stdType: "Continuation", // Could be derived from case history
+      location: systemCase.employeeLocation.split(",")[0].trim(), // Extract city from "City, State"
+      disabilityDate: systemCase.dateOfDisability || "",
+      stdStartDate: systemCase.stdStartDate || systemCase.payStartDate || "",
+      stdEndDate: systemCase.stdEndDate || systemCase.payEndDate,
+      ficaDate: systemCase.ficaDate,
+      totalStdDaysToPay: 7, // Default, should be calculated from dates
+      hourlyRate: 25, // Default, would come from HRIS
+      comments: `Case #${systemCase.caseNumber}`,
+    }
+  }
+  
+  const handleToggleCase = (caseNumber: string) => {
+    const newSelected = new Set(selectedCaseNumbers)
+    if (newSelected.has(caseNumber)) {
+      newSelected.delete(caseNumber)
+    } else {
+      newSelected.add(caseNumber)
+    }
+    setSelectedCaseNumbers(newSelected)
+  }
+  
+  const handleSelectAll = () => {
+    if (selectedCaseNumbers.size === filteredStdCases.length) {
+      setSelectedCaseNumbers(new Set())
+    } else {
+      setSelectedCaseNumbers(new Set(filteredStdCases.map(c => c.caseNumber)))
+    }
+  }
+  
+  const handleAddSelectedCases = () => {
+    const selectedSystemCases = stdCases.filter(c => selectedCaseNumbers.has(c.caseNumber))
+    const convertedCases = selectedSystemCases.map(convertSystemCase)
+    const processed = convertedCases.map(processCase)
+    setCases(prev => [...prev, ...processed])
+    setSelectedCaseNumbers(new Set())
+  }
+  
+  const handleRemoveCase = (index: number) => {
+    setCases(prev => prev.filter((_, i) => i !== index))
+  }
+  
+  const handleClearAll = () => {
+    setCases([])
+  }
 
   const handleLoadSampleData = () => {
     setJsonInput(JSON.stringify(sampleData, null, 2))
@@ -388,32 +458,98 @@ export default function PayrollExportPage() {
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Upload className="h-5 w-5" />
-              Import Data
+              <Database className="h-5 w-5" />
+              Add Cases
             </CardTitle>
-            <CardDescription>Paste JSON array of employee cases</CardDescription>
+            <CardDescription>Select cases from the system or import JSON data</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <Textarea
-              placeholder='[{"employeeName": "John Smith", ...}]'
-              className="font-mono text-sm h-64"
-              value={jsonInput}
-              onChange={(e) => setJsonInput(e.target.value)}
-            />
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={handleLoadSampleData} className="flex-1">
-                Load Sample Data
-              </Button>
-              <Button onClick={handleParseJson} className="flex-1">
-                Parse JSON
-              </Button>
-            </div>
-            {parseError && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{parseError}</AlertDescription>
-              </Alert>
-            )}
+          <CardContent>
+            <Tabs defaultValue="lookup" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="lookup">System Lookup</TabsTrigger>
+                <TabsTrigger value="json">JSON Import</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="lookup" className="space-y-4 mt-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search STD cases..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+                
+                <div className="border rounded-md max-h-64 overflow-y-auto">
+                  {filteredStdCases.length > 0 ? (
+                    <>
+                      <div className="flex items-center gap-2 p-2 border-b bg-muted/50 sticky top-0">
+                        <Checkbox 
+                          checked={selectedCaseNumbers.size === filteredStdCases.length && filteredStdCases.length > 0}
+                          onCheckedChange={handleSelectAll}
+                        />
+                        <span className="text-sm font-medium">Select All ({filteredStdCases.length})</span>
+                      </div>
+                      {filteredStdCases.map((c) => (
+                        <div 
+                          key={c.caseNumber} 
+                          className="flex items-center gap-2 p-2 hover:bg-muted/50 cursor-pointer border-b last:border-b-0"
+                          onClick={() => handleToggleCase(c.caseNumber)}
+                        >
+                          <Checkbox 
+                            checked={selectedCaseNumbers.has(c.caseNumber)}
+                            onCheckedChange={() => handleToggleCase(c.caseNumber)}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{c.employeeName}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {c.caseNumber} • {c.employeeLocation}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    <div className="p-4 text-center text-muted-foreground text-sm">
+                      {searchTerm ? "No matching STD cases found" : "No open STD cases in system"}
+                    </div>
+                  )}
+                </div>
+                
+                <Button 
+                  onClick={handleAddSelectedCases} 
+                  disabled={selectedCaseNumbers.size === 0}
+                  className="w-full"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add {selectedCaseNumbers.size} Selected Case{selectedCaseNumbers.size !== 1 ? "s" : ""}
+                </Button>
+              </TabsContent>
+              
+              <TabsContent value="json" className="space-y-4 mt-4">
+                <Textarea
+                  placeholder='[{"employeeName": "John Smith", ...}]'
+                  className="font-mono text-sm h-48"
+                  value={jsonInput}
+                  onChange={(e) => setJsonInput(e.target.value)}
+                />
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={handleLoadSampleData} className="flex-1">
+                    Load Sample
+                  </Button>
+                  <Button onClick={handleParseJson} className="flex-1">
+                    Parse JSON
+                  </Button>
+                </div>
+                {parseError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{parseError}</AlertDescription>
+                  </Alert>
+                )}
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
 
@@ -451,10 +587,16 @@ export default function PayrollExportPage() {
                     </p>
                   </div>
                 </div>
-                <Button onClick={generateXlsx} size="lg" className="w-full">
-                  <Download className="mr-2 h-5 w-5" />
-                  Download Excel File
-                </Button>
+                <div className="flex gap-2">
+                  <Button onClick={generateXlsx} size="lg" className="flex-1">
+                    <Download className="mr-2 h-5 w-5" />
+                    Download Excel File
+                  </Button>
+                  <Button onClick={handleClearAll} size="lg" variant="outline">
+                    <X className="mr-2 h-4 w-4" />
+                    Clear All
+                  </Button>
+                </div>
               </div>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
@@ -492,6 +634,7 @@ export default function PayrollExportPage() {
                     <TableHead className="text-right">Offset</TableHead>
                     <TableHead className="text-right">Pay This Period</TableHead>
                     <TableHead className="min-w-[200px]">Errors</TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -526,6 +669,16 @@ export default function PayrollExportPage() {
                             Valid
                           </Badge>
                         )}
+                      </TableCell>
+                      <TableCell>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleRemoveCase(idx)}
+                          className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
