@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
-import { LayoutDashboard, Plus, Settings, ChevronDown, User, LogOut, Bug, ListTodo } from "lucide-react"
+import { LayoutDashboard, Plus, Settings, ChevronDown, User, LogOut, Bug, ListTodo, FileSpreadsheet } from "lucide-react"
 import { useUser } from "@/contexts/user-context"
 import { useEmployees } from "@/contexts/employees-context"
 import { Badge } from "@/components/ui/badge"
@@ -92,6 +92,15 @@ export default function Page() {
               >
                 <ListTodo className="h-4 w-4" />
                 <span className="hidden sm:inline">To Do Backlog</span>
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => window.location.href = "/payroll-export"}
+                className="gap-1 sm:gap-2 px-2 sm:px-4"
+                size="sm"
+              >
+                <FileSpreadsheet className="h-4 w-4" />
+                <span className="hidden sm:inline">Payroll Export</span>
               </Button>
             </div>
             <div className="navbar-right flex items-center gap-1 sm:gap-2">
