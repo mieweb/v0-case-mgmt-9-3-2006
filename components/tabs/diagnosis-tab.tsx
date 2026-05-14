@@ -503,10 +503,6 @@ export function DiagnosisTab() {
     <div className="diagnosis-tab-container space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium">Diagnosis Information</h3>
-        <Button size="sm" onClick={() => setIsAddingDiagnosis(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Diagnosis
-        </Button>
       </div>
 
       {/* Filters */}
