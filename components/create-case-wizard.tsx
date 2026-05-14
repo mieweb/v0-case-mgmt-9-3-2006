@@ -160,9 +160,9 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="employee-search">Employee Name or Employee Number</Label>
+                <Label htmlFor="employee-search">Employee Search</Label>
                 <EmployeeAutocomplete
-                  placeholder="Start typing to search..."
+                  placeholder="Search by name, ID, DOB, or last 4 of SSN..."
                   onSelect={(employee) => {
                     setFormData((prev) => ({
                       ...prev,
@@ -172,7 +172,7 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
                     }))
                   }}
                 />
-                <p className="text-xs text-muted-foreground">Search by name or employee number</p>
+                <p className="text-xs text-muted-foreground">Search by name, employee number, date of birth, or last 4 digits of SSN</p>
               </div>
 
               <div className="space-y-2">
