@@ -143,6 +143,7 @@ export function DiagnosisTab() {
     setIcd11Code(code.code)
     setIcd11Description(code.description)
     setSelectedIcd11Result(code) // Store the full result including ICD-10 mapping
+    setIcd11SearchResults([]) // Clear search results to prevent dropdown from reappearing
     setShowIcd11Results(false)
   }
 
