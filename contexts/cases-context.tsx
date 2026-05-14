@@ -442,7 +442,7 @@ const initialCases: Case[] = [
     employeeName: "Michael Davis",
     employeeNumber: "EMP-45678",
     employeeLocation: "Granville, OH",
-    status: "Pending",
+    status: "Open",
     caseType: "Long-term Disability",
     caseCategory: "",
     caseManager: "Kate Gilligan, BSN, RN, CCM",
