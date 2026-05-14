@@ -2,7 +2,42 @@ import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
+function Input({ className, type, onKeyDown, onChange, ...props }: React.ComponentProps<'input'>) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // If 't' or 'T' is pressed on a date or datetime-local field, enter today's date
+    if ((type === 'date' || type === 'datetime-local') && (e.key === 't' || e.key === 'T')) {
+      e.preventDefault()
+      const today = new Date()
+      let value: string
+      
+      if (type === 'date') {
+        value = today.toISOString().split('T')[0]
+      } else {
+        // datetime-local format: YYYY-MM-DDTHH:MM
+        value = today.toISOString().slice(0, 16)
+      }
+      
+      // Create a synthetic event to trigger onChange
+      const syntheticEvent = {
+        target: { value },
+        currentTarget: { value },
+      } as React.ChangeEvent<HTMLInputElement>
+      
+      // Update the input value
+      e.currentTarget.value = value
+      
+      // Call the onChange handler if provided
+      if (onChange) {
+        onChange(syntheticEvent)
+      }
+    }
+    
+    // Call the original onKeyDown handler if provided
+    if (onKeyDown) {
+      onKeyDown(e)
+    }
+  }
+
   return (
     <input
       type={type}
@@ -13,6 +48,8 @@ function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
         'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
         className,
       )}
+      onKeyDown={handleKeyDown}
+      onChange={onChange}
       {...props}
     />
   )

@@ -21,11 +21,18 @@ interface ICD10Code {
   description: string
 }
 
+interface ICD11Code {
+  code: string
+  description: string
+  icd10Code?: string
+  icd10Description?: string
+}
+
 export function DiagnosisTab() {
   const { currentCase, updateCase } = useCases()
   const { currentUser } = useUser()
   const [filterActive, setFilterActive] = useState<"all" | "active" | "inactive">("active")
-  const [filterCase, setFilterCase] = useState<"all" | "current">("current")
+  
   const [isAddingDiagnosis, setIsAddingDiagnosis] = useState(false)
   const [editingDiagnosis, setEditingDiagnosis] = useState<Diagnosis | null>(null)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
@@ -43,13 +50,22 @@ export function DiagnosisTab() {
   const [isSearching, setIsSearching] = useState(false)
   const [showSearchResults, setShowSearchResults] = useState(false)
 
-  // Quick add form state
+  // Quick add form state (ICD-10)
   const [quickAddCode, setQuickAddCode] = useState("")
   const [quickAddDescription, setQuickAddDescription] = useState("")
   const [quickAddDate, setQuickAddDate] = useState(new Date().toISOString().split("T")[0])
   const [quickAddSearchResults, setQuickAddSearchResults] = useState<ICD10Code[]>([])
   const [isQuickAddSearching, setIsQuickAddSearching] = useState(false)
   const [showQuickAddResults, setShowQuickAddResults] = useState(false)
+
+  // ICD-11 form state (international only)
+  const [icd11Code, setIcd11Code] = useState("")
+  const [icd11Description, setIcd11Description] = useState("")
+  const [icd11Date, setIcd11Date] = useState(new Date().toISOString().split("T")[0])
+  const [icd11SearchResults, setIcd11SearchResults] = useState<ICD11Code[]>([])
+  const [isIcd11Searching, setIsIcd11Searching] = useState(false)
+  const [showIcd11Results, setShowIcd11Results] = useState(false)
+  const [selectedIcd11Result, setSelectedIcd11Result] = useState<ICD11Code | null>(null)
 
   // Debounced ICD-10 search
   const searchICD10 = useCallback(async (query: string) => {
@@ -88,6 +104,54 @@ export function DiagnosisTab() {
     setCustomCode(code.code)
     setCustomDescription(code.description)
     setShowSearchResults(false)
+  }
+
+  // ICD-11 search function
+  const searchICD11 = useCallback(async (query: string) => {
+    if (query.length < 2) {
+      setIcd11SearchResults([])
+      setShowIcd11Results(false)
+      return
+    }
+
+    setIsIcd11Searching(true)
+    try {
+      const response = await fetch(`/api/icd11?q=${encodeURIComponent(query)}&maxList=15`)
+      const data = await response.json()
+      setIcd11SearchResults(data.results || [])
+      setShowIcd11Results(true)
+    } catch (error) {
+      console.error("ICD-11 search error:", error)
+      setIcd11SearchResults([])
+    } finally {
+      setIsIcd11Searching(false)
+    }
+  }, [])
+
+  // Debounce ICD-11 search
+  useEffect(() => {
+    // Clear results immediately when input is empty
+    if (!icd11Code) {
+      setIcd11SearchResults([])
+      setShowIcd11Results(false)
+      return
+    }
+
+    const timer = setTimeout(() => {
+      if (icd11Code) {
+        searchICD11(icd11Code)
+      }
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [icd11Code, searchICD11])
+
+  const handleSelectICD11 = (code: ICD11Code) => {
+    setIcd11Code(code.code)
+    setIcd11Description(code.description)
+    setSelectedIcd11Result(code) // Store the full result including ICD-10 mapping
+    setIcd11SearchResults([]) // Clear search results to prevent dropdown from reappearing
+    setShowIcd11Results(false)
   }
 
   // Quick add ICD-10 search
@@ -135,14 +199,14 @@ export function DiagnosisTab() {
     const newDiagnosis: Diagnosis = {
       id: `diag-${Date.now()}`,
       icd10Code: quickAddCode,
-      description: quickAddDescription,
+      icd10Description: quickAddDescription,
       diagnosisDate: quickAddDate,
       notes: "",
       isActive: true,
       priority: diagnoses.length + 1,
       caseNumber: currentCase.caseNumber,
-      addedBy: currentUser.name,
-      addedAt: new Date().toISOString(),
+      createdBy: currentUser.name,
+      createdAt: new Date().toISOString(),
     }
 
     const updatedDiagnoses = [...diagnoses, newDiagnosis]
@@ -166,13 +230,57 @@ export function DiagnosisTab() {
     setShowQuickAddResults(false)
   }
 
+  const handleAddICD11Diagnosis = () => {
+    if (!currentCase || !currentUser || !icd11Code || !icd11Date) return
+
+    // Get the ICD-10 code from the selected result (auto-translated)
+    const icd10Code = selectedIcd11Result?.icd10Code || ""
+    const icd10Description = selectedIcd11Result?.icd10Description || ""
+
+    const newDiagnosis: Diagnosis = {
+      id: `diag-icd11-${Date.now()}`,
+      icd10Code: icd10Code,
+      icd10Description: icd10Description,
+      icd11Code: icd11Code,
+      icd11Description: icd11Description,
+      diagnosisDate: icd11Date,
+      notes: icd10Code ? `ICD-11 (International) - Auto-translated to ICD-10: ${icd10Code}` : "ICD-11 (International)",
+      isActive: true,
+      priority: diagnoses.length + 1,
+      caseNumber: currentCase.caseNumber,
+      createdBy: currentUser.name,
+      createdAt: new Date().toISOString(),
+    }
+
+    const updatedDiagnoses = [...diagnoses, newDiagnosis]
+
+    updateCase(
+      currentCase.caseNumber,
+      { diagnoses: updatedDiagnoses },
+      {
+        action: "added",
+        field: "diagnosis",
+        newValue: `${icd11Code} - ${icd11Description} (ICD-11)${icd10Code ? ` [ICD-10: ${icd10Code}]` : ""}`,
+        description: `Added ICD-11 diagnosis: ${icd11Code} - ${icd11Description}${icd10Code ? ` (Auto-translated to ICD-10: ${icd10Code})` : ""}`,
+      }
+    )
+
+    // Reset ICD-11 form
+    setIcd11Code("")
+    setIcd11Description("")
+    setIcd11Date(new Date().toISOString().split("T")[0])
+    setSelectedIcd11Result(null)
+    setIcd11SearchResults([])
+    setShowIcd11Results(false)
+  }
+
   const diagnoses = currentCase?.diagnoses || []
 
-  // Filter diagnoses
+  // Filter diagnoses - always show only current case
   const filteredDiagnoses = diagnoses.filter((diag) => {
     if (filterActive === "active" && !diag.isActive) return false
     if (filterActive === "inactive" && diag.isActive) return false
-    if (filterCase === "current" && diag.caseNumber !== currentCase?.caseNumber) return false
+    if (diag.caseNumber !== currentCase?.caseNumber) return false
     return true
   })
 
@@ -416,18 +524,7 @@ export function DiagnosisTab() {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex gap-2 items-center">
-          <Label className="text-sm">Case:</Label>
-          <Select value={filterCase} onValueChange={(value: any) => setFilterCase(value)}>
-            <SelectTrigger className="w-[160px] bg-background">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Cases</SelectItem>
-              <SelectItem value="current">Current Case Only</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        
         <div className="ml-auto text-sm text-muted-foreground">
           Showing {filteredDiagnoses.length} of {diagnoses.length} diagnoses
         </div>
@@ -516,6 +613,80 @@ export function DiagnosisTab() {
         </div>
       </div>
 
+      {/* ICD-11 Quick Add Row (International Only) */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end mt-4 pt-4 border-t border-dashed">
+        <div className="space-y-2 relative">
+          <Label htmlFor="icd11-code" className="text-sm text-muted-foreground">
+            ICD-11 Code: <span className="text-xs text-amber-600">(international only)</span>
+          </Label>
+          <div className="relative">
+            <Input
+              id="icd11-code"
+              value={icd11Code}
+              onChange={(e) => setIcd11Code(e.target.value.toUpperCase())}
+              placeholder="Search ICD-11..."
+              className="font-mono bg-background"
+              onFocus={() => icd11SearchResults.length > 0 && setShowIcd11Results(true)}
+              onBlur={() => setTimeout(() => setShowIcd11Results(false), 200)}
+            />
+            {isIcd11Searching && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              </div>
+            )}
+          </div>
+          {showIcd11Results && icd11SearchResults.length > 0 && (
+            <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-60 overflow-y-auto">
+              {icd11SearchResults.map((result) => (
+                <button
+                  key={result.code}
+                  type="button"
+                  className="w-full px-3 py-2 text-left hover:bg-muted flex items-start gap-2"
+                  onMouseDown={() => handleSelectICD11(result)}
+                >
+                  <span className="font-mono text-sm font-medium shrink-0">{result.code}</span>
+                  <span className="text-sm text-muted-foreground">{result.description}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="icd11-description" className="text-sm text-muted-foreground">
+            Description:
+          </Label>
+          <Input
+            id="icd11-description"
+            value={icd11Description}
+            onChange={(e) => setIcd11Description(e.target.value)}
+            placeholder="Auto-populated from ICD-11"
+            className="bg-background"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="icd11-date" className="text-sm text-muted-foreground">
+            Diagnosis Date:
+          </Label>
+          <Input
+            id="icd11-date"
+            type="date"
+            value={icd11Date}
+            onChange={(e) => setIcd11Date(e.target.value)}
+            className="bg-background"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label className="text-sm text-muted-foreground invisible">Action</Label>
+          <Button 
+            onClick={handleAddICD11Diagnosis} 
+            className="w-full"
+            disabled={!icd11Code || !icd11Date}
+          >
+            Add ICD-11 Diagnosis
+          </Button>
+        </div>
+      </div>
+
       {/* Diagnoses Table */}
       <div className="diagnosis-list border rounded-lg">
         <Table>
@@ -524,6 +695,7 @@ export function DiagnosisTab() {
               <TableHead className="w-[50px]"></TableHead>
               <TableHead className="w-[80px]">Priority</TableHead>
               <TableHead>ICD-10 Code</TableHead>
+              <TableHead>ICD-11 Code</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Diagnosis Date</TableHead>
               <TableHead>Status</TableHead>
@@ -534,7 +706,7 @@ export function DiagnosisTab() {
           <TableBody>
             {sortedDiagnoses.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
                   No diagnoses found. Click "Add Diagnosis" to get started.
                 </TableCell>
               </TableRow>
@@ -563,7 +735,30 @@ export function DiagnosisTab() {
                     </div>
                   </TableCell>
                   <TableCell className="font-mono font-semibold">{diagnosis.icd10Code}</TableCell>
-                  <TableCell>{diagnosis.icd10Description}</TableCell>
+                  <TableCell className="font-mono font-semibold">{diagnosis.icd11Code || "-"}</TableCell>
+                  <TableCell>
+                    {(() => {
+                      const icd10Desc = diagnosis.icd10Description || ""
+                      const icd11Desc = diagnosis.icd11Description || ""
+                      if (icd10Desc && icd11Desc) {
+                        // Only show both if they're different
+                        if (icd10Desc.toLowerCase() === icd11Desc.toLowerCase()) {
+                          return icd10Desc
+                        }
+                        return (
+                          <div className="space-y-1">
+                            <div><span className="text-xs font-medium text-muted-foreground">ICD-10:</span> {icd10Desc}</div>
+                            <div><span className="text-xs font-medium text-muted-foreground">ICD-11:</span> {icd11Desc}</div>
+                          </div>
+                        )
+                      } else if (icd10Desc) {
+                        return icd10Desc
+                      } else if (icd11Desc) {
+                        return icd11Desc
+                      }
+                      return "-"
+                    })()}
+                  </TableCell>
                   <TableCell>{(() => { const d = new Date(diagnosis.diagnosisDate); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })()}</TableCell>
                   <TableCell>
                     <Badge variant={diagnosis.isActive ? "default" : "secondary"}>
