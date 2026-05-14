@@ -745,7 +745,12 @@ export function DiagnosisTab() {
                         if (icd10Desc.toLowerCase() === icd11Desc.toLowerCase()) {
                           return icd10Desc
                         }
-                        return `${icd10Desc} / ${icd11Desc}`
+                        return (
+                          <div className="space-y-1">
+                            <div><span className="text-xs font-medium text-muted-foreground">ICD-10:</span> {icd10Desc}</div>
+                            <div><span className="text-xs font-medium text-muted-foreground">ICD-11:</span> {icd11Desc}</div>
+                          </div>
+                        )
                       } else if (icd10Desc) {
                         return icd10Desc
                       } else if (icd11Desc) {
