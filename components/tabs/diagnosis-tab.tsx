@@ -741,6 +741,10 @@ export function DiagnosisTab() {
                       const icd10Desc = diagnosis.icd10Description || ""
                       const icd11Desc = diagnosis.icd11Description || ""
                       if (icd10Desc && icd11Desc) {
+                        // Only show both if they're different
+                        if (icd10Desc.toLowerCase() === icd11Desc.toLowerCase()) {
+                          return icd10Desc
+                        }
                         return `${icd10Desc} / ${icd11Desc}`
                       } else if (icd10Desc) {
                         return icd10Desc
