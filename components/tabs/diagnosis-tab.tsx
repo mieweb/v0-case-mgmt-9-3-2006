@@ -130,6 +130,13 @@ export function DiagnosisTab() {
 
   // Debounce ICD-11 search
   useEffect(() => {
+    // Clear results immediately when input is empty
+    if (!icd11Code) {
+      setIcd11SearchResults([])
+      setShowIcd11Results(false)
+      return
+    }
+
     const timer = setTimeout(() => {
       if (icd11Code) {
         searchICD11(icd11Code)
@@ -263,6 +270,8 @@ export function DiagnosisTab() {
     setIcd11Description("")
     setIcd11Date(new Date().toISOString().split("T")[0])
     setSelectedIcd11Result(null)
+    setIcd11SearchResults([])
+    setShowIcd11Results(false)
   }
 
   const diagnoses = currentCase?.diagnoses || []
