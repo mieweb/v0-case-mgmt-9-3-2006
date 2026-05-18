@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { useAdmin } from "@/contexts/admin-context"
+import { useAdmin, type Location } from "@/contexts/admin-context"
 import { useUser, type SecurityRole } from "@/contexts/user-context"
 import { useEmployees, type Employee } from "@/contexts/employees-context"
 import { useCases, type AbsenceEntry } from "@/contexts/cases-context"
@@ -142,6 +142,7 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
           <TabsTrigger value="work-status-report">Work Status Report</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="case-managers">Case Managers</TabsTrigger>
+          <TabsTrigger value="locations">Locations</TabsTrigger>
           <TabsTrigger value="case-types">Case Types</TabsTrigger>
           <TabsTrigger value="letter-templates">Letter Templates</TabsTrigger>
           <TabsTrigger value="case-note-templates">Case Note Templates</TabsTrigger>
@@ -172,6 +173,10 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
 
         <TabsContent value="case-managers" className="space-y-6">
           <CaseManagerManager />
+        </TabsContent>
+
+        <TabsContent value="locations" className="space-y-6">
+          <LocationManager />
         </TabsContent>
 
         <TabsContent value="case-types" className="space-y-6">
@@ -1067,6 +1072,197 @@ function CaseManagerManager() {
                 ))
             )}
           </div>
+        </CardContent>
+      </Card>
+    </>
+  )
+}
+
+const REGIONS = ["US", "Canada"]
+
+function LocationManager() {
+  const { locations, addLocation, updateLocation, deleteLocation } = useAdmin()
+  const [newName, setNewName] = useState("")
+  const [newRegion, setNewRegion] = useState("")
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editName, setEditName] = useState("")
+  const [editRegion, setEditRegion] = useState("")
+  const [editActive, setEditActive] = useState(true)
+
+  const handleAdd = () => {
+    if (!newName.trim() || !newRegion) return
+    addLocation({
+      name: newName.trim(),
+      region: newRegion,
+      active: true,
+    })
+    setNewName("")
+    setNewRegion("")
+  }
+
+  const handleStartEdit = (loc: { id: string; name: string; region: string; active: boolean }) => {
+    setEditingId(loc.id)
+    setEditName(loc.name)
+    setEditRegion(loc.region)
+    setEditActive(loc.active)
+  }
+
+  const handleSaveEdit = () => {
+    if (!editingId || !editName.trim() || !editRegion) return
+    updateLocation(editingId, {
+      name: editName.trim(),
+      region: editRegion,
+      active: editActive,
+    })
+    setEditingId(null)
+    setEditName("")
+    setEditRegion("")
+    setEditActive(true)
+  }
+
+  const handleCancelEdit = () => {
+    setEditingId(null)
+    setEditName("")
+    setEditRegion("")
+    setEditActive(true)
+  }
+
+  // Group locations by region
+  const locationsByRegion = locations.reduce((acc, loc) => {
+    if (!acc[loc.region]) acc[loc.region] = []
+    acc[loc.region].push(loc)
+    return acc
+  }, {} as Record<string, typeof locations>)
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Add New Location</CardTitle>
+          <CardDescription>Add locations with their associated region</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Location Name</Label>
+              <Input
+                placeholder="e.g., Toledo"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Region</Label>
+              <Select value={newRegion} onValueChange={setNewRegion}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select region" />
+                </SelectTrigger>
+                <SelectContent>
+                  {REGIONS.map((region) => (
+                    <SelectItem key={region} value={region}>
+                      {region}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <Button onClick={handleAdd} disabled={!newName.trim() || !newRegion}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Location
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Locations</CardTitle>
+          <CardDescription>Manage locations grouped by region</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {locations.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">
+              No locations defined yet. Add your first location above.
+            </p>
+          ) : (
+            <div className="space-y-6">
+              {REGIONS.filter(region => locationsByRegion[region]?.length > 0).map((region) => (
+                <div key={region} className="space-y-2">
+                  <h3 className="font-semibold text-lg border-b pb-2">{region} Region</h3>
+                  <div className="space-y-2 pl-2">
+                    {locationsByRegion[region]
+                      ?.sort((a, b) => a.name.localeCompare(b.name))
+                      .map((loc) => (
+                        <div key={loc.id} className="border rounded-lg p-3">
+                          {editingId === loc.id ? (
+                            <div className="space-y-3">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <Label>Location Name</Label>
+                                  <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label>Region</Label>
+                                  <Select value={editRegion} onValueChange={setEditRegion}>
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {REGIONS.map((r) => (
+                                        <SelectItem key={r} value={r}>
+                                          {r}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <label className="flex items-center gap-2">
+                                  <input
+                                    type="checkbox"
+                                    checked={editActive}
+                                    onChange={(e) => setEditActive(e.target.checked)}
+                                    className="rounded"
+                                  />
+                                  <span className="text-sm">Active</span>
+                                </label>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button size="sm" onClick={handleSaveEdit}>
+                                  <Check className="mr-2 h-4 w-4" />
+                                  Save
+                                </Button>
+                                <Button size="sm" variant="outline" onClick={handleCancelEdit}>
+                                  <X className="mr-2 h-4 w-4" />
+                                  Cancel
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">{loc.name}</span>
+                                <Badge variant="outline" className="text-xs">{loc.region}</Badge>
+                                {!loc.active && <span className="text-xs px-2 py-0.5 bg-muted rounded">Inactive</span>}
+                              </div>
+                              <div className="flex gap-2">
+                                <Button size="sm" variant="outline" onClick={() => handleStartEdit(loc)}>
+                                  <Edit2 className="h-4 w-4" />
+                                </Button>
+                                <Button size="sm" variant="outline" onClick={() => deleteLocation(loc.id)}>
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </>

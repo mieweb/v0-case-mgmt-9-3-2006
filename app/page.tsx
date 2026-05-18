@@ -190,16 +190,14 @@ export default function Page() {
                   <DropdownMenuContent align="end" className="w-56">
                     <DropdownMenuItem onClick={() => openAdminSection("users")}>Users</DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => openAdminSection("case-managers")}>Case Managers</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => openAdminSection("case-types")}>Case Types</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => openAdminSection("letter-templates")}>
-                      Letter Templates
+                    <DropdownMenuItem onClick={() => openAdminSection("absence-reason-codes")}>
+                      Absence Reason Codes
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => openAdminSection("case-note-templates")}>
-                      Case Note Templates
+                    <DropdownMenuItem onClick={() => openAdminSection("absence-status-codes")}>
+                      Absence Status Codes
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => openAdminSection("case-status-codes")}>
-                      Case Status Codes
+                    <DropdownMenuItem onClick={() => openAdminSection("case-activity-codes")}>
+                      Case Activity Codes
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => openAdminSection("case-category-codes")}>
                       Case Category Codes
@@ -207,23 +205,26 @@ export default function Page() {
                     <DropdownMenuItem onClick={() => openAdminSection("case-closure-reason-codes")}>
                       Case Closure Reason Codes
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openAdminSection("case-managers")}>Case Managers</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openAdminSection("case-note-templates")}>
+                      Case Note Templates
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openAdminSection("case-status-codes")}>
+                      Case Status Codes
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openAdminSection("case-types")}>Case Types</DropdownMenuItem>
                     <DropdownMenuItem onClick={() => openAdminSection("contact-type-codes")}>
                       Contact Type Codes
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => openAdminSection("absence-status-codes")}>
-                      Absence Status Codes
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => openAdminSection("absence-reason-codes")}>
-                      Absence Reason Codes
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => openAdminSection("restriction-codes")}>
-                      Restriction Codes
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => openAdminSection("case-activity-codes")}>
-                      Case Activity Codes
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => openAdminSection("document-type-codes")}>
                       Document Type Codes
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openAdminSection("letter-templates")}>
+                      Letter Templates
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openAdminSection("locations")}>Locations</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openAdminSection("restriction-codes")}>
+                      Restriction Codes
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

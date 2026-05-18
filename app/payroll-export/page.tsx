@@ -66,7 +66,7 @@ const LOCATION_TO_PLAN: Record<string, string> = {
 }
 
 // Region options
-const REGIONS = ["East", "West", "Central", "South", "North"]
+const REGIONS = ["US", "Canada"]
 
 // Location options
 const LOCATIONS = Object.keys(LOCATION_TO_PLAN)

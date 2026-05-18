@@ -24,6 +24,13 @@ export interface CaseManager {
   active: boolean
 }
 
+export interface Location {
+  id: string
+  name: string
+  region: string
+  active: boolean
+}
+
 interface CodeTables {
   letterTemplates: Code[]
   caseNoteTemplates: Code[]
@@ -48,6 +55,10 @@ interface AdminContextType {
   addCaseManager: (caseManager: Omit<CaseManager, "id">) => void
   updateCaseManager: (id: string, updates: Partial<Omit<CaseManager, "id">>) => void
   deleteCaseManager: (id: string) => void
+  locations: Location[]
+  addLocation: (location: Omit<Location, "id">) => void
+  updateLocation: (id: string, updates: Partial<Omit<Location, "id">>) => void
+  deleteLocation: (id: string) => void
   codes: CodeTables
   addCode: (table: keyof CodeTables, code: Omit<Code, "id">) => void
   updateCode: (table: keyof CodeTables, id: string, updates: Partial<Omit<Code, "id">>) => void
@@ -1237,9 +1248,29 @@ const initialCaseManagers: CaseManager[] = [
   { id: "12", name: "Tricia Fletcher", active: true },
 ]
 
+const initialLocations: Location[] = [
+  { id: "1", name: "Rockford", region: "US", active: true },
+  { id: "2", name: "Tallmadge", region: "US", active: true },
+  { id: "3", name: "Kansas City", region: "US", active: true },
+  { id: "4", name: "Delmar", region: "US", active: true },
+  { id: "5", name: "Fairburn", region: "US", active: true },
+  { id: "6", name: "Newark", region: "US", active: true },
+  { id: "7", name: "Santa Clara", region: "US", active: true },
+  { id: "8", name: "Starr", region: "US", active: true },
+  { id: "9", name: "Waxahachie", region: "US", active: true },
+  { id: "10", name: "Toledo", region: "US", active: true },
+  { id: "11", name: "Columbus", region: "US", active: true },
+  { id: "12", name: "Atlanta", region: "US", active: true },
+  { id: "13", name: "Denver", region: "US", active: true },
+  { id: "14", name: "Jacksonville", region: "US", active: true },
+  { id: "15", name: "Toronto", region: "Canada", active: true },
+  { id: "16", name: "Vancouver", region: "Canada", active: true },
+]
+
 export function AdminProvider({ children }: { children: ReactNode }) {
   const [caseTypes, setCaseTypes] = useState<CaseType[]>(initialCaseTypes)
   const [caseManagers, setCaseManagers] = useState<CaseManager[]>(initialCaseManagers)
+  const [locations, setLocations] = useState<Location[]>(initialLocations)
   const [codes, setCodes] = useState<CodeTables>(initialCodeTables)
 
   const addCaseType = (caseType: Omit<CaseType, "id">) => {
@@ -1279,6 +1310,22 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     setCaseManagers((prev) => prev.filter((cm) => cm.id !== id))
   }
 
+  const addLocation = (location: Omit<Location, "id">) => {
+    const newLocation: Location = {
+      id: Date.now().toString(),
+      ...location,
+    }
+    setLocations((prev) => [...prev, newLocation])
+  }
+
+  const updateLocation = (id: string, updates: Partial<Omit<Location, "id">>) => {
+    setLocations((prev) => prev.map((loc) => (loc.id === id ? { ...loc, ...updates } : loc)))
+  }
+
+  const deleteLocation = (id: string) => {
+    setLocations((prev) => prev.filter((loc) => loc.id !== id))
+  }
+
   const addCode = (table: keyof CodeTables, code: Omit<Code, "id">) => {
     const newCode: Code = {
       id: Date.now().toString(),
@@ -1316,6 +1363,10 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         addCaseManager,
         updateCaseManager,
         deleteCaseManager,
+        locations,
+        addLocation,
+        updateLocation,
+        deleteLocation,
         codes,
         addCode,
         updateCode,
