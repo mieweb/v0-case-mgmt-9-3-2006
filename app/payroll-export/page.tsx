@@ -363,6 +363,7 @@ export default function PayrollExportPage() {
       "STD Amount",
       "Offset Reason",
       "Offset Amount",
+      "Offset Amount per Pay Period",
       "Offset Frequency",
       "Normalized Offset Amount",
       "STD Earnings to pay this Pay Period",
@@ -373,7 +374,8 @@ export default function PayrollExportPage() {
     wsData.push(headers)
 
     // Data rows (starting Row 8)
-    cases.forEach((c) => {
+    cases.forEach((c, idx) => {
+      const rowNum = idx + 8 // Excel row number (1-indexed, data starts at row 8)
       wsData.push([
         c.employeeName,
         c.employeeId,
@@ -383,18 +385,19 @@ export default function PayrollExportPage() {
         c.disabilityDate,
         c.stdStartDate,
         c.stdEndDate || "",
-        c.date185,
+        c.date185, // Will be replaced with formula
         c.ficaDate || "",
         c.totalStdDaysToPay,
         c.hourlyRate,
         c.stdPlan,
         c.rockfordTallmadgeIndicator || "",
-        c.stdAmount,
+        c.stdAmount, // Will be replaced with formula
         c.offsetReason || "",
         c.offsetAmount || "",
+        "", // Offset Amount per Pay Period (new column for formula)
         c.offsetFrequency || "",
-        c.normalizedOffset,
-        c.payThisPeriod,
+        c.normalizedOffset, // Will be replaced with formula
+        c.payThisPeriod, // Will be replaced with formula
         c.partialReturnToWorkSupplement || "",
         c.comments || "",
         c.errors.join("; "),
@@ -403,31 +406,68 @@ export default function PayrollExportPage() {
 
     const ws = XLSX.utils.aoa_to_sheet(wsData)
 
-    // Set column widths
+    // Add formulas to each data row
+    cases.forEach((c, idx) => {
+      const rowNum = idx + 8 // Excel row number (1-indexed, data starts at row 8)
+      
+      // Column I (185 days): =F{row}+185 (Date of Disability + 185 days)
+      // Note: Excel date formulas - if F is a date, this adds 185 days
+      ws[`I${rowNum}`] = { f: `F${rowNum}+185` }
+      
+      // Column O (STD Amount): Formula based on STD Plan (M), Hourly Rate (L), and Days (K)
+      // STD Plan determines the multiplier (60% of daily rate * 8 hours * days, or 70% for Rockford/Tallmadge)
+      // =IF(N{row}<>"Rockford/Tallmadge", L{row}*8*0.6*K{row}, L{row}*8*0.7*K{row})
+      ws[`O${rowNum}`] = { 
+        f: `IF(N${rowNum}<>"Rockford/Tallmadge",L${rowNum}*8*0.6*K${rowNum},L${rowNum}*8*0.7*K${rowNum})`,
+        z: '"$"#,##0.00'
+      }
+      
+      // Column R (Offset Amount per Pay Period): Normalize based on frequency
+      // =IF(S{row}="weekly",Q{row}*2,IF(S{row}="monthly",Q{row}/2,Q{row}))
+      ws[`R${rowNum}`] = { 
+        f: `IF(S${rowNum}="weekly",Q${rowNum}*2,IF(S${rowNum}="monthly",Q${rowNum}/2,IF(Q${rowNum}="",0,Q${rowNum})))`,
+        z: '"$"#,##0.00'
+      }
+      
+      // Column T (Normalized Offset Amount): Same as R but for display
+      ws[`T${rowNum}`] = { 
+        f: `R${rowNum}`,
+        z: '"$"#,##0.00'
+      }
+      
+      // Column U (STD Earnings to pay this Pay Period): =O{row}-T{row}
+      ws[`U${rowNum}`] = { 
+        f: `O${rowNum}-T${rowNum}`,
+        z: '"$"#,##0.00'
+      }
+    })
+
+    // Set column widths (updated for new column)
     const colWidths = [
-      { wch: 20 }, // Employee Name
-      { wch: 12 }, // Employee ID
-      { wch: 18 }, // Case Manager
-      { wch: 12 }, // STD Type
-      { wch: 15 }, // Location
-      { wch: 15 }, // Date of Disability
-      { wch: 15 }, // STD Start Date
-      { wch: 15 }, // STD End Date
-      { wch: 12 }, // 185 days
-      { wch: 12 }, // FICA Date
-      { wch: 12 }, // Total Days
-      { wch: 12 }, // Hourly Rate
-      { wch: 15 }, // STD Plan
-      { wch: 22 }, // Rockford/Tallmadge
-      { wch: 15 }, // STD Amount
-      { wch: 18 }, // Offset Reason
-      { wch: 15 }, // Offset Amount
-      { wch: 15 }, // Offset Frequency
-      { wch: 20 }, // Normalized Offset
-      { wch: 25 }, // STD Earnings
-      { wch: 25 }, // Partial Return
-      { wch: 30 }, // Comments
-      { wch: 35 }, // Errors
+      { wch: 20 }, // A: Employee Name
+      { wch: 12 }, // B: Employee ID
+      { wch: 18 }, // C: Case Manager
+      { wch: 12 }, // D: STD Type
+      { wch: 15 }, // E: Location
+      { wch: 15 }, // F: Date of Disability
+      { wch: 15 }, // G: STD Start Date
+      { wch: 15 }, // H: STD End Date
+      { wch: 12 }, // I: 185 days (formula)
+      { wch: 12 }, // J: FICA Date
+      { wch: 12 }, // K: Total Days
+      { wch: 12 }, // L: Hourly Rate
+      { wch: 15 }, // M: STD Plan
+      { wch: 22 }, // N: Rockford/Tallmadge
+      { wch: 15 }, // O: STD Amount (formula)
+      { wch: 18 }, // P: Offset Reason
+      { wch: 15 }, // Q: Offset Amount
+      { wch: 18 }, // R: Offset Amount per Pay Period (formula)
+      { wch: 15 }, // S: Offset Frequency
+      { wch: 20 }, // T: Normalized Offset (formula)
+      { wch: 25 }, // U: STD Earnings (formula)
+      { wch: 25 }, // V: Partial Return
+      { wch: 30 }, // W: Comments
+      { wch: 35 }, // X: Errors
     ]
     ws["!cols"] = colWidths
 
