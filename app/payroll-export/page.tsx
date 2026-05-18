@@ -7,10 +7,13 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { AlertCircle, Download, FileSpreadsheet, Upload, Search, Plus, X, Database } from "lucide-react"
+import { AlertCircle, Download, FileSpreadsheet, Upload, Search, Plus, X, Database, LayoutDashboard, ListTodo, Filter } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import Link from "next/link"
 import { useCases, Case } from "@/contexts/cases-context"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -20,7 +23,11 @@ type EmployeeCase = {
   employeeId: string
   caseManager: string
   stdType: string
+  region: string
   location: string
+  payType: "Hourly" | "Salary"
+  ppeStartDate: string
+  ppeEndDate: string
   disabilityDate: string
   stdStartDate: string
   stdEndDate?: string
@@ -57,6 +64,12 @@ const LOCATION_TO_PLAN: Record<string, string> = {
   Waxahachie: "USW-IBEW-IAM",
 }
 
+// Region options
+const REGIONS = ["East", "West", "Central", "South", "North"]
+
+// Location options
+const LOCATIONS = Object.keys(LOCATION_TO_PLAN)
+
 // Sample Data
 const sampleData: EmployeeCase[] = [
   {
@@ -64,7 +77,11 @@ const sampleData: EmployeeCase[] = [
     employeeId: "12345",
     caseManager: "Sarah Jones",
     stdType: "New",
+    region: "Central",
     location: "Rockford",
+    payType: "Hourly",
+    ppeStartDate: "2026-01-01",
+    ppeEndDate: "2026-01-14",
     disabilityDate: "2026-01-01",
     stdStartDate: "2026-01-08",
     stdEndDate: "2026-02-15",
@@ -82,7 +99,11 @@ const sampleData: EmployeeCase[] = [
     employeeId: "67890",
     caseManager: "Mike Johnson",
     stdType: "Continuation",
+    region: "Central",
     location: "Kansas City",
+    payType: "Hourly",
+    ppeStartDate: "2026-01-01",
+    ppeEndDate: "2026-01-14",
     disabilityDate: "2025-12-15",
     stdStartDate: "2025-12-22",
     stdEndDate: "2026-01-31",
@@ -98,7 +119,11 @@ const sampleData: EmployeeCase[] = [
     employeeId: "11111",
     caseManager: "Sarah Jones",
     stdType: "New",
+    region: "East",
     location: "Newark",
+    payType: "Salary",
+    ppeStartDate: "2026-02-01",
+    ppeEndDate: "2026-02-14",
     disabilityDate: "2026-02-01",
     stdStartDate: "2026-02-08",
     totalStdDaysToPay: 7,
@@ -110,7 +135,11 @@ const sampleData: EmployeeCase[] = [
     employeeId: "",
     caseManager: "Mike Johnson",
     stdType: "New",
+    region: "Central",
     location: "Tallmadge",
+    payType: "Hourly",
+    ppeStartDate: "2026-01-15",
+    ppeEndDate: "2026-01-28",
     disabilityDate: "2026-01-15",
     stdStartDate: "2026-01-22",
     stdEndDate: "2026-02-28",
@@ -243,6 +272,14 @@ export default function PayrollExportPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCaseNumbers, setSelectedCaseNumbers] = useState<Set<string>>(new Set())
   
+  // Filter state
+  const [filterRegion, setFilterRegion] = useState<string>("all")
+  const [filterLocation, setFilterLocation] = useState<string>("all")
+  const [filterPayType, setFilterPayType] = useState<string>("all")
+  const [filterPpeStartDate, setFilterPpeStartDate] = useState<string>("")
+  const [filterPpeEndDate, setFilterPpeEndDate] = useState<string>("")
+  const [showFilters, setShowFilters] = useState(false)
+  
   const { cases: systemCases } = useCases()
   
   // Filter for Short-term Disability cases only
@@ -255,14 +292,33 @@ export default function PayrollExportPage() {
     c.employeeNumber.toLowerCase().includes(searchTerm.toLowerCase())
   )
   
+  // Apply filters to cases in the export list
+  const filteredCases = cases.filter(c => {
+    if (filterRegion !== "all" && c.region !== filterRegion) return false
+    if (filterLocation !== "all" && c.location !== filterLocation) return false
+    if (filterPayType !== "all" && c.payType !== filterPayType) return false
+    if (filterPpeStartDate && c.ppeStartDate < filterPpeStartDate) return false
+    if (filterPpeEndDate && c.ppeEndDate > filterPpeEndDate) return false
+    return true
+  })
+  
+  // Get unique values from current cases for filter dropdowns
+  const uniqueRegions = [...new Set(cases.map(c => c.region).filter(Boolean))]
+  const uniqueLocations = [...new Set(cases.map(c => c.location).filter(Boolean))]
+  
   // Convert system case to EmployeeCase format
   const convertSystemCase = (systemCase: Case): EmployeeCase => {
+    const locationCity = systemCase.employeeLocation.split(",")[0].trim()
     return {
       employeeName: systemCase.employeeName,
       employeeId: systemCase.employeeNumber,
       caseManager: systemCase.caseManager,
       stdType: "Continuation", // Could be derived from case history
-      location: systemCase.employeeLocation.split(",")[0].trim(), // Extract city from "City, State"
+      region: "Central", // Default, would come from HRIS
+      location: locationCity,
+      payType: "Hourly", // Default, would come from HRIS
+      ppeStartDate: new Date().toISOString().split("T")[0], // Default to today
+      ppeEndDate: new Date(Date.now() + 13 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // Default to 2 weeks
       disabilityDate: systemCase.dateOfDisability || "",
       stdStartDate: systemCase.stdStartDate || systemCase.payStartDate || "",
       stdEndDate: systemCase.stdEndDate || systemCase.payEndDate,
@@ -271,6 +327,14 @@ export default function PayrollExportPage() {
       hourlyRate: 25, // Default, would come from HRIS
       comments: `Case #${systemCase.caseNumber}`,
     }
+  }
+  
+  const clearFilters = () => {
+    setFilterRegion("all")
+    setFilterLocation("all")
+    setFilterPayType("all")
+    setFilterPpeStartDate("")
+    setFilterPpeEndDate("")
   }
   
   const handleToggleCase = (caseNumber: string) => {
@@ -350,7 +414,11 @@ export default function PayrollExportPage() {
       "Employee ID",
       "Case Manager",
       "STD Type",
+      "Region",
       "Location",
+      "Pay Type",
+      "PPE Start Date",
+      "PPE End Date",
       "Date of Disability",
       "STD Start Date",
       "STD End Date",
@@ -363,6 +431,7 @@ export default function PayrollExportPage() {
       "STD Amount",
       "Offset Reason",
       "Offset Amount",
+      "Offset Amount per Pay Period",
       "Offset Frequency",
       "Normalized Offset Amount",
       "STD Earnings to pay this Pay Period",
@@ -373,28 +442,34 @@ export default function PayrollExportPage() {
     wsData.push(headers)
 
     // Data rows (starting Row 8)
-    cases.forEach((c) => {
+    filteredCases.forEach((c, idx) => {
+      const rowNum = idx + 8 // Excel row number (1-indexed, data starts at row 8)
       wsData.push([
         c.employeeName,
         c.employeeId,
         c.caseManager,
         c.stdType,
+        c.region,
         c.location,
+        c.payType,
+        c.ppeStartDate,
+        c.ppeEndDate,
         c.disabilityDate,
         c.stdStartDate,
         c.stdEndDate || "",
-        c.date185,
+        c.date185, // Will be replaced with formula
         c.ficaDate || "",
         c.totalStdDaysToPay,
         c.hourlyRate,
         c.stdPlan,
         c.rockfordTallmadgeIndicator || "",
-        c.stdAmount,
+        c.stdAmount, // Will be replaced with formula
         c.offsetReason || "",
         c.offsetAmount || "",
+        "", // Offset Amount per Pay Period (new column for formula)
         c.offsetFrequency || "",
-        c.normalizedOffset,
-        c.payThisPeriod,
+        c.normalizedOffset, // Will be replaced with formula
+        c.payThisPeriod, // Will be replaced with formula
         c.partialReturnToWorkSupplement || "",
         c.comments || "",
         c.errors.join("; "),
@@ -403,31 +478,68 @@ export default function PayrollExportPage() {
 
     const ws = XLSX.utils.aoa_to_sheet(wsData)
 
-    // Set column widths
+    // Add formulas to each data row
+    filteredCases.forEach((c, idx) => {
+      const rowNum = idx + 8 // Excel row number (1-indexed, data starts at row 8)
+      
+      // Column M (185 days): =J{row}+185 (Date of Disability + 185 days)
+      ws[`M${rowNum}`] = { f: `J${rowNum}+185` }
+      
+      // Column S (STD Amount): Formula based on STD Plan, Hourly Rate, and Days
+      ws[`S${rowNum}`] = { 
+        f: `IF(R${rowNum}<>"Rockford/Tallmadge",P${rowNum}*8*0.6*O${rowNum},P${rowNum}*8*0.7*O${rowNum})`,
+        z: '"$"#,##0.00'
+      }
+      
+      // Column V (Offset Amount per Pay Period): Normalize based on frequency
+      ws[`V${rowNum}`] = { 
+        f: `IF(W${rowNum}="weekly",U${rowNum}*2,IF(W${rowNum}="monthly",U${rowNum}/2,IF(U${rowNum}="",0,U${rowNum})))`,
+        z: '"$"#,##0.00'
+      }
+      
+      // Column X (Normalized Offset Amount): Same as V but for display
+      ws[`X${rowNum}`] = { 
+        f: `V${rowNum}`,
+        z: '"$"#,##0.00'
+      }
+      
+      // Column Y (STD Earnings to pay this Pay Period): =S{row}-X{row}
+      ws[`Y${rowNum}`] = { 
+        f: `S${rowNum}-X${rowNum}`,
+        z: '"$"#,##0.00'
+      }
+    })
+
+    // Set column widths (updated for new columns)
     const colWidths = [
-      { wch: 20 }, // Employee Name
-      { wch: 12 }, // Employee ID
-      { wch: 18 }, // Case Manager
-      { wch: 12 }, // STD Type
-      { wch: 15 }, // Location
-      { wch: 15 }, // Date of Disability
-      { wch: 15 }, // STD Start Date
-      { wch: 15 }, // STD End Date
-      { wch: 12 }, // 185 days
-      { wch: 12 }, // FICA Date
-      { wch: 12 }, // Total Days
-      { wch: 12 }, // Hourly Rate
-      { wch: 15 }, // STD Plan
-      { wch: 22 }, // Rockford/Tallmadge
-      { wch: 15 }, // STD Amount
-      { wch: 18 }, // Offset Reason
-      { wch: 15 }, // Offset Amount
-      { wch: 15 }, // Offset Frequency
-      { wch: 20 }, // Normalized Offset
-      { wch: 25 }, // STD Earnings
-      { wch: 25 }, // Partial Return
-      { wch: 30 }, // Comments
-      { wch: 35 }, // Errors
+      { wch: 20 }, // A: Employee Name
+      { wch: 12 }, // B: Employee ID
+      { wch: 18 }, // C: Case Manager
+      { wch: 12 }, // D: STD Type
+      { wch: 12 }, // E: Region
+      { wch: 15 }, // F: Location
+      { wch: 10 }, // G: Pay Type
+      { wch: 12 }, // H: PPE Start Date
+      { wch: 12 }, // I: PPE End Date
+      { wch: 15 }, // J: Date of Disability
+      { wch: 15 }, // K: STD Start Date
+      { wch: 15 }, // L: STD End Date
+      { wch: 12 }, // M: 185 days (formula)
+      { wch: 12 }, // N: FICA Date
+      { wch: 12 }, // O: Total Days
+      { wch: 12 }, // P: Hourly Rate
+      { wch: 15 }, // Q: STD Plan
+      { wch: 22 }, // R: Rockford/Tallmadge
+      { wch: 15 }, // S: STD Amount (formula)
+      { wch: 18 }, // T: Offset Reason
+      { wch: 15 }, // U: Offset Amount
+      { wch: 18 }, // V: Offset Amount per Pay Period (formula)
+      { wch: 15 }, // W: Offset Frequency
+      { wch: 20 }, // X: Normalized Offset (formula)
+      { wch: 25 }, // Y: STD Earnings (formula)
+      { wch: 25 }, // Z: Partial Return
+      { wch: 30 }, // AA: Comments
+      { wch: 35 }, // AB: Errors
     ]
     ws["!cols"] = colWidths
 
@@ -446,6 +558,27 @@ export default function PayrollExportPage() {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-[1600px]">
+      {/* Navigation Header */}
+      <div className="flex items-center gap-2 mb-6">
+        <Link href="/">
+          <Button variant="ghost" size="sm" className="gap-2">
+            <LayoutDashboard className="h-4 w-4" />
+            Dashboard
+          </Button>
+        </Link>
+        <Link href="/?view=backlog">
+          <Button variant="ghost" size="sm" className="gap-2">
+            <ListTodo className="h-4 w-4" />
+            To Do Backlog
+          </Button>
+        </Link>
+        <div className="flex-1" />
+        <Button variant="default" size="sm" className="gap-2" disabled>
+          <FileSpreadsheet className="h-4 w-4" />
+          Payroll Export
+        </Button>
+      </div>
+
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground">STD Payroll Export</h1>
         <p className="text-muted-foreground mt-2">
@@ -612,10 +745,100 @@ export default function PayrollExportPage() {
       {cases.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Data Preview</CardTitle>
-            <CardDescription>
-              Review all calculated fields and validation errors before exporting
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Data Preview</CardTitle>
+                <CardDescription>
+                  Review all calculated fields and validation errors before exporting
+                  {filteredCases.length !== cases.length && (
+                    <span className="ml-2 text-primary">
+                      (Showing {filteredCases.length} of {cases.length} cases)
+                    </span>
+                  )}
+                </CardDescription>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowFilters(!showFilters)}
+                className="gap-2"
+              >
+                <Filter className="h-4 w-4" />
+                {showFilters ? "Hide Filters" : "Show Filters"}
+              </Button>
+            </div>
+            
+            {/* Filters */}
+            {showFilters && (
+              <div className="mt-4 p-4 border rounded-lg bg-muted/30">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs">Region</Label>
+                    <Select value={filterRegion} onValueChange={setFilterRegion}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="All Regions" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Regions</SelectItem>
+                        {REGIONS.map(r => (
+                          <SelectItem key={r} value={r}>{r}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">Location</Label>
+                    <Select value={filterLocation} onValueChange={setFilterLocation}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="All Locations" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Locations</SelectItem>
+                        {LOCATIONS.map(l => (
+                          <SelectItem key={l} value={l}>{l}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">Pay Type</Label>
+                    <Select value={filterPayType} onValueChange={setFilterPayType}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="All Pay Types" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Pay Types</SelectItem>
+                        <SelectItem value="Hourly">Hourly</SelectItem>
+                        <SelectItem value="Salary">Salary</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">PPE Start Date</Label>
+                    <Input 
+                      type="date" 
+                      value={filterPpeStartDate} 
+                      onChange={(e) => setFilterPpeStartDate(e.target.value)}
+                      className="h-9"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">PPE End Date</Label>
+                    <Input 
+                      type="date" 
+                      value={filterPpeEndDate} 
+                      onChange={(e) => setFilterPpeEndDate(e.target.value)}
+                      className="h-9"
+                    />
+                  </div>
+                  <div className="space-y-2 flex items-end">
+                    <Button variant="ghost" size="sm" onClick={clearFilters} className="h-9">
+                      Clear Filters
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -624,7 +847,11 @@ export default function PayrollExportPage() {
                   <TableRow>
                     <TableHead className="min-w-[150px]">Employee Name</TableHead>
                     <TableHead>Employee ID</TableHead>
+                    <TableHead>Region</TableHead>
                     <TableHead>Location</TableHead>
+                    <TableHead>Pay Type</TableHead>
+                    <TableHead>PPE Start</TableHead>
+                    <TableHead>PPE End</TableHead>
                     <TableHead>STD Plan</TableHead>
                     <TableHead>Disability Date</TableHead>
                     <TableHead>185 Days</TableHead>
@@ -638,11 +865,17 @@ export default function PayrollExportPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {cases.map((c, idx) => (
+                  {filteredCases.map((c, idx) => (
                     <TableRow key={idx} className={c.errors.length > 0 ? "bg-red-50 dark:bg-red-950/20" : ""}>
                       <TableCell className="font-medium">{c.employeeName}</TableCell>
                       <TableCell>{c.employeeId || <span className="text-red-500">Missing</span>}</TableCell>
+                      <TableCell>{c.region}</TableCell>
                       <TableCell>{c.location}</TableCell>
+                      <TableCell>
+                        <Badge variant={c.payType === "Hourly" ? "outline" : "secondary"}>{c.payType}</Badge>
+                      </TableCell>
+                      <TableCell>{formatDate(c.ppeStartDate)}</TableCell>
+                      <TableCell>{formatDate(c.ppeEndDate)}</TableCell>
                       <TableCell>
                         <Badge variant="outline">{c.stdPlan}</Badge>
                       </TableCell>
