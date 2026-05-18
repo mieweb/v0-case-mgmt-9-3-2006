@@ -1249,20 +1249,22 @@ const initialCaseManagers: CaseManager[] = [
 ]
 
 const initialLocations: Location[] = [
-  { id: "1", name: "Rockford", region: "Central", active: true },
-  { id: "2", name: "Tallmadge", region: "Central", active: true },
-  { id: "3", name: "Kansas City", region: "Central", active: true },
-  { id: "4", name: "Delmar", region: "East", active: true },
-  { id: "5", name: "Fairburn", region: "South", active: true },
-  { id: "6", name: "Newark", region: "East", active: true },
-  { id: "7", name: "Santa Clara", region: "West", active: true },
-  { id: "8", name: "Starr", region: "South", active: true },
-  { id: "9", name: "Waxahachie", region: "South", active: true },
-  { id: "10", name: "Toledo", region: "Central", active: true },
-  { id: "11", name: "Columbus", region: "Central", active: true },
-  { id: "12", name: "Atlanta", region: "South", active: true },
-  { id: "13", name: "Denver", region: "West", active: true },
-  { id: "14", name: "Jacksonville", region: "South", active: true },
+  { id: "1", name: "Rockford", region: "US", active: true },
+  { id: "2", name: "Tallmadge", region: "US", active: true },
+  { id: "3", name: "Kansas City", region: "US", active: true },
+  { id: "4", name: "Delmar", region: "US", active: true },
+  { id: "5", name: "Fairburn", region: "US", active: true },
+  { id: "6", name: "Newark", region: "US", active: true },
+  { id: "7", name: "Santa Clara", region: "US", active: true },
+  { id: "8", name: "Starr", region: "US", active: true },
+  { id: "9", name: "Waxahachie", region: "US", active: true },
+  { id: "10", name: "Toledo", region: "US", active: true },
+  { id: "11", name: "Columbus", region: "US", active: true },
+  { id: "12", name: "Atlanta", region: "US", active: true },
+  { id: "13", name: "Denver", region: "US", active: true },
+  { id: "14", name: "Jacksonville", region: "US", active: true },
+  { id: "15", name: "Toronto", region: "Canada", active: true },
+  { id: "16", name: "Vancouver", region: "Canada", active: true },
 ]
 
 export function AdminProvider({ children }: { children: ReactNode }) {

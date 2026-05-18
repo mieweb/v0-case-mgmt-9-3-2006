@@ -1078,7 +1078,7 @@ function CaseManagerManager() {
   )
 }
 
-const REGIONS = ["Central", "East", "West", "South", "North"]
+const REGIONS = ["US", "Canada"]
 
 function LocationManager() {
   const { locations, addLocation, updateLocation, deleteLocation } = useAdmin()
