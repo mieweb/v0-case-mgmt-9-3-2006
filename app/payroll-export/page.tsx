@@ -7,10 +7,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { AlertCircle, Download, FileSpreadsheet, Upload, Search, Plus, X, Database } from "lucide-react"
+import { AlertCircle, Download, FileSpreadsheet, Upload, Search, Plus, X, Database, LayoutDashboard, ListTodo } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
+import Link from "next/link"
 import { useCases, Case } from "@/contexts/cases-context"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -486,6 +487,27 @@ export default function PayrollExportPage() {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-[1600px]">
+      {/* Navigation Header */}
+      <div className="flex items-center gap-2 mb-6">
+        <Link href="/">
+          <Button variant="ghost" size="sm" className="gap-2">
+            <LayoutDashboard className="h-4 w-4" />
+            Dashboard
+          </Button>
+        </Link>
+        <Link href="/?view=backlog">
+          <Button variant="ghost" size="sm" className="gap-2">
+            <ListTodo className="h-4 w-4" />
+            To Do Backlog
+          </Button>
+        </Link>
+        <div className="flex-1" />
+        <Button variant="default" size="sm" className="gap-2" disabled>
+          <FileSpreadsheet className="h-4 w-4" />
+          Payroll Export
+        </Button>
+      </div>
+
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground">STD Payroll Export</h1>
         <p className="text-muted-foreground mt-2">

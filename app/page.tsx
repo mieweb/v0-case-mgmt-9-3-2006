@@ -17,17 +17,27 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
 import { LayoutDashboard, Plus, Settings, ChevronDown, User, LogOut, Bug, ListTodo, FileSpreadsheet } from "lucide-react"
+import { useSearchParams } from "next/navigation"
 import { useUser } from "@/contexts/user-context"
 import { useEmployees } from "@/contexts/employees-context"
 import { Badge } from "@/components/ui/badge"
 import { isDebugMode, setDebugMode } from "@/lib/debug"
 
 export default function Page() {
+  const searchParams = useSearchParams()
   const [activeView, setActiveView] = useState<"dashboard" | "case" | "create" | "admin" | "backlog">("dashboard")
   const [adminSection, setAdminSection] = useState<string>("work-status-report")
   const { users, currentUser, setCurrentUser } = useUser()
   const { employees } = useEmployees()
   const [debugEnabled, setDebugEnabled] = useState(false)
+
+  // Handle URL query param for view navigation
+  useEffect(() => {
+    const view = searchParams.get("view")
+    if (view === "backlog") {
+      setActiveView("backlog")
+    }
+  }, [searchParams])
 
   useEffect(() => {
     setDebugEnabled(isDebugMode())
