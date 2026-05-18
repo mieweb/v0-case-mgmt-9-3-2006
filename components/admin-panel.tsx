@@ -1274,7 +1274,7 @@ function LocationManager() {
   )
 }
 
-const PAY_CODE_CATEGORIES = ["US Salaried", "US Hourly", "CA Salaried"]
+const PAY_CODE_CATEGORIES = ["US Salaried", "US Hourly", "CA Salaried", "CA Hourly"]
 
 function PayCodesManager() {
   const { codes, addCode, updateCode, deleteCode } = useAdmin()

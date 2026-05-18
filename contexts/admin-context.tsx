@@ -1248,6 +1248,11 @@ Any concerns from the plant/HR, etc?`,
     { id: "10", code: "2050R_CA", description: "100% Salary", active: true, category: "CA Salaried" },
     { id: "11", code: "2055R_CA", description: "66.67% Salary", active: true, category: "CA Salaried" },
     { id: "12", code: "2060R_CA", description: "80% Salary", active: true, category: "CA Salaried" },
+    // CA Hourly
+    { id: "13", code: "STD-CA-FICA-EX", description: "Short Term Disab_CA FICA EX $", active: true, category: "CA Hourly" },
+    { id: "14", code: "STD-CA-FICA-EX-NWK", description: "Short Term Disab FICA_CA EX Nwk $", active: true, category: "CA Hourly" },
+    { id: "15", code: "STD-CA-NWK", description: "Short Term Disab_CA Nwk $", active: true, category: "CA Hourly" },
+    { id: "16", code: "STD-CA", description: "Short Term Disab_CA $", active: true, category: "CA Hourly" },
   ],
 }
 
