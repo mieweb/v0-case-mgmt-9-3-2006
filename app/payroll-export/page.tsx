@@ -946,7 +946,7 @@ export default function PayrollExportPage() {
                         {formatCurrency(c.payThisPeriod)}
                       </TableCell>
                       <TableCell>
-                        {c.errors.length > 0 ? (
+                        {c.errors.length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             {c.errors.map((err, i) => (
                               <Badge key={i} variant="destructive" className="text-xs">
@@ -954,10 +954,6 @@ export default function PayrollExportPage() {
                               </Badge>
                             ))}
                           </div>
-                        ) : (
-                          <Badge variant="outline" className="text-green-600 border-green-600">
-                            Valid
-                          </Badge>
                         )}
                       </TableCell>
                       <TableCell>
