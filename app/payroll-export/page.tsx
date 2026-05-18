@@ -223,9 +223,8 @@ function validateCase(caseData: EmployeeCase, stdPlan: string): string[] {
     errors.push("No Disability Date")
   }
 
-  if (!caseData.ficaDate) {
-    errors.push("Missing FICA Date")
-  }
+  // FICA Date is calculated from disability date, so no separate validation needed
+  // The date185 (FICA Date) will be calculated if disabilityDate exists
 
   if (caseData.offsetAmount && !caseData.offsetFrequency) {
     errors.push("Missing offset frequency")
