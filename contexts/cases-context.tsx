@@ -18,6 +18,18 @@ export interface AbsenceEntry {
   }
 }
 
+export interface PayEntry {
+  id: string
+  payCode: string
+  payCodeDescription: string
+  startDate: string
+  endDate?: string
+  amount: string
+  frequency: "weekly" | "bi-weekly" | "monthly"
+  isActive: boolean
+  notes?: string
+}
+
 export interface ADATrackingEntry {
   id: string
   date: string
@@ -150,6 +162,7 @@ export interface Case {
   payStartDate?: string
   payEndDate?: string
   ficaDate?: string // Added FICA tracking date field for automatic calculation
+  payEntries?: PayEntry[]
   todos?: TodoItem[]
   caseNotes?: CaseNote[]
   activityLog?: ActivityLogEntry[]
