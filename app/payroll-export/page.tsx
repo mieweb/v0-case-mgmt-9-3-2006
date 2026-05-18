@@ -910,7 +910,7 @@ export default function PayrollExportPage() {
                     <TableHead>PPE End</TableHead>
                     <TableHead>STD Plan</TableHead>
                     <TableHead>Disability Date</TableHead>
-                    <TableHead>185 Days</TableHead>
+                    <TableHead>FICA Date</TableHead>
                     <TableHead className="text-right">Days to Pay</TableHead>
                     <TableHead className="text-right">Hourly Rate</TableHead>
                     <TableHead className="text-right">STD Amount</TableHead>
