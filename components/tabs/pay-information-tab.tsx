@@ -43,6 +43,7 @@ export function PayInformationTab() {
   const [stdOffsetFrequency, setStdOffsetFrequency] = useState("")
   const [stdOffsetAmountWarning, setStdOffsetAmountWarning] = useState<string | null>(null)
   const [stdPlan, setStdPlan] = useState("")
+  const [selectedPayCode, setSelectedPayCode] = useState("")
 
   // Pay Entries State (like absence entries)
   const [payEntries, setPayEntries] = useState<PayEntry[]>([])
@@ -429,8 +430,8 @@ export function PayInformationTab() {
             </div>
           </div>
 
-          {/* Row 3: STD Plan */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Row 3: STD Plan and Pay Codes */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="std-plan" className="text-sm text-muted-foreground">
                 STD Plan
@@ -445,6 +446,28 @@ export function PayInformationTab() {
                   handleFieldUpdate("stdPlan", e.target.value)
                 }}
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="pay-code" className="text-sm text-muted-foreground">
+                Pay Code
+              </Label>
+              <Select value={selectedPayCode} onValueChange={(val) => {
+                setSelectedPayCode(val)
+                handleFieldUpdate("payCode", val)
+              }}>
+                <SelectTrigger id="pay-code" className="bg-background">
+                  <SelectValue placeholder="Select pay code..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {codes.payCodes
+                    .filter((pc) => pc.active)
+                    .map((payCode) => (
+                      <SelectItem key={payCode.id} value={payCode.code}>
+                        {payCode.code} - {payCode.description}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>
