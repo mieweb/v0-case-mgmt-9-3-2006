@@ -426,7 +426,7 @@ export function CaseTab() {
       return
     }
 
-    const disabilityDate = new Date(dateOfDisability)
+    const disabilityDate = new Date(dateOfDisability + "T00:00:00")
     if (isNaN(disabilityDate.getTime())) {
       if (ficaDate !== "") {
         setFicaDate("")

@@ -257,6 +257,15 @@ export function CaseManager() {
               <div className="text-sm font-medium">{currentCase?.caseManager || "Unassigned"}</div>
             </div>
 
+            <div className="disability-date-field w-[120px]">
+              <div className="text-xs text-muted-foreground mb-1">Date of Disability</div>
+              <div className="text-sm font-medium">
+                {currentCase?.dateOfDisability
+                  ? new Date(currentCase.dateOfDisability + "T00:00:00").toLocaleDateString()
+                  : "—"}
+              </div>
+            </div>
+
             <Button size="sm" variant="outline" onClick={handleQuickAddNote} className="h-8 gap-2 bg-transparent">
               <Plus className="h-4 w-4" />
               Add Case Note
