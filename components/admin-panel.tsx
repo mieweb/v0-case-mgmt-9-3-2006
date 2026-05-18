@@ -155,6 +155,7 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
           <TabsTrigger value="restriction-codes">Restrictions</TabsTrigger>
           <TabsTrigger value="case-activity-codes">Case Activity</TabsTrigger>
           <TabsTrigger value="document-type-codes">Document Type</TabsTrigger>
+          <TabsTrigger value="pay-codes">Pay Codes</TabsTrigger>
         </TabsList>
 
         <TabsContent value="work-status-report" className="space-y-6">
@@ -497,6 +498,18 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
             onAdd={(code) => addCode("documentType", code)}
             onUpdate={(id, code) => updateCode("documentType", id, code)}
             onDelete={(id) => deleteCode("documentType", id)}
+            hasDescription
+          />
+        </TabsContent>
+
+        <TabsContent value="pay-codes" className="space-y-6">
+          <CodeTableManager
+            title="Pay Codes"
+            description="Manage payroll and compensation codes"
+            codes={codes.payCodes}
+            onAdd={(code) => addCode("payCodes", code)}
+            onUpdate={(id, code) => updateCode("payCodes", id, code)}
+            onDelete={(id) => deleteCode("payCodes", id)}
             hasDescription
           />
         </TabsContent>

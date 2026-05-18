@@ -43,6 +43,7 @@ interface CodeTables {
   restrictionCodes: Code[]
   caseActivity: Code[]
   documentType: Code[]
+  payCodes: Code[]
 }
 
 interface AdminContextType {
@@ -1230,6 +1231,22 @@ Any concerns from the plant/HR, etc?`,
     { id: "69", code: "CM-WTBO Payment", description: "WTBO Payment Detail Documentation", active: true },
     { id: "70", code: "CM-XRAY", description: "X-Ray", active: true },
     { id: "71", code: "CM-XRAY-REPORT", description: "Xray report", active: true },
+  ],
+  payCodes: [
+    { id: "1", code: "REG", description: "Regular Pay", active: true },
+    { id: "2", code: "OT", description: "Overtime Pay", active: true },
+    { id: "3", code: "HOL", description: "Holiday Pay", active: true },
+    { id: "4", code: "VAC", description: "Vacation Pay", active: true },
+    { id: "5", code: "SICK", description: "Sick Pay", active: true },
+    { id: "6", code: "PTO", description: "Paid Time Off", active: true },
+    { id: "7", code: "STD", description: "Short-Term Disability", active: true },
+    { id: "8", code: "LTD", description: "Long-Term Disability", active: true },
+    { id: "9", code: "FMLA", description: "FMLA Leave", active: true },
+    { id: "10", code: "WC", description: "Workers Compensation", active: true },
+    { id: "11", code: "BER", description: "Bereavement Leave", active: true },
+    { id: "12", code: "JUR", description: "Jury Duty", active: true },
+    { id: "13", code: "MIL", description: "Military Leave", active: true },
+    { id: "14", code: "UNP", description: "Unpaid Leave", active: true },
   ],
 }
 

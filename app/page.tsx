@@ -223,6 +223,7 @@ export default function Page() {
                       Letter Templates
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => openAdminSection("locations")}>Locations</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openAdminSection("pay-codes")}>Pay Codes</DropdownMenuItem>
                     <DropdownMenuItem onClick={() => openAdminSection("restriction-codes")}>
                       Restriction Codes
                     </DropdownMenuItem>
