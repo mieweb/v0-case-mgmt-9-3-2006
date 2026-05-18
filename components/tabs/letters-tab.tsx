@@ -94,6 +94,7 @@ export function LettersTab() {
   
   // Attachment item selection state
   const [selectedAttachmentTypes, setSelectedAttachmentTypes] = useState<string[]>([])
+  const [otherAttachmentDescription, setOtherAttachmentDescription] = useState("")
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -171,15 +172,25 @@ export function LettersTab() {
 
   const handleSaveDraftAction = () => {
     if (!currentCase) return
+    
+    // Validate that if "other" is selected, description is provided
+    if (selectedAttachmentTypes.includes("other") && !otherAttachmentDescription.trim()) {
+      return // Don't save if Other is selected but no description provided
+    }
 
     const now = new Date().toISOString()
     // Evaluate mustache variables in the content before saving
     const evaluatedContent = evaluateMustacheTemplate(content, currentCase)
     const templateName = letterTemplates?.find((t) => t.code === template)?.name || template || "Draft"
+    
+    // Combine attachment types with "other" description if provided
+    const finalAttachmentTypes = selectedAttachmentTypes.map(type => 
+      type === "other" && otherAttachmentDescription ? `other: ${otherAttachmentDescription}` : type
+    )
 
     if (editingLetter) {
       setLetters((prev) =>
-        prev.map((l) => (l.id === editingLetter.id ? { ...l, sentFrom, letterType: templateName, template, content: evaluatedContent, attachments, additionalItems, attachmentItemTypes: selectedAttachmentTypes } : l)),
+        prev.map((l) => (l.id === editingLetter.id ? { ...l, sentFrom, letterType: templateName, template, content: evaluatedContent, attachments, additionalItems, attachmentItemTypes: finalAttachmentTypes } : l)),
       )
       updateCase(
         currentCase.caseNumber,
@@ -205,7 +216,7 @@ export function LettersTab() {
         status: "Draft",
         attachments,
         additionalItems,
-        attachmentItemTypes: selectedAttachmentTypes,
+        attachmentItemTypes: finalAttachmentTypes,
       }
       setLetters((prev) => [...prev, newLetter])
       
@@ -258,6 +269,7 @@ export function LettersTab() {
     setAttachments([])
     setAdditionalItems("")
     setSelectedAttachmentTypes([])
+    setOtherAttachmentDescription("")
   }
 
   const handleSendLetterAction = () => {
@@ -319,6 +331,7 @@ export function LettersTab() {
     setAttachments([])
     setAdditionalItems("")
     setSelectedAttachmentTypes([])
+    setOtherAttachmentDescription("")
   }
 
   const handleDeleteLetter = (id: string) => {
@@ -668,24 +681,42 @@ export function LettersTab() {
               {ATTACHMENT_ITEM_TYPES.map((type) => {
                 const isSelected = selectedAttachmentTypes.includes(type.id)
                 return (
-                  <div key={type.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`attachment-type-${type.id}`}
-                      checked={isSelected}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedAttachmentTypes((prev) => [...prev, type.id])
-                        } else {
-                          setSelectedAttachmentTypes((prev) => prev.filter((t) => t !== type.id))
-                        }
-                      }}
-                    />
-                    <label
-                      htmlFor={`attachment-type-${type.id}`}
-                      className="text-sm font-medium leading-none cursor-pointer flex-1"
-                    >
-                      {type.label}
-                    </label>
+                  <div key={type.id} className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`attachment-type-${type.id}`}
+                        checked={isSelected}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedAttachmentTypes((prev) => [...prev, type.id])
+                          } else {
+                            setSelectedAttachmentTypes((prev) => prev.filter((t) => t !== type.id))
+                            if (type.id === "other") {
+                              setOtherAttachmentDescription("")
+                            }
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor={`attachment-type-${type.id}`}
+                        className="text-sm font-medium leading-none cursor-pointer flex-1"
+                      >
+                        {type.label}
+                      </label>
+                    </div>
+                    {type.id === "other" && isSelected && (
+                      <div className="ml-6">
+                        <Input
+                          placeholder="Please specify what 'Other' means (required)"
+                          value={otherAttachmentDescription}
+                          onChange={(e) => setOtherAttachmentDescription(e.target.value)}
+                          className={`text-sm ${!otherAttachmentDescription ? "border-destructive" : ""}`}
+                        />
+                        {!otherAttachmentDescription && (
+                          <p className="text-xs text-destructive mt-1">This field is required when Other is selected</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )
               })}
