@@ -36,7 +36,7 @@ export function LetterWindow({
   onSendLetter,
 }: LetterWindowProps) {
   const [position, setPosition] = useState({ x: 50, y: 50 })
-  const [size, setSize] = useState({ width: 900, height: window.innerHeight * 0.85 })
+  const [size, setSize] = useState({ width: 900, height: 600 })
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [isResizing, setIsResizing] = useState(false)
@@ -44,6 +44,11 @@ export function LetterWindow({
   const [startPos, setStartPos] = useState({ x: 0, y: 0 })
   const [startSize, setStartSize] = useState({ width: 0, height: 0 })
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 })
+
+  // Set initial height after mount to access window
+  useEffect(() => {
+    setSize(prev => ({ ...prev, height: window.innerHeight * 0.85 }))
+  }, [])
 
   const handleResizeStart = useCallback((e: React.MouseEvent, direction: string) => {
     e.preventDefault()
