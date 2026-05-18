@@ -28,6 +28,7 @@ type EmployeeCase = {
   location: string
   payType: "Hourly" | "Salary"
   wageType: string
+  payCode?: string
   ppeStartDate: string
   ppeEndDate: string
   disabilityDate: string
@@ -283,12 +284,13 @@ export default function PayrollExportPage() {
   const [filterLocation, setFilterLocation] = useState<string>("all")
   const [filterPayType, setFilterPayType] = useState<string>("all")
   const [filterWageType, setFilterWageType] = useState<string>("all")
+  const [filterPayCode, setFilterPayCode] = useState<string>("all")
   const [filterPpeStartDate, setFilterPpeStartDate] = useState<string>("")
   const [filterPpeEndDate, setFilterPpeEndDate] = useState<string>("")
   const [showFilters, setShowFilters] = useState(false)
   
   const { cases: systemCases } = useCases()
-  const { locations: adminLocations } = useAdmin()
+  const { locations: adminLocations, codes } = useAdmin()
   
   // Filter for Short-term Disability cases only
   const stdCases = systemCases.filter(c => c.caseType === "Short-term Disability" && c.status === "Open")
@@ -306,6 +308,7 @@ export default function PayrollExportPage() {
     if (filterLocation !== "all" && c.location !== filterLocation) return false
     if (filterPayType !== "all" && c.payType !== filterPayType) return false
     if (filterWageType !== "all" && c.wageType !== filterWageType) return false
+    if (filterPayCode !== "all" && c.payCode !== filterPayCode) return false
     if (filterPpeStartDate && c.ppeStartDate < filterPpeStartDate) return false
     if (filterPpeEndDate && c.ppeEndDate > filterPpeEndDate) return false
     return true
@@ -327,6 +330,7 @@ export default function PayrollExportPage() {
       location: locationCity,
       payType: "Hourly", // Default, would come from HRIS
       wageType: "Regular", // Default, would come from HRIS
+      payCode: (systemCase as { payCode?: string }).payCode || "",
       ppeStartDate: new Date().toISOString().split("T")[0], // Default to today
       ppeEndDate: new Date(Date.now() + 13 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // Default to 2 weeks
       disabilityDate: systemCase.dateOfDisability || "",
@@ -344,6 +348,7 @@ export default function PayrollExportPage() {
     setFilterLocation("all")
     setFilterPayType("all")
     setFilterWageType("all")
+    setFilterPayCode("all")
     setFilterPpeStartDate("")
     setFilterPpeEndDate("")
   }
@@ -847,6 +852,22 @@ export default function PayrollExportPage() {
                     </Select>
                   </div>
                   <div className="space-y-2">
+                    <Label className="text-xs">Pay Code</Label>
+                    <Select value={filterPayCode} onValueChange={setFilterPayCode}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="All Pay Codes" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Pay Codes</SelectItem>
+                        {codes.payCodes
+                          .filter((pc) => pc.active)
+                          .map((pc) => (
+                            <SelectItem key={pc.id} value={pc.code}>{pc.code}</SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
                     <Label className="text-xs">PPE Start Date</Label>
                     <Input 
                       type="date" 
@@ -884,6 +905,7 @@ export default function PayrollExportPage() {
                     <TableHead>Location</TableHead>
                     <TableHead>Pay Type</TableHead>
                     <TableHead>Wage Type</TableHead>
+                    <TableHead>Pay Code</TableHead>
                     <TableHead>PPE Start</TableHead>
                     <TableHead>PPE End</TableHead>
                     <TableHead>STD Plan</TableHead>
@@ -909,6 +931,7 @@ export default function PayrollExportPage() {
                         <Badge variant={c.payType === "Hourly" ? "outline" : "secondary"}>{c.payType}</Badge>
                       </TableCell>
                       <TableCell>{c.wageType}</TableCell>
+                      <TableCell>{c.payCode || <span className="text-muted-foreground">—</span>}</TableCell>
                       <TableCell>{formatDate(c.ppeStartDate)}</TableCell>
                       <TableCell>{formatDate(c.ppeEndDate)}</TableCell>
                       <TableCell>
