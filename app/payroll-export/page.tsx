@@ -439,8 +439,8 @@ export default function PayrollExportPage() {
       "Date of Disability",
       "STD Start Date",
       "STD End Date",
-      "185 days",
       "FICA Date",
+      "Actual FICA Date",
       "Total Days of STD to be paid",
       "Hourly Rate",
       "STD Plan",
@@ -500,7 +500,7 @@ export default function PayrollExportPage() {
     filteredCases.forEach((c, idx) => {
       const rowNum = idx + 8 // Excel row number (1-indexed, data starts at row 8)
       
-      // Column N (185 days): =K{row}+185 (Date of Disability + 185 days)
+      // Column N (FICA Date): =K{row}+185 (Date of Disability + 185 days)
       ws[`N${rowNum}`] = { f: `K${rowNum}+185` }
       
       // Column T (STD Amount): Formula based on STD Plan, Hourly Rate, and Days
@@ -543,8 +543,8 @@ export default function PayrollExportPage() {
       { wch: 15 }, // K: Date of Disability
       { wch: 15 }, // L: STD Start Date
       { wch: 15 }, // M: STD End Date
-      { wch: 12 }, // N: 185 days (formula)
-      { wch: 12 }, // O: FICA Date
+      { wch: 12 }, // N: FICA Date (formula)
+      { wch: 12 }, // O: Actual FICA Date
       { wch: 12 }, // P: Total Days
       { wch: 12 }, // Q: Hourly Rate
       { wch: 15 }, // R: STD Plan
