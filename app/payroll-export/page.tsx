@@ -26,6 +26,7 @@ type EmployeeCase = {
   region: string
   location: string
   payType: "Hourly" | "Salary"
+  wageType: string
   ppeStartDate: string
   ppeEndDate: string
   disabilityDate: string
@@ -70,6 +71,9 @@ const REGIONS = ["East", "West", "Central", "South", "North"]
 // Location options
 const LOCATIONS = Object.keys(LOCATION_TO_PLAN)
 
+// Wage type options
+const WAGE_TYPES = ["Regular", "Overtime", "Holiday", "Sick", "Vacation", "PTO"]
+
 // Sample Data
 const sampleData: EmployeeCase[] = [
   {
@@ -80,6 +84,7 @@ const sampleData: EmployeeCase[] = [
     region: "Central",
     location: "Rockford",
     payType: "Hourly",
+    wageType: "Regular",
     ppeStartDate: "2026-01-01",
     ppeEndDate: "2026-01-14",
     disabilityDate: "2026-01-01",
@@ -102,6 +107,7 @@ const sampleData: EmployeeCase[] = [
     region: "Central",
     location: "Kansas City",
     payType: "Hourly",
+    wageType: "Regular",
     ppeStartDate: "2026-01-01",
     ppeEndDate: "2026-01-14",
     disabilityDate: "2025-12-15",
@@ -122,6 +128,7 @@ const sampleData: EmployeeCase[] = [
     region: "East",
     location: "Newark",
     payType: "Salary",
+    wageType: "Sick",
     ppeStartDate: "2026-02-01",
     ppeEndDate: "2026-02-14",
     disabilityDate: "2026-02-01",
@@ -138,6 +145,7 @@ const sampleData: EmployeeCase[] = [
     region: "Central",
     location: "Tallmadge",
     payType: "Hourly",
+    wageType: "Regular",
     ppeStartDate: "2026-01-15",
     ppeEndDate: "2026-01-28",
     disabilityDate: "2026-01-15",
@@ -276,6 +284,7 @@ export default function PayrollExportPage() {
   const [filterRegion, setFilterRegion] = useState<string>("all")
   const [filterLocation, setFilterLocation] = useState<string>("all")
   const [filterPayType, setFilterPayType] = useState<string>("all")
+  const [filterWageType, setFilterWageType] = useState<string>("all")
   const [filterPpeStartDate, setFilterPpeStartDate] = useState<string>("")
   const [filterPpeEndDate, setFilterPpeEndDate] = useState<string>("")
   const [showFilters, setShowFilters] = useState(false)
@@ -297,6 +306,7 @@ export default function PayrollExportPage() {
     if (filterRegion !== "all" && c.region !== filterRegion) return false
     if (filterLocation !== "all" && c.location !== filterLocation) return false
     if (filterPayType !== "all" && c.payType !== filterPayType) return false
+    if (filterWageType !== "all" && c.wageType !== filterWageType) return false
     if (filterPpeStartDate && c.ppeStartDate < filterPpeStartDate) return false
     if (filterPpeEndDate && c.ppeEndDate > filterPpeEndDate) return false
     return true
@@ -317,6 +327,7 @@ export default function PayrollExportPage() {
       region: "Central", // Default, would come from HRIS
       location: locationCity,
       payType: "Hourly", // Default, would come from HRIS
+      wageType: "Regular", // Default, would come from HRIS
       ppeStartDate: new Date().toISOString().split("T")[0], // Default to today
       ppeEndDate: new Date(Date.now() + 13 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // Default to 2 weeks
       disabilityDate: systemCase.dateOfDisability || "",
@@ -333,6 +344,7 @@ export default function PayrollExportPage() {
     setFilterRegion("all")
     setFilterLocation("all")
     setFilterPayType("all")
+    setFilterWageType("all")
     setFilterPpeStartDate("")
     setFilterPpeEndDate("")
   }
@@ -417,6 +429,7 @@ export default function PayrollExportPage() {
       "Region",
       "Location",
       "Pay Type",
+      "Wage Type",
       "PPE Start Date",
       "PPE End Date",
       "Date of Disability",
@@ -452,6 +465,7 @@ export default function PayrollExportPage() {
         c.region,
         c.location,
         c.payType,
+        c.wageType,
         c.ppeStartDate,
         c.ppeEndDate,
         c.disabilityDate,
@@ -482,30 +496,30 @@ export default function PayrollExportPage() {
     filteredCases.forEach((c, idx) => {
       const rowNum = idx + 8 // Excel row number (1-indexed, data starts at row 8)
       
-      // Column M (185 days): =J{row}+185 (Date of Disability + 185 days)
-      ws[`M${rowNum}`] = { f: `J${rowNum}+185` }
+      // Column N (185 days): =K{row}+185 (Date of Disability + 185 days)
+      ws[`N${rowNum}`] = { f: `K${rowNum}+185` }
       
-      // Column S (STD Amount): Formula based on STD Plan, Hourly Rate, and Days
-      ws[`S${rowNum}`] = { 
-        f: `IF(R${rowNum}<>"Rockford/Tallmadge",P${rowNum}*8*0.6*O${rowNum},P${rowNum}*8*0.7*O${rowNum})`,
+      // Column T (STD Amount): Formula based on STD Plan, Hourly Rate, and Days
+      ws[`T${rowNum}`] = { 
+        f: `IF(S${rowNum}<>"Rockford/Tallmadge",Q${rowNum}*8*0.6*P${rowNum},Q${rowNum}*8*0.7*P${rowNum})`,
         z: '"$"#,##0.00'
       }
       
-      // Column V (Offset Amount per Pay Period): Normalize based on frequency
-      ws[`V${rowNum}`] = { 
-        f: `IF(W${rowNum}="weekly",U${rowNum}*2,IF(W${rowNum}="monthly",U${rowNum}/2,IF(U${rowNum}="",0,U${rowNum})))`,
+      // Column W (Offset Amount per Pay Period): Normalize based on frequency
+      ws[`W${rowNum}`] = { 
+        f: `IF(X${rowNum}="weekly",V${rowNum}*2,IF(X${rowNum}="monthly",V${rowNum}/2,IF(V${rowNum}="",0,V${rowNum})))`,
         z: '"$"#,##0.00'
       }
       
-      // Column X (Normalized Offset Amount): Same as V but for display
-      ws[`X${rowNum}`] = { 
-        f: `V${rowNum}`,
-        z: '"$"#,##0.00'
-      }
-      
-      // Column Y (STD Earnings to pay this Pay Period): =S{row}-X{row}
+      // Column Y (Normalized Offset Amount): Same as W but for display
       ws[`Y${rowNum}`] = { 
-        f: `S${rowNum}-X${rowNum}`,
+        f: `W${rowNum}`,
+        z: '"$"#,##0.00'
+      }
+      
+      // Column Z (STD Earnings to pay this Pay Period): =T{row}-Y{row}
+      ws[`Z${rowNum}`] = { 
+        f: `T${rowNum}-Y${rowNum}`,
         z: '"$"#,##0.00'
       }
     })
@@ -519,27 +533,28 @@ export default function PayrollExportPage() {
       { wch: 12 }, // E: Region
       { wch: 15 }, // F: Location
       { wch: 10 }, // G: Pay Type
-      { wch: 12 }, // H: PPE Start Date
-      { wch: 12 }, // I: PPE End Date
-      { wch: 15 }, // J: Date of Disability
-      { wch: 15 }, // K: STD Start Date
-      { wch: 15 }, // L: STD End Date
-      { wch: 12 }, // M: 185 days (formula)
-      { wch: 12 }, // N: FICA Date
-      { wch: 12 }, // O: Total Days
-      { wch: 12 }, // P: Hourly Rate
-      { wch: 15 }, // Q: STD Plan
-      { wch: 22 }, // R: Rockford/Tallmadge
-      { wch: 15 }, // S: STD Amount (formula)
-      { wch: 18 }, // T: Offset Reason
-      { wch: 15 }, // U: Offset Amount
-      { wch: 18 }, // V: Offset Amount per Pay Period (formula)
-      { wch: 15 }, // W: Offset Frequency
-      { wch: 20 }, // X: Normalized Offset (formula)
-      { wch: 25 }, // Y: STD Earnings (formula)
-      { wch: 25 }, // Z: Partial Return
-      { wch: 30 }, // AA: Comments
-      { wch: 35 }, // AB: Errors
+      { wch: 12 }, // H: Wage Type
+      { wch: 12 }, // I: PPE Start Date
+      { wch: 12 }, // J: PPE End Date
+      { wch: 15 }, // K: Date of Disability
+      { wch: 15 }, // L: STD Start Date
+      { wch: 15 }, // M: STD End Date
+      { wch: 12 }, // N: 185 days (formula)
+      { wch: 12 }, // O: FICA Date
+      { wch: 12 }, // P: Total Days
+      { wch: 12 }, // Q: Hourly Rate
+      { wch: 15 }, // R: STD Plan
+      { wch: 22 }, // S: Rockford/Tallmadge
+      { wch: 15 }, // T: STD Amount (formula)
+      { wch: 18 }, // U: Offset Reason
+      { wch: 15 }, // V: Offset Amount
+      { wch: 18 }, // W: Offset Amount per Pay Period (formula)
+      { wch: 15 }, // X: Offset Frequency
+      { wch: 20 }, // Y: Normalized Offset (formula)
+      { wch: 25 }, // Z: STD Earnings (formula)
+      { wch: 25 }, // AA: Partial Return
+      { wch: 30 }, // AB: Comments
+      { wch: 35 }, // AC: Errors
     ]
     ws["!cols"] = colWidths
 
@@ -814,6 +829,20 @@ export default function PayrollExportPage() {
                     </Select>
                   </div>
                   <div className="space-y-2">
+                    <Label className="text-xs">Wage Type</Label>
+                    <Select value={filterWageType} onValueChange={setFilterWageType}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="All Wage Types" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Wage Types</SelectItem>
+                        {WAGE_TYPES.map(w => (
+                          <SelectItem key={w} value={w}>{w}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
                     <Label className="text-xs">PPE Start Date</Label>
                     <Input 
                       type="date" 
@@ -850,6 +879,7 @@ export default function PayrollExportPage() {
                     <TableHead>Region</TableHead>
                     <TableHead>Location</TableHead>
                     <TableHead>Pay Type</TableHead>
+                    <TableHead>Wage Type</TableHead>
                     <TableHead>PPE Start</TableHead>
                     <TableHead>PPE End</TableHead>
                     <TableHead>STD Plan</TableHead>
@@ -874,6 +904,7 @@ export default function PayrollExportPage() {
                       <TableCell>
                         <Badge variant={c.payType === "Hourly" ? "outline" : "secondary"}>{c.payType}</Badge>
                       </TableCell>
+                      <TableCell>{c.wageType}</TableCell>
                       <TableCell>{formatDate(c.ppeStartDate)}</TableCell>
                       <TableCell>{formatDate(c.ppeEndDate)}</TableCell>
                       <TableCell>
