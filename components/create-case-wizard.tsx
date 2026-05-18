@@ -21,7 +21,7 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
   const [step, setStep] = useState(1)
   const totalSteps = 4
   const { addCase, cases, setCurrentCase } = useCases()
-  const { caseTypes, codes, caseManagers } = useAdmin()
+  const { caseTypes, codes, caseManagers, locations } = useAdmin()
 
   const [formData, setFormData] = useState({
     employeeName: "",
@@ -195,11 +195,14 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
                     <SelectValue placeholder="Select location..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Toledo, OH">Toledo, OH</SelectItem>
-                    <SelectItem value="Newark, OH">Newark, OH</SelectItem>
-                    <SelectItem value="Granville, OH">Granville, OH</SelectItem>
-                    <SelectItem value="Kansas City, KS">Kansas City, KS</SelectItem>
-                    <SelectItem value="Fort Worth, TX">Fort Worth, TX</SelectItem>
+                    {locations
+                      .filter((loc) => loc.active)
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((loc) => (
+                        <SelectItem key={loc.id} value={loc.name}>
+                          {loc.name} ({loc.region})
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>

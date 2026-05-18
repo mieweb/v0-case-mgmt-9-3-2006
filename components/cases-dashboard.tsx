@@ -54,7 +54,7 @@ type SortDirection = "asc" | "desc" | null
 
 export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
   const { cases, setCurrentCase } = useCases()
-  const { caseManagers } = useAdmin()
+  const { caseManagers, locations: adminLocations } = useAdmin()
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [activeFilterId, setActiveFilterId] = useState<string | null>("my-cases")
@@ -144,7 +144,8 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
     const matchesLocation =
       !showMoreFilters ||
       advancedFilters.location === "all" ||
-      caseItem.employeeLocation === advancedFilters.location
+      caseItem.employeeLocation === advancedFilters.location ||
+      caseItem.employeeLocation.startsWith(advancedFilters.location + ",")
 
     const matchesDateFrom =
       !showMoreFilters ||
@@ -511,11 +512,14 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Locations</SelectItem>
-                      {uniqueLocations.map((location) => (
-                        <SelectItem key={location} value={location}>
-                          {location}
-                        </SelectItem>
-                      ))}
+                      {adminLocations
+                        .filter((loc) => loc.active)
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((loc) => (
+                          <SelectItem key={loc.id} value={loc.name}>
+                            {loc.name} ({loc.region})
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </div>

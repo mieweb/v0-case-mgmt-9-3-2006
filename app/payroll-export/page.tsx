@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
 import { useCases, Case } from "@/contexts/cases-context"
+import { useAdmin } from "@/contexts/admin-context"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 // Types
@@ -67,9 +68,6 @@ const LOCATION_TO_PLAN: Record<string, string> = {
 
 // Region options
 const REGIONS = ["US", "Canada"]
-
-// Location options
-const LOCATIONS = Object.keys(LOCATION_TO_PLAN)
 
 // Wage type options
 const WAGE_TYPES = ["Regular", "Overtime", "Holiday", "Sick", "Vacation", "PTO"]
@@ -290,6 +288,7 @@ export default function PayrollExportPage() {
   const [showFilters, setShowFilters] = useState(false)
   
   const { cases: systemCases } = useCases()
+  const { locations: adminLocations } = useAdmin()
   
   // Filter for Short-term Disability cases only
   const stdCases = systemCases.filter(c => c.caseType === "Short-term Disability" && c.status === "Open")
@@ -809,9 +808,14 @@ export default function PayrollExportPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Locations</SelectItem>
-                        {LOCATIONS.map(l => (
-                          <SelectItem key={l} value={l}>{l}</SelectItem>
-                        ))}
+                        {adminLocations
+                          .filter((loc) => loc.active)
+                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .map((loc) => (
+                            <SelectItem key={loc.id} value={loc.name}>
+                              {loc.name} ({loc.region})
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </div>
