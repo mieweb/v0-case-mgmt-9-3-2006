@@ -1234,20 +1234,20 @@ Any concerns from the plant/HR, etc?`,
   ],
   payCodes: [
     // US Salaried
-    { id: "1", code: "US-2070", description: "Short Term Disability 100%/Salary", active: true },
-    { id: "2", code: "US-2080", description: "Short Term Disability 60%/Salary", active: true },
-    { id: "3", code: "US-2085", description: "Short Term Disab FICA ex/Salary 60% of salary", active: true },
-    { id: "4", code: "US-2075", description: "Short Term Disability 90%/Salary (pilots only)", active: true },
-    { id: "5", code: "US-2090", description: "Short Term Disab vacation/Salary (make whole when taken vacation)", active: true },
+    { id: "1", code: "US-2070", description: "Short Term Disability 100%/Salary", active: true, category: "US Salaried" },
+    { id: "2", code: "US-2080", description: "Short Term Disability 60%/Salary", active: true, category: "US Salaried" },
+    { id: "3", code: "US-2085", description: "Short Term Disab FICA ex/Salary 60% of salary", active: true, category: "US Salaried" },
+    { id: "4", code: "US-2075", description: "Short Term Disability 90%/Salary (pilots only)", active: true, category: "US Salaried" },
+    { id: "5", code: "US-2090", description: "Short Term Disab vacation/Salary (make whole when taken vacation)", active: true, category: "US Salaried" },
     // US Hourly
-    { id: "6", code: "STD-FICA-EX", description: "Short Term Disab FICA EX $", active: true },
-    { id: "7", code: "STD-FICA-EX-NWK", description: "Short Term Disab FICA EX Nwk $", active: true },
-    { id: "8", code: "STD-NWK", description: "Short Term Disab Nwk $", active: true },
-    { id: "9", code: "STD", description: "Short Term Disab $", active: true },
+    { id: "6", code: "STD-FICA-EX", description: "Short Term Disab FICA EX $", active: true, category: "US Hourly" },
+    { id: "7", code: "STD-FICA-EX-NWK", description: "Short Term Disab FICA EX Nwk $", active: true, category: "US Hourly" },
+    { id: "8", code: "STD-NWK", description: "Short Term Disab Nwk $", active: true, category: "US Hourly" },
+    { id: "9", code: "STD", description: "Short Term Disab $", active: true, category: "US Hourly" },
     // CA Salaried
-    { id: "10", code: "2050R_CA", description: "100% Salary", active: true },
-    { id: "11", code: "2055R_CA", description: "66.67% Salary", active: true },
-    { id: "12", code: "2060R_CA", description: "80% Salary", active: true },
+    { id: "10", code: "2050R_CA", description: "100% Salary", active: true, category: "CA Salaried" },
+    { id: "11", code: "2055R_CA", description: "66.67% Salary", active: true, category: "CA Salaried" },
+    { id: "12", code: "2060R_CA", description: "80% Salary", active: true, category: "CA Salaried" },
   ],
 }
 

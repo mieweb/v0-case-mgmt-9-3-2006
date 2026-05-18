@@ -503,15 +503,7 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
         </TabsContent>
 
         <TabsContent value="pay-codes" className="space-y-6">
-          <CodeTableManager
-            title="Pay Codes"
-            description="Manage payroll and compensation codes"
-            codes={codes.payCodes}
-            onAdd={(code) => addCode("payCodes", code)}
-            onUpdate={(id, code) => updateCode("payCodes", id, code)}
-            onDelete={(id) => deleteCode("payCodes", id)}
-            hasDescription
-          />
+          <PayCodesManager />
         </TabsContent>
       </Tabs>
     </div>
@@ -1271,6 +1263,217 @@ function LocationManager() {
                           )}
                         </div>
                       ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </>
+  )
+}
+
+const PAY_CODE_CATEGORIES = ["US Salaried", "US Hourly", "CA Salaried"]
+
+function PayCodesManager() {
+  const { codes, addCode, updateCode, deleteCode } = useAdmin()
+  const [newCode, setNewCode] = useState("")
+  const [newDescription, setNewDescription] = useState("")
+  const [newCategory, setNewCategory] = useState("")
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editCode, setEditCode] = useState("")
+  const [editDescription, setEditDescription] = useState("")
+  const [editCategory, setEditCategory] = useState("")
+  const [editActive, setEditActive] = useState(true)
+
+  const handleAdd = () => {
+    if (!newCode.trim() || !newCategory) return
+    addCode("payCodes", {
+      code: newCode.trim(),
+      description: newDescription.trim(),
+      active: true,
+      category: newCategory,
+    })
+    setNewCode("")
+    setNewDescription("")
+    setNewCategory("")
+  }
+
+  const handleStartEdit = (payCode: { id: string; code: string; description?: string; active: boolean; category?: string }) => {
+    setEditingId(payCode.id)
+    setEditCode(payCode.code)
+    setEditDescription(payCode.description || "")
+    setEditCategory(payCode.category || "")
+    setEditActive(payCode.active)
+  }
+
+  const handleSaveEdit = () => {
+    if (!editingId || !editCode.trim() || !editCategory) return
+    updateCode("payCodes", editingId, {
+      code: editCode.trim(),
+      description: editDescription.trim(),
+      active: editActive,
+      category: editCategory,
+    })
+    setEditingId(null)
+    setEditCode("")
+    setEditDescription("")
+    setEditCategory("")
+    setEditActive(true)
+  }
+
+  const handleCancelEdit = () => {
+    setEditingId(null)
+    setEditCode("")
+    setEditDescription("")
+    setEditCategory("")
+    setEditActive(true)
+  }
+
+  // Group pay codes by category
+  const payCodesByCategory = codes.payCodes.reduce((acc, code) => {
+    const cat = (code as { category?: string }).category || "Uncategorized"
+    if (!acc[cat]) acc[cat] = []
+    acc[cat].push(code)
+    return acc
+  }, {} as Record<string, typeof codes.payCodes>)
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Add New Pay Code</CardTitle>
+          <CardDescription>Add payroll and compensation codes</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label>Code</Label>
+              <Input
+                placeholder="e.g., US-2070"
+                value={newCode}
+                onChange={(e) => setNewCode(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Input
+                placeholder="e.g., Short Term Disability 100%/Salary"
+                value={newDescription}
+                onChange={(e) => setNewDescription(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Category</Label>
+              <Select value={newCategory} onValueChange={setNewCategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PAY_CODE_CATEGORIES.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <Button onClick={handleAdd} disabled={!newCode.trim() || !newCategory}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Pay Code
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Pay Codes</CardTitle>
+          <CardDescription>Manage payroll and compensation codes grouped by category</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {codes.payCodes.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">
+              No pay codes defined yet. Add your first pay code above.
+            </p>
+          ) : (
+            <div className="space-y-6">
+              {PAY_CODE_CATEGORIES.filter(cat => payCodesByCategory[cat]?.length > 0).map((category) => (
+                <div key={category} className="space-y-2">
+                  <h3 className="font-semibold text-lg border-b pb-2">{category}</h3>
+                  <div className="space-y-2 pl-2">
+                    {payCodesByCategory[category]?.map((payCode) => (
+                      <div key={payCode.id} className="border rounded-lg p-3">
+                        {editingId === payCode.id ? (
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-3 gap-4">
+                              <div className="space-y-2">
+                                <Label>Code</Label>
+                                <Input value={editCode} onChange={(e) => setEditCode(e.target.value)} />
+                              </div>
+                              <div className="space-y-2">
+                                <Label>Description</Label>
+                                <Input value={editDescription} onChange={(e) => setEditDescription(e.target.value)} />
+                              </div>
+                              <div className="space-y-2">
+                                <Label>Category</Label>
+                                <Select value={editCategory} onValueChange={setEditCategory}>
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {PAY_CODE_CATEGORIES.map((cat) => (
+                                      <SelectItem key={cat} value={cat}>
+                                        {cat}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <label className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={editActive}
+                                  onChange={(e) => setEditActive(e.target.checked)}
+                                  className="rounded"
+                                />
+                                <span className="text-sm">Active</span>
+                              </label>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" onClick={handleSaveEdit}>
+                                <Check className="mr-2 h-4 w-4" />
+                                Save
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={handleCancelEdit}>
+                                <X className="mr-2 h-4 w-4" />
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <span className="font-mono font-medium">{payCode.code}</span>
+                              <span className="text-muted-foreground">-</span>
+                              <span>{payCode.description}</span>
+                              {!payCode.active && <span className="text-xs px-2 py-0.5 bg-muted rounded">Inactive</span>}
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" variant="outline" onClick={() => handleStartEdit(payCode as { id: string; code: string; description?: string; active: boolean; category?: string })}>
+                                <Edit2 className="h-4 w-4" />
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => deleteCode("payCodes", payCode.id)}>
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
