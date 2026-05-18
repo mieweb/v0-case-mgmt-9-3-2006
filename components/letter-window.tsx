@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { Minus, Square, ExternalLink, X, Save, FileText, Send } from "lucide-react"
+import { Minus, Square, ExternalLink, X, Save, FileText } from "lucide-react"
 
 interface LetterWindowProps {
   isOpen: boolean
@@ -18,7 +18,6 @@ interface LetterWindowProps {
   onSaveAsTemplate?: () => void
   onCancel?: () => void
   onSaveDraft?: () => void
-  onSendLetter?: () => void
 }
 
 export function LetterWindow({
@@ -240,13 +239,9 @@ export function LetterWindow({
           <Button variant="outline" size="sm" onClick={onCancel}>
             Cancel
           </Button>
-          <Button variant="outline" size="sm" onClick={onSaveDraft}>
+          <Button size="sm" onClick={onSaveDraft}>
             <FileText className="mr-2 h-4 w-4" />
             Save Draft
-          </Button>
-          <Button size="sm" onClick={onSendLetter}>
-            <Send className="mr-2 h-4 w-4" />
-            Send Letter
           </Button>
         </div>
       </div>
