@@ -33,18 +33,22 @@ interface LetterAttachment {
   attachmentType?: string // The category of attachment (e.g., "Medical Records", "FMLA Forms")
 }
 
-// Predefined attachment item types
+// Predefined attachment item types (alphabetized)
 const ATTACHMENT_ITEM_TYPES = [
-  { id: "medical-records", label: "Medical Records" },
-  { id: "fmla-forms", label: "FMLA Forms" },
-  { id: "ada-documentation", label: "ADA Documentation" },
-  { id: "return-to-work", label: "Return to Work Documentation" },
-  { id: "physicians-note", label: "Physician's Note" },
-  { id: "job-description", label: "Job Description" },
-  { id: "accommodation-request", label: "Accommodation Request" },
-  { id: "insurance-forms", label: "Insurance Forms" },
-  { id: "ssdi-documentation", label: "SSDI Documentation" },
-  { id: "workers-comp", label: "Workers' Compensation Forms" },
+  { id: "a2k-informational", label: "A2K Informational Process Pamphlet" },
+  { id: "ada-accommodation-request", label: "ADA Accommodation Request" },
+  { id: "aetna-maternity", label: "Aetna Enhanced Maternity Fact Sheet" },
+  { id: "disability-guidelines", label: "Disability Process Guidelines" },
+  { id: "eap-flyer", label: "EAP Flyer" },
+  { id: "maternity-pay-example", label: "Maternity Pay Example (Salaried only)" },
+  { id: "maven-flyer", label: "Maven Flyer" },
+  { id: "nj-forms", label: "New Jersey Forms" },
+  { id: "rejuvenate-flyer", label: "Rejuvenate Flyer (Kidney Disease/Transplants)" },
+  { id: "sal-hrly-responsibilities", label: "Sal/Hrly Responsibilities Letter" },
+  { id: "std-application-full", label: "STD Application - Full, case to already be opened" },
+  { id: "std-application-partial", label: "STD Application - Partial" },
+  { id: "std-reimbursement", label: "STD Reimbursement Agreement" },
+  { id: "usw-responsibilities", label: "USW Responsibilities Letter" },
   { id: "other", label: "Other" },
 ]
 
