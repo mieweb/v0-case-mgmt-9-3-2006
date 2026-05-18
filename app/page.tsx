@@ -191,6 +191,7 @@ export default function Page() {
                     <DropdownMenuItem onClick={() => openAdminSection("users")}>Users</DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => openAdminSection("case-managers")}>Case Managers</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openAdminSection("locations")}>Locations</DropdownMenuItem>
                     <DropdownMenuItem onClick={() => openAdminSection("case-types")}>Case Types</DropdownMenuItem>
                     <DropdownMenuItem onClick={() => openAdminSection("letter-templates")}>
                       Letter Templates
