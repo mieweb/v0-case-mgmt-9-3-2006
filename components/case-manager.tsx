@@ -261,7 +261,7 @@ export function CaseManager() {
               <div className="text-xs text-muted-foreground mb-1">Date of Disability</div>
               <div className="text-sm font-medium">
                 {currentCase?.dateOfDisability
-                  ? new Date(currentCase.dateOfDisability).toLocaleDateString()
+                  ? new Date(currentCase.dateOfDisability + "T00:00:00").toLocaleDateString()
                   : "—"}
               </div>
             </div>
