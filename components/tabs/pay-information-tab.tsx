@@ -324,7 +324,7 @@ export function PayInformationTab() {
           </div>
 
           {/* Row 2: Rate of pay and STD offset */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="rate-of-pay" className="text-sm text-muted-foreground">
                 Rate of Pay
@@ -373,26 +373,21 @@ export function PayInformationTab() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="std-offset-type" className="text-sm text-muted-foreground">
-                STD Offset Type
-              </Label>
-              <Select value={stdOffsetType} onValueChange={setStdOffsetType}>
-                <SelectTrigger id="std-offset-type" className="bg-background">
-                  <SelectValue placeholder="Select type..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ssdi">SSDI</SelectItem>
-                  <SelectItem value="comp">Workers Comp</SelectItem>
-                  <SelectItem value="pers">PERS</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
               <Label htmlFor="std-offset-amount" className="text-sm text-muted-foreground">
-                STD Offset Amount
+                STD Offset
               </Label>
               <div className="flex gap-2">
+                <Select value={stdOffsetType} onValueChange={setStdOffsetType}>
+                  <SelectTrigger id="std-offset-type" className="bg-background w-[140px]">
+                    <SelectValue placeholder="Select type..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ssdi">SSDI</SelectItem>
+                    <SelectItem value="comp">Workers Comp</SelectItem>
+                    <SelectItem value="pers">PERS</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
                 <div className="relative flex-1">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
                   <Input
@@ -416,7 +411,7 @@ export function PayInformationTab() {
                   />
                 </div>
                 <Select value={stdOffsetFrequency} onValueChange={setStdOffsetFrequency}>
-                  <SelectTrigger id="std-offset-frequency" className="bg-background w-[120px]">
+                  <SelectTrigger id="std-offset-frequency" className="bg-background w-[110px]">
                     <SelectValue placeholder="Freq" />
                   </SelectTrigger>
                   <SelectContent>
