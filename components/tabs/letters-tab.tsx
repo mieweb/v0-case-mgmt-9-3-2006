@@ -722,55 +722,6 @@ export function LettersTab() {
               })}
             </div>
           </div>
-
-          {/* Additional Attachments Section */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs">Additional Attachments</Label>
-              <label htmlFor="letter-attachment-upload" className="cursor-pointer">
-                <Button type="button" variant="outline" size="sm" asChild>
-                  <span>
-                    <Paperclip className="mr-2 h-4 w-4" />
-                    Add File
-                  </span>
-                </Button>
-                <input
-                  id="letter-attachment-upload"
-                  type="file"
-                  multiple
-                  className="hidden"
-                  onChange={handleFileUpload}
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.png,.jpg,.jpeg"
-                />
-              </label>
-            </div>
-            
-            {attachments.filter((a) => !a.attachmentType).length > 0 ? (
-              <div className="border rounded-md divide-y">
-                {attachments.filter((a) => !a.attachmentType).map((attachment) => (
-                  <div key={attachment.id} className="flex items-center justify-between p-2 hover:bg-muted/50">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm font-medium">{attachment.name}</p>
-                        <p className="text-xs text-muted-foreground">{formatFileSize(attachment.size)}</p>
-                      </div>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleRemoveAttachment(attachment.id)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-xs text-muted-foreground">No additional attachments</p>
-            )}
-          </div>
         </div>
       </LetterWindow>
 
