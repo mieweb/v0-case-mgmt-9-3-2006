@@ -5,10 +5,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Pencil, X, Plus, Trash2, DollarSign, AlertTriangle, Check } from 'lucide-react'
+import { Pencil, X, Plus, Trash2, DollarSign, AlertTriangle, Check, Clock } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import { useCases, PayEntry } from "@/contexts/cases-context"
 import { useAdmin } from "@/contexts/admin-context"
@@ -20,7 +18,6 @@ export function PayInformationTab() {
 
   // Pay Entries State (history)
   const [payEntries, setPayEntries] = useState<PayEntry[]>([])
-  const [showAddDialog, setShowAddDialog] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [filterActive, setFilterActive] = useState<"all" | "active" | "inactive">("active")
 
@@ -95,18 +92,16 @@ export function PayInformationTab() {
   useEffect(() => {
     if (currentCase) {
       setPayEntries(currentCase.payEntries || [])
-    }
-  }, [currentCase?.caseNumber])
-
-  // Auto-calculate FICA date when dialog opens
-  useEffect(() => {
-    if (showAddDialog && currentCase?.dateOfDisability && !formData.ficaDate) {
-      const calculatedFica = calculateFicaDate(currentCase.dateOfDisability)
-      if (calculatedFica) {
-        setFormData(prev => ({ ...prev, ficaDate: calculatedFica }))
+      
+      // Auto-calculate FICA date
+      if (currentCase.dateOfDisability) {
+        const calculatedFica = calculateFicaDate(currentCase.dateOfDisability)
+        if (calculatedFica) {
+          setFormData(prev => ({ ...prev, ficaDate: calculatedFica }))
+        }
       }
     }
-  }, [showAddDialog, currentCase?.dateOfDisability])
+  }, [currentCase?.caseNumber, currentCase?.dateOfDisability])
 
   // Get pay code description
   const getPayCodeDescription = (code: string) => {
@@ -167,7 +162,6 @@ export function PayInformationTab() {
     updateCase(currentCase.caseNumber, { payEntries: updatedEntries })
 
     resetForm()
-    setShowAddDialog(false)
   }
 
   // Start editing
@@ -259,203 +253,218 @@ export function PayInformationTab() {
     return `$${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   }
 
-  // Pay Information Form (used in dialog and inline edit)
-  const PayInfoForm = ({ isInline = false }: { isInline?: boolean }) => (
-    <div className={`space-y-4 ${isInline ? "" : "pt-4"}`}>
-      {/* Row 1: Pay dates and FICA */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="space-y-2">
-          <Label className="text-sm text-muted-foreground">Pay Start Date *</Label>
-          <Input
-            type="date"
-            className="bg-background"
-            value={formData.payStartDate}
-            onChange={(e) => setFormData({ ...formData, payStartDate: e.target.value })}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label className="text-sm text-muted-foreground">Pay End Date</Label>
-          <Input
-            type="date"
-            className="bg-background"
-            value={formData.payEndDate}
-            onChange={(e) => setFormData({ ...formData, payEndDate: e.target.value })}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label className="text-sm text-muted-foreground">
-            FICA Date <span className="text-xs italic">(auto-calculated)</span>
-          </Label>
-          <Input type="date" className="bg-muted/50" value={formData.ficaDate} readOnly />
-          <p className="text-xs text-muted-foreground">
-            Date of disability + 6 months + first day of next month
-          </p>
-        </div>
-      </div>
-
-      {/* Row 2: Rate of pay and STD offset */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label className="text-sm text-muted-foreground">Rate of Pay</Label>
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-              <Input
-                type="text"
-                inputMode="decimal"
-                placeholder="0.00"
-                className={`bg-background pl-7 ${rateOfPayWarning ? "border-amber-500" : ""}`}
-                value={formData.rateOfPay}
-                onChange={(e) => {
-                  let value = e.target.value.replace(/[^0-9.]/g, '')
-                  const parts = value.split('.')
-                  if (parts.length > 2) {
-                    value = parts[0] + '.' + parts.slice(1).join('')
-                  } else if (parts[1]?.length > 2) {
-                    value = parts[0] + '.' + parts[1].slice(0, 2)
-                  }
-                  setFormData({ ...formData, rateOfPay: value })
-                  setRateOfPayWarning(validateMoneyAmount(value, formData.rateOfPayType))
-                }}
-              />
-            </div>
-            <Select 
-              value={formData.rateOfPayType} 
-              onValueChange={(val: "hourly" | "monthly") => {
-                setFormData({ ...formData, rateOfPayType: val })
-                setRateOfPayWarning(validateMoneyAmount(formData.rateOfPay, val))
-              }}
-            >
-              <SelectTrigger className="bg-background w-[120px]">
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="hourly">Hourly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          {rateOfPayWarning && (
-            <p className="text-xs text-amber-600 flex items-center gap-1">
-              <AlertTriangle className="h-3 w-3" />
-              {rateOfPayWarning}
-            </p>
-          )}
-        </div>
-        <div className="space-y-2">
-          <Label className="text-sm text-muted-foreground">STD Offset</Label>
-          <div className="flex gap-2">
-            <Select 
-              value={formData.stdOffsetType} 
-              onValueChange={(val) => setFormData({ ...formData, stdOffsetType: val })}
-            >
-              <SelectTrigger className="bg-background w-[140px]">
-                <SelectValue placeholder="Select type..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ssdi">SSDI</SelectItem>
-                <SelectItem value="comp">Workers Comp</SelectItem>
-                <SelectItem value="pers">PERS</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="relative flex-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-              <Input
-                type="text"
-                inputMode="decimal"
-                placeholder="0.00"
-                className={`bg-background pl-7 ${stdOffsetWarning ? "border-amber-500" : ""}`}
-                value={formData.stdOffsetAmount}
-                onChange={(e) => {
-                  let value = e.target.value.replace(/[^0-9.]/g, '')
-                  const parts = value.split('.')
-                  if (parts.length > 2) {
-                    value = parts[0] + '.' + parts.slice(1).join('')
-                  } else if (parts[1]?.length > 2) {
-                    value = parts[0] + '.' + parts[1].slice(0, 2)
-                  }
-                  setFormData({ ...formData, stdOffsetAmount: value })
-                  setStdOffsetWarning(validateMoneyAmount(value, "offset"))
-                }}
-              />
-            </div>
-            <Select 
-              value={formData.stdOffsetFrequency} 
-              onValueChange={(val: "weekly" | "monthly") => setFormData({ ...formData, stdOffsetFrequency: val })}
-            >
-              <SelectTrigger className="bg-background w-[110px]">
-                <SelectValue placeholder="Freq" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          {stdOffsetWarning && (
-            <p className="text-xs text-amber-600 flex items-center gap-1">
-              <AlertTriangle className="h-3 w-3" />
-              {stdOffsetWarning}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Row 3: STD Plan and Pay Code */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label className="text-sm text-muted-foreground">STD Plan</Label>
-          <Input
-            placeholder="Plan name or code"
-            className="bg-background"
-            value={formData.stdPlan}
-            onChange={(e) => setFormData({ ...formData, stdPlan: e.target.value })}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label className="text-sm text-muted-foreground">Pay Code *</Label>
-          <Select 
-            value={formData.payCode} 
-            onValueChange={(val) => setFormData({ ...formData, payCode: val })}
-          >
-            <SelectTrigger className="bg-background">
-              <SelectValue placeholder="Select pay code..." />
-            </SelectTrigger>
-            <SelectContent>
-              {codes.payCodes
-                .filter((pc) => pc.active)
-                .map((payCode) => (
-                  <SelectItem key={payCode.id} value={payCode.code}>
-                    {payCode.code} - {payCode.description}
-                  </SelectItem>
-                ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {/* Notes */}
-      <div className="space-y-2">
-        <Label className="text-sm text-muted-foreground">Notes</Label>
-        <Textarea
-          placeholder="Additional notes..."
-          className="bg-background"
-          value={formData.notes}
-          onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-        />
-      </div>
-    </div>
-  )
-
   return (
     <div className="space-y-6">
-      {/* Pay Information History Card */}
+      {/* Pay Information Entry Form */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign className="h-5 w-5" />
+            Pay Information
+          </CardTitle>
+          <CardDescription>Manage pay dates, rates, and STD offset information</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Row 1: Pay dates and FICA */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Pay Start Date *</Label>
+              <Input
+                type="date"
+                className="bg-background"
+                value={formData.payStartDate}
+                onChange={(e) => setFormData({ ...formData, payStartDate: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Pay End Date</Label>
+              <Input
+                type="date"
+                className="bg-background"
+                value={formData.payEndDate}
+                onChange={(e) => setFormData({ ...formData, payEndDate: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">
+                FICA Date <span className="text-xs italic">(auto-calculated)</span>
+              </Label>
+              <Input type="date" className="bg-muted/50" value={formData.ficaDate} readOnly />
+              <p className="text-xs text-muted-foreground">
+                Date of disability + 6 months + first day of next month
+              </p>
+            </div>
+          </div>
+
+          {/* Row 2: Rate of pay and STD offset */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Rate of Pay</Label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                  <Input
+                    type="text"
+                    inputMode="decimal"
+                    placeholder="0.00"
+                    className={`bg-background pl-7 ${rateOfPayWarning ? "border-amber-500" : ""}`}
+                    value={formData.rateOfPay}
+                    onChange={(e) => {
+                      let value = e.target.value.replace(/[^0-9.]/g, '')
+                      const parts = value.split('.')
+                      if (parts.length > 2) {
+                        value = parts[0] + '.' + parts.slice(1).join('')
+                      } else if (parts[1]?.length > 2) {
+                        value = parts[0] + '.' + parts[1].slice(0, 2)
+                      }
+                      setFormData({ ...formData, rateOfPay: value })
+                      setRateOfPayWarning(validateMoneyAmount(value, formData.rateOfPayType))
+                    }}
+                  />
+                </div>
+                <Select 
+                  value={formData.rateOfPayType} 
+                  onValueChange={(val: "hourly" | "monthly") => {
+                    setFormData({ ...formData, rateOfPayType: val })
+                    setRateOfPayWarning(validateMoneyAmount(formData.rateOfPay, val))
+                  }}
+                >
+                  <SelectTrigger className="bg-background w-[120px]">
+                    <SelectValue placeholder="Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hourly">Hourly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {rateOfPayWarning && (
+                <p className="text-xs text-amber-600 flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" />
+                  {rateOfPayWarning}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">STD Offset</Label>
+              <div className="flex gap-2">
+                <Select 
+                  value={formData.stdOffsetType} 
+                  onValueChange={(val) => setFormData({ ...formData, stdOffsetType: val })}
+                >
+                  <SelectTrigger className="bg-background w-[140px]">
+                    <SelectValue placeholder="Select type..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ssdi">SSDI</SelectItem>
+                    <SelectItem value="comp">Workers Comp</SelectItem>
+                    <SelectItem value="pers">PERS</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                  <Input
+                    type="text"
+                    inputMode="decimal"
+                    placeholder="0.00"
+                    className={`bg-background pl-7 ${stdOffsetWarning ? "border-amber-500" : ""}`}
+                    value={formData.stdOffsetAmount}
+                    onChange={(e) => {
+                      let value = e.target.value.replace(/[^0-9.]/g, '')
+                      const parts = value.split('.')
+                      if (parts.length > 2) {
+                        value = parts[0] + '.' + parts.slice(1).join('')
+                      } else if (parts[1]?.length > 2) {
+                        value = parts[0] + '.' + parts[1].slice(0, 2)
+                      }
+                      setFormData({ ...formData, stdOffsetAmount: value })
+                      setStdOffsetWarning(validateMoneyAmount(value, "offset"))
+                    }}
+                  />
+                </div>
+                <Select 
+                  value={formData.stdOffsetFrequency} 
+                  onValueChange={(val: "weekly" | "monthly") => setFormData({ ...formData, stdOffsetFrequency: val })}
+                >
+                  <SelectTrigger className="bg-background w-[110px]">
+                    <SelectValue placeholder="Freq" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {stdOffsetWarning && (
+                <p className="text-xs text-amber-600 flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" />
+                  {stdOffsetWarning}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Row 3: STD Plan and Pay Code */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">STD Plan</Label>
+              <Input
+                placeholder="Plan name or code"
+                className="bg-background"
+                value={formData.stdPlan}
+                onChange={(e) => setFormData({ ...formData, stdPlan: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Pay Code *</Label>
+              <Select 
+                value={formData.payCode} 
+                onValueChange={(val) => setFormData({ ...formData, payCode: val })}
+              >
+                <SelectTrigger className="bg-background">
+                  <SelectValue placeholder="Select pay code..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {codes.payCodes
+                    .filter((pc) => pc.active)
+                    .map((payCode) => (
+                      <SelectItem key={payCode.id} value={payCode.code}>
+                        {payCode.code} - {payCode.description}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Notes */}
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground">Notes</Label>
+            <Textarea
+              placeholder="Additional notes..."
+              className="bg-background"
+              value={formData.notes}
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+            />
+          </div>
+
+          {/* Add Entry Button */}
+          <div className="flex justify-end">
+            <Button onClick={handleAddEntry} disabled={!formData.payStartDate || !formData.payCode}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Pay Information
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Pay Information History */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5" />
+              <Clock className="h-5 w-5" />
               Pay Information History
             </CardTitle>
             <CardDescription>Track pay information changes and history</CardDescription>
@@ -471,40 +480,12 @@ export function PayInformationTab() {
                 <SelectItem value="inactive">Inactive Only</SelectItem>
               </SelectContent>
             </Select>
-            <Dialog open={showAddDialog} onOpenChange={(open) => {
-              setShowAddDialog(open)
-              if (!open) resetForm()
-            }}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Pay Information
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-3xl">
-                <DialogHeader>
-                  <DialogTitle>Add Pay Information</DialogTitle>
-                </DialogHeader>
-                <PayInfoForm />
-                <div className="flex justify-end gap-2 pt-4">
-                  <Button variant="outline" onClick={() => {
-                    setShowAddDialog(false)
-                    resetForm()
-                  }}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleAddEntry} disabled={!formData.payStartDate || !formData.payCode}>
-                    Add Entry
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
           </div>
         </CardHeader>
         <CardContent>
           {filteredEntries.length === 0 ? (
             <p className="text-muted-foreground text-center py-8">
-              No pay information entries found. Click &quot;Add Pay Information&quot; to create one.
+              No pay information entries found. Fill out the form above and click &quot;Add Pay Information&quot; to create one.
             </p>
           ) : (
             <div className="space-y-4">
@@ -513,7 +494,149 @@ export function PayInformationTab() {
                   <CardContent className="pt-4">
                     {editingId === entry.id ? (
                       <div className="space-y-4">
-                        <PayInfoForm isInline />
+                        {/* Inline Edit Form */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="space-y-2">
+                            <Label className="text-sm text-muted-foreground">Pay Start Date *</Label>
+                            <Input
+                              type="date"
+                              className="bg-background"
+                              value={formData.payStartDate}
+                              onChange={(e) => setFormData({ ...formData, payStartDate: e.target.value })}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-sm text-muted-foreground">Pay End Date</Label>
+                            <Input
+                              type="date"
+                              className="bg-background"
+                              value={formData.payEndDate}
+                              onChange={(e) => setFormData({ ...formData, payEndDate: e.target.value })}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-sm text-muted-foreground">FICA Date</Label>
+                            <Input type="date" className="bg-muted/50" value={formData.ficaDate} readOnly />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <Label className="text-sm text-muted-foreground">Rate of Pay</Label>
+                            <div className="flex gap-2">
+                              <div className="relative flex-1">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                                <Input
+                                  type="text"
+                                  inputMode="decimal"
+                                  placeholder="0.00"
+                                  className="bg-background pl-7"
+                                  value={formData.rateOfPay}
+                                  onChange={(e) => {
+                                    let value = e.target.value.replace(/[^0-9.]/g, '')
+                                    setFormData({ ...formData, rateOfPay: value })
+                                  }}
+                                />
+                              </div>
+                              <Select 
+                                value={formData.rateOfPayType} 
+                                onValueChange={(val: "hourly" | "monthly") => setFormData({ ...formData, rateOfPayType: val })}
+                              >
+                                <SelectTrigger className="bg-background w-[120px]">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="hourly">Hourly</SelectItem>
+                                  <SelectItem value="monthly">Monthly</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-sm text-muted-foreground">STD Offset</Label>
+                            <div className="flex gap-2">
+                              <Select 
+                                value={formData.stdOffsetType} 
+                                onValueChange={(val) => setFormData({ ...formData, stdOffsetType: val })}
+                              >
+                                <SelectTrigger className="bg-background w-[130px]">
+                                  <SelectValue placeholder="Type..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="ssdi">SSDI</SelectItem>
+                                  <SelectItem value="comp">Workers Comp</SelectItem>
+                                  <SelectItem value="pers">PERS</SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <div className="relative flex-1">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                                <Input
+                                  type="text"
+                                  inputMode="decimal"
+                                  placeholder="0.00"
+                                  className="bg-background pl-7"
+                                  value={formData.stdOffsetAmount}
+                                  onChange={(e) => {
+                                    let value = e.target.value.replace(/[^0-9.]/g, '')
+                                    setFormData({ ...formData, stdOffsetAmount: value })
+                                  }}
+                                />
+                              </div>
+                              <Select 
+                                value={formData.stdOffsetFrequency} 
+                                onValueChange={(val: "weekly" | "monthly") => setFormData({ ...formData, stdOffsetFrequency: val })}
+                              >
+                                <SelectTrigger className="bg-background w-[100px]">
+                                  <SelectValue placeholder="Freq" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="weekly">Weekly</SelectItem>
+                                  <SelectItem value="monthly">Monthly</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <Label className="text-sm text-muted-foreground">STD Plan</Label>
+                            <Input
+                              placeholder="Plan name or code"
+                              className="bg-background"
+                              value={formData.stdPlan}
+                              onChange={(e) => setFormData({ ...formData, stdPlan: e.target.value })}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-sm text-muted-foreground">Pay Code *</Label>
+                            <Select 
+                              value={formData.payCode} 
+                              onValueChange={(val) => setFormData({ ...formData, payCode: val })}
+                            >
+                              <SelectTrigger className="bg-background">
+                                <SelectValue placeholder="Select pay code..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {codes.payCodes
+                                  .filter((pc) => pc.active)
+                                  .map((payCode) => (
+                                    <SelectItem key={payCode.id} value={payCode.code}>
+                                      {payCode.code} - {payCode.description}
+                                    </SelectItem>
+                                  ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-sm text-muted-foreground">Notes</Label>
+                          <Textarea
+                            placeholder="Additional notes..."
+                            className="bg-background"
+                            value={formData.notes}
+                            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                          />
+                        </div>
                         <div className="flex justify-end gap-2">
                           <Button variant="outline" size="sm" onClick={handleCancelEdit}>
                             <X className="mr-2 h-4 w-4" />
@@ -527,8 +650,8 @@ export function PayInformationTab() {
                       </div>
                     ) : (
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
                             <Badge variant={entry.isActive ? "default" : "secondary"}>
                               {entry.payCode}
                             </Badge>
@@ -545,21 +668,24 @@ export function PayInformationTab() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleToggleActive(entry.id)}
-                              title={entry.isActive ? "Mark Inactive" : "Mark Active"}
-                            >
-                              {entry.isActive ? "Deactivate" : "Activate"}
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
                               onClick={() => handleStartEdit(entry)}
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="ghost"
-                              size="icon"
+                              size="sm"
+                              onClick={() => handleToggleActive(entry.id)}
+                            >
+                              {entry.isActive ? (
+                                <X className="h-4 w-4" />
+                              ) : (
+                                <Check className="h-4 w-4" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               onClick={() => handleDeleteEntry(entry.id)}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -568,44 +694,54 @@ export function PayInformationTab() {
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                           <div>
-                            <span className="text-muted-foreground">Pay Period:</span>
-                            <p className="font-medium">
-                              {formatDate(entry.payStartDate)} - {entry.payEndDate ? formatDate(entry.payEndDate) : "Ongoing"}
-                            </p>
+                            <span className="text-muted-foreground">Pay Start:</span>{" "}
+                            <span className="font-medium">{formatDate(entry.payStartDate)}</span>
                           </div>
                           <div>
-                            <span className="text-muted-foreground">FICA Date:</span>
-                            <p className="font-medium">{entry.ficaDate ? formatDate(entry.ficaDate) : "—"}</p>
+                            <span className="text-muted-foreground">Pay End:</span>{" "}
+                            <span className="font-medium">{entry.payEndDate ? formatDate(entry.payEndDate) : "—"}</span>
                           </div>
                           <div>
-                            <span className="text-muted-foreground">Rate of Pay:</span>
-                            <p className="font-medium">
-                              {formatCurrency(entry.rateOfPay)} / {entry.rateOfPayType === "hourly" ? "hr" : "mo"}
-                            </p>
+                            <span className="text-muted-foreground">FICA Date:</span>{" "}
+                            <span className="font-medium">{entry.ficaDate ? formatDate(entry.ficaDate) : "—"}</span>
                           </div>
                           <div>
-                            <span className="text-muted-foreground">STD Plan:</span>
-                            <p className="font-medium">{entry.stdPlan || "—"}</p>
+                            <span className="text-muted-foreground">Rate:</span>{" "}
+                            <span className="font-medium">
+                              {entry.rateOfPay ? `${formatCurrency(entry.rateOfPay)}/${entry.rateOfPayType}` : "—"}
+                            </span>
                           </div>
                         </div>
-                        {(entry.stdOffsetType || entry.stdOffsetAmount) && (
-                          <div className="text-sm">
-                            <span className="text-muted-foreground">STD Offset:</span>
-                            <p className="font-medium">
-                              {entry.stdOffsetType?.toUpperCase() || ""} {formatCurrency(entry.stdOffsetAmount || "")} 
-                              {entry.stdOffsetFrequency ? ` / ${entry.stdOffsetFrequency}` : ""}
-                            </p>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <span className="text-muted-foreground">STD Plan:</span>{" "}
+                            <span className="font-medium">{entry.stdPlan || "—"}</span>
                           </div>
-                        )}
+                          <div>
+                            <span className="text-muted-foreground">STD Offset:</span>{" "}
+                            <span className="font-medium">
+                              {entry.stdOffsetType ? (
+                                <>
+                                  {entry.stdOffsetType.toUpperCase()}
+                                  {entry.stdOffsetAmount && ` - ${formatCurrency(entry.stdOffsetAmount)}`}
+                                  {entry.stdOffsetFrequency && `/${entry.stdOffsetFrequency}`}
+                                </>
+                              ) : "—"}
+                            </span>
+                          </div>
+                          <div className="md:col-span-2">
+                            <span className="text-muted-foreground">Created:</span>{" "}
+                            <span className="font-medium">
+                              {new Date(entry.createdAt).toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
                         {entry.notes && (
                           <div className="text-sm">
-                            <span className="text-muted-foreground">Notes:</span>
-                            <p>{entry.notes}</p>
+                            <span className="text-muted-foreground">Notes:</span>{" "}
+                            <span>{entry.notes}</span>
                           </div>
                         )}
-                        <div className="text-xs text-muted-foreground">
-                          Created: {new Date(entry.createdAt).toLocaleString()}
-                        </div>
                       </div>
                     )}
                   </CardContent>
