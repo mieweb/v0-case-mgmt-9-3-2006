@@ -20,14 +20,20 @@ export interface AbsenceEntry {
 
 export interface PayEntry {
   id: string
+  payStartDate: string
+  payEndDate?: string
+  ficaDate?: string
+  rateOfPay: string
+  rateOfPayType: "hourly" | "monthly"
+  stdOffsetType?: string
+  stdOffsetAmount?: string
+  stdOffsetFrequency?: "weekly" | "monthly"
+  stdPlan?: string
   payCode: string
   payCodeDescription: string
-  startDate: string
-  endDate?: string
-  amount: string
-  frequency: "weekly" | "bi-weekly" | "monthly"
   isActive: boolean
   notes?: string
+  createdAt: string
 }
 
 export interface ADATrackingEntry {
