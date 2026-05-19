@@ -430,7 +430,7 @@ export function PayInformationTab() {
                     .filter((pc) => pc.active)
                     .map((payCode) => (
                       <SelectItem key={payCode.id} value={payCode.code}>
-                        {payCode.code} - {payCode.description}
+                        {payCode.description}
                       </SelectItem>
                     ))}
                 </SelectContent>
@@ -621,7 +621,7 @@ export function PayInformationTab() {
                                   .filter((pc) => pc.active)
                                   .map((payCode) => (
                                     <SelectItem key={payCode.id} value={payCode.code}>
-                                      {payCode.code} - {payCode.description}
+                                      {payCode.description}
                                     </SelectItem>
                                   ))}
                               </SelectContent>
