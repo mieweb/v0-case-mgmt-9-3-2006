@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Pencil, X, Plus, Trash2, DollarSign, AlertTriangle, Check, Clock } from 'lucide-react'
+import { Pencil, X, Plus, Trash2, DollarSign, AlertTriangle, Check, Clock, ToggleLeft, ToggleRight } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import { useCases, PayEntry } from "@/contexts/cases-context"
 import { useAdmin } from "@/contexts/admin-context"
@@ -676,19 +676,22 @@ export function PayInformationTab() {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleToggleActive(entry.id)}
+                              title={entry.isActive ? "Deactivate entry" : "Activate entry"}
                             >
                               {entry.isActive ? (
-                                <X className="h-4 w-4" />
+                                <ToggleRight className="h-4 w-4 text-green-600" />
                               ) : (
-                                <Check className="h-4 w-4" />
+                                <ToggleLeft className="h-4 w-4 text-muted-foreground" />
                               )}
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDeleteEntry(entry.id)}
+                              title="Delete entry"
                             >
                               <Trash2 className="h-4 w-4" />
+                            </Button>
                             </Button>
                           </div>
                         </div>
