@@ -550,18 +550,20 @@ export function CaseNotesTab() {
                   
                   recognition.onresult = function(event) {
                     let finalTranscript = '';
+                    let interimTranscript = '';
                     for (let i = event.resultIndex; i < event.results.length; i++) {
+                      const transcript = event.results[i][0].transcript;
                       if (event.results[i].isFinal) {
-                        finalTranscript += event.results[i][0].transcript;
+                        finalTranscript += transcript;
+                      } else {
+                        interimTranscript += transcript;
                       }
                     }
+                    console.log('[v0] Final:', finalTranscript, 'Interim:', interimTranscript);
                     if (finalTranscript) {
-                      const cursorPos = noteContent.selectionStart;
-                      const textBefore = noteContent.value.substring(0, cursorPos);
-                      const textAfter = noteContent.value.substring(cursorPos);
-                      noteContent.value = textBefore + finalTranscript + ' ' + textAfter;
-                      noteContent.selectionStart = noteContent.selectionEnd = cursorPos + finalTranscript.length + 1;
-                      noteContent.focus();
+                      const currentValue = noteContent.value || '';
+                      noteContent.value = currentValue + (currentValue ? ' ' : '') + finalTranscript;
+                      console.log('[v0] Updated value:', noteContent.value);
                     }
                   };
                   
