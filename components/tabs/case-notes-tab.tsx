@@ -588,6 +588,20 @@ export function CaseNotesTab() {
               } else {
                 dictateBtn.style.display = 'none';
               }
+              
+              // Save button handler - send data back to parent window
+              document.getElementById('saveBtn').addEventListener('click', function() {
+                const data = {
+                  type: 'CASE_NOTE_SAVE',
+                  noteDate: document.getElementById('noteDate').value,
+                  activity: document.getElementById('activity').value,
+                  content: document.getElementById('noteContent').value
+                };
+                if (window.opener) {
+                  window.opener.postMessage(data, '*');
+                  window.close();
+                }
+              });
             </script>
           </body>
         </html>
@@ -595,6 +609,20 @@ export function CaseNotesTab() {
       newWindow.document.close()
     }
   }
+
+  // Listen for messages from pop-out window
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'CASE_NOTE_SAVE') {
+        setNoteDate(event.data.noteDate)
+        setActivity(event.data.activity)
+        setContent(event.data.content)
+      }
+    }
+    
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [])
 
   return (
     <div className="case-notes-tab space-y-6">
