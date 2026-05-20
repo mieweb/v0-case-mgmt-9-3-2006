@@ -846,7 +846,7 @@ const initialCases: Case[] = [
     caseManager: "Arlene Rosario, CPDM",
     created: "9/1/2025",
     lastUpdated: "9/6/2025",
-    dateOfDisability: "2025-08-15",
+    dateOfDisability: "08/15/2025",
     lastWorkDate: "2025-09-01",
     returnToWorkDate: "2025-09-05",
     fileDate: "2025-09-06",
