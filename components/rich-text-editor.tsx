@@ -517,7 +517,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
           <span className="text-xs">{"<< >> to {{ }}"}</span>
         </Button>
 
-                <div className="w-px h-6 bg-border mx-1" />
+        <div className="w-px h-6 bg-border mx-1" />
         <Button
           type="button"
           variant={isListening ? "destructive" : "ghost"}
@@ -528,8 +528,12 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
             console.log("[v0] Dictation button clicked, speechSupported:", speechSupported)
             toggleDictation()
           }}
+          onMouseDown={(e) => {
+            console.log("[v0] Dictation button mousedown")
+          }}
           disabled={!speechSupported}
-          className={cn("h-8 px-2 gap-1", isListening && "animate-pulse")}
+          className={cn("h-8 px-2 gap-1 pointer-events-auto relative z-20", isListening && "animate-pulse")}
+          style={{ pointerEvents: 'auto' }}
           title={!speechSupported ? "Speech recognition not supported in this browser" : isListening ? "Stop Dictation" : "Start Dictation"}
         >
           {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
