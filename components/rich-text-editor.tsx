@@ -85,6 +85,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
   // Check for speech recognition support
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    console.log("[v0] SpeechRecognition check:", !!SpeechRecognition)
     setSpeechSupported(!!SpeechRecognition)
   }, [])
 
@@ -516,22 +517,24 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
           <span className="text-xs">{"<< >> to {{ }}"}</span>
         </Button>
 
-        {speechSupported && (
-          <>
-            <div className="w-px h-6 bg-border mx-1" />
-            <Button
-              type="button"
-              variant={isListening ? "destructive" : "ghost"}
-              size="sm"
-              onClick={toggleDictation}
-              className={cn("h-8 px-2 gap-1", isListening && "animate-pulse")}
-              title={isListening ? "Stop Dictation" : "Start Dictation"}
-            >
-              {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              <span className="text-xs">{isListening ? "Stop" : "Dictate"}</span>
-            </Button>
-          </>
-        )}
+                <div className="w-px h-6 bg-border mx-1" />
+        <Button
+          type="button"
+          variant={isListening ? "destructive" : "ghost"}
+          size="sm"
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            console.log("[v0] Dictation button clicked, speechSupported:", speechSupported)
+            toggleDictation()
+          }}
+          disabled={!speechSupported}
+          className={cn("h-8 px-2 gap-1", isListening && "animate-pulse")}
+          title={!speechSupported ? "Speech recognition not supported in this browser" : isListening ? "Stop Dictation" : "Start Dictation"}
+        >
+          {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+          <span className="text-xs">{isListening ? "Stop" : "Dictate"}</span>
+        </Button>
       </div>
 
       {/* Editor */}
