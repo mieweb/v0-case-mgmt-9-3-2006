@@ -440,33 +440,155 @@ export function CaseNotesTab() {
           <head>
             <title>${editingNote ? "Edit Note" : "Create Note"}</title>
             <style>
-              body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; }
+              body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; margin: 0; background: #f5f5f5; }
+              .header { background: #1e40af; color: white; padding: 15px 20px; margin: -20px -20px 20px -20px; }
+              .header h2 { margin: 0; font-size: 18px; }
               .form-group { margin-bottom: 15px; }
-              label { display: block; margin-bottom: 5px; font-weight: 500; }
-              input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-              textarea { min-height: 400px; font-family: inherit; }
+              label { display: block; margin-bottom: 5px; font-weight: 600; color: #374151; }
+              input, select { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; }
+              .editor-container { border: 1px solid #d1d5db; border-radius: 6px; background: white; }
+              .toolbar { display: flex; align-items: center; gap: 8px; padding: 8px; border-bottom: 1px solid #d1d5db; background: #f9fafb; }
+              .dictate-btn { 
+                display: flex; align-items: center; gap: 4px; padding: 6px 12px; 
+                border: none; border-radius: 4px; cursor: pointer; font-size: 14px;
+                background: #f3f4f6; color: #374151;
+              }
+              .dictate-btn:hover { background: #e5e7eb; }
+              .dictate-btn.active { background: #dc2626; color: white; animation: pulse 1.5s infinite; }
+              @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+              .note-textarea { 
+                width: 100%; min-height: 350px; padding: 15px; border: none; 
+                font-family: inherit; font-size: 14px; line-height: 1.6; resize: vertical;
+                box-sizing: border-box;
+              }
+              .note-textarea:focus { outline: none; }
+              .button-group { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+              button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
+              .btn-primary { background: #1e40af; color: white; }
+              .btn-primary:hover { background: #1e3a8a; }
+              .btn-secondary { background: #6b7280; color: white; }
+              .btn-secondary:hover { background: #4b5563; }
+              .mic-icon { width: 16px; height: 16px; }
             </style>
           </head>
           <body>
-            <h2>${editingNote ? "Edit Note" : "Create Note"}</h2>
+            <div class="header">
+              <h2>${editingNote ? "Edit Note" : "Create Note"}</h2>
+            </div>
             <div class="form-group">
               <label>Note Date</label>
-              <input type="date" value="${noteDate}" />
+              <input type="date" id="noteDate" value="${noteDate}" />
             </div>
             <div class="form-group">
               <label>Activity</label>
-              <select>
-                <option value="phone">Phone Call</option>
-                <option value="email">Email</option>
-                <option value="meeting">Meeting</option>
-                <option value="review">Case Review</option>
-                <option value="other">Other</option>
+              <select id="activity">
+                <option value="phone" ${activity === "phone" ? "selected" : ""}>Phone Call</option>
+                <option value="email" ${activity === "email" ? "selected" : ""}>Email</option>
+                <option value="meeting" ${activity === "meeting" ? "selected" : ""}>Meeting</option>
+                <option value="review" ${activity === "review" ? "selected" : ""}>Case Review</option>
+                <option value="other" ${activity === "other" ? "selected" : ""}>Other</option>
               </select>
             </div>
             <div class="form-group">
               <label>Notes</label>
-              <textarea>${content}</textarea>
+              <div class="editor-container">
+                <div class="toolbar">
+                  <button type="button" id="dictateBtn" class="dictate-btn">
+                    <svg class="mic-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                      <line x1="12" x2="12" y1="19" y2="22"></line>
+                    </svg>
+                    <span id="dictateText">Dictate</span>
+                  </button>
+                </div>
+                <textarea id="noteContent" class="note-textarea" placeholder="Enter your notes here...">${content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+              </div>
             </div>
+            <div class="button-group">
+              <button class="btn-secondary" onclick="window.close()">Cancel</button>
+              <button class="btn-primary" id="saveBtn">Save Note</button>
+            </div>
+            <script>
+              let recognition = null;
+              let isListening = false;
+              
+              const dictateBtn = document.getElementById('dictateBtn');
+              const dictateText = document.getElementById('dictateText');
+              const noteContent = document.getElementById('noteContent');
+              
+              const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+              
+              if (SpeechRecognition) {
+                dictateBtn.addEventListener('click', async function() {
+                  if (isListening && recognition) {
+                    recognition.stop();
+                    isListening = false;
+                    dictateBtn.classList.remove('active');
+                    dictateText.textContent = 'Dictate';
+                    return;
+                  }
+                  
+                  try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    stream.getTracks().forEach(track => track.stop());
+                  } catch (err) {
+                    alert('Microphone access is required for dictation. Please allow microphone access and try again.');
+                    return;
+                  }
+                  
+                  recognition = new SpeechRecognition();
+                  recognition.continuous = true;
+                  recognition.interimResults = true;
+                  recognition.lang = 'en-US';
+                  
+                  recognition.onstart = function() {
+                    isListening = true;
+                    dictateBtn.classList.add('active');
+                    dictateText.textContent = 'Stop';
+                  };
+                  
+                  recognition.onresult = function(event) {
+                    let finalTranscript = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                      if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                      }
+                    }
+                    if (finalTranscript) {
+                      const cursorPos = noteContent.selectionStart;
+                      const textBefore = noteContent.value.substring(0, cursorPos);
+                      const textAfter = noteContent.value.substring(cursorPos);
+                      noteContent.value = textBefore + finalTranscript + ' ' + textAfter;
+                      noteContent.selectionStart = noteContent.selectionEnd = cursorPos + finalTranscript.length + 1;
+                      noteContent.focus();
+                    }
+                  };
+                  
+                  recognition.onerror = function(event) {
+                    if (event.error === 'no-speech' || event.error === 'aborted') return;
+                    console.error('Speech recognition error:', event.error);
+                    isListening = false;
+                    dictateBtn.classList.remove('active');
+                    dictateText.textContent = 'Dictate';
+                  };
+                  
+                  recognition.onend = function() {
+                    if (isListening) {
+                      try { recognition.start(); } catch(e) {
+                        isListening = false;
+                        dictateBtn.classList.remove('active');
+                        dictateText.textContent = 'Dictate';
+                      }
+                    }
+                  };
+                  
+                  recognition.start();
+                });
+              } else {
+                dictateBtn.style.display = 'none';
+              }
+            </script>
           </body>
         </html>
       `)
