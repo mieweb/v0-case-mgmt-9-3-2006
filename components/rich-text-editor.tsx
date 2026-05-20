@@ -79,11 +79,24 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
   const [isListening, setIsListening] = useState(false)
   const [speechSupported, setSpeechSupported] = useState(false)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const isListeningRef = useRef(false)
+  const shouldRestartRef = useRef(false)
 
   // Check for speech recognition support
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     setSpeechSupported(!!SpeechRecognition)
+  }, [])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        shouldRestartRef.current = false
+        isListeningRef.current = false
+        recognitionRef.current.stop()
+      }
+    }
   }, [])
 
   useEffect(() => {
@@ -167,6 +180,8 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     if (!SpeechRecognition) return
 
     if (isListening && recognitionRef.current) {
+      shouldRestartRef.current = false
+      isListeningRef.current = false
       recognitionRef.current.stop()
       setIsListening(false)
       return
@@ -176,9 +191,21 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     recognition.continuous = true
     recognition.interimResults = true
     recognition.lang = "en-US"
+    recognition.maxAlternatives = 1
+
+    // Keep the recognition session alive longer
+    const startRecognition = () => {
+      try {
+        recognition.start()
+      } catch (e) {
+        // Already started, ignore
+      }
+    }
 
     recognition.onstart = () => {
       setIsListening(true)
+      isListeningRef.current = true
+      shouldRestartRef.current = true
     }
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
@@ -214,30 +241,46 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     }
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      // "no-speech" is not a real error - it just means the user hasn't spoken yet
-      // "aborted" happens when we manually stop - also not an error
+      // These are not real errors - ignore them and keep listening
       if (event.error === "no-speech" || event.error === "aborted") {
         return
       }
+      
+      // For network errors, try to restart
+      if (event.error === "network") {
+        console.warn("Speech recognition network error, will retry...")
+        return
+      }
+      
       console.error("Speech recognition error:", event.error)
+      shouldRestartRef.current = false
+      isListeningRef.current = false
       setIsListening(false)
     }
 
     recognition.onend = () => {
-      // If still listening (wasn't manually stopped), restart to keep listening
-      if (isListening && recognitionRef.current) {
-        try {
-          recognitionRef.current.start()
-        } catch {
-          setIsListening(false)
-        }
+      // Only restart if we should still be listening (user hasn't stopped it)
+      if (shouldRestartRef.current && isListeningRef.current) {
+        // Small delay before restarting to avoid rapid restarts
+        setTimeout(() => {
+          if (shouldRestartRef.current && isListeningRef.current) {
+            try {
+              recognition.start()
+            } catch {
+              // If start fails, stop listening
+              shouldRestartRef.current = false
+              isListeningRef.current = false
+              setIsListening(false)
+            }
+          }
+        }, 100)
       } else {
         setIsListening(false)
       }
     }
 
     recognitionRef.current = recognition
-    recognition.start()
+    startRecognition()
   }
 
   const insertVariable = (variable: string) => {
