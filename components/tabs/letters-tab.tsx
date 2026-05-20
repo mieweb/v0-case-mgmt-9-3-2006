@@ -595,8 +595,8 @@ export function LettersTab() {
         setSentFrom(event.data.sentFrom)
         // Convert plain text back to HTML paragraphs
         const htmlContent = event.data.content
-          .split('\\n\\n')
-          .map((paragraph: string) => \`<p>\${paragraph.replace(/\\n/g, '<br>')}</p>\`)
+          .split('\n\n')
+          .map((paragraph: string) => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
           .join('')
         setContent(htmlContent)
       }
