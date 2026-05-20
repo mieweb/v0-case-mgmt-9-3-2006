@@ -503,6 +503,7 @@ export function CaseNotesTab() {
                   </button>
                 </div>
                 <textarea id="noteContent" class="note-textarea" placeholder="Enter your notes here...">${content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+                <div id="interimText" style="padding: 10px 15px; color: #6b7280; font-style: italic; border-top: 1px dashed #e5e7eb; display: none; min-height: 24px; background: #fefce8;"></div>
               </div>
             </div>
             <div class="button-group">
@@ -516,6 +517,7 @@ export function CaseNotesTab() {
               const dictateBtn = document.getElementById('dictateBtn');
               const dictateText = document.getElementById('dictateText');
               const noteContent = document.getElementById('noteContent');
+              const interimText = document.getElementById('interimText');
               
               const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
               
@@ -546,6 +548,8 @@ export function CaseNotesTab() {
                     isListening = true;
                     dictateBtn.classList.add('active');
                     dictateText.textContent = 'Stop';
+                    interimText.style.display = 'block';
+                    interimText.textContent = 'Listening...';
                   };
                   
                   recognition.onresult = function(event) {
@@ -559,11 +563,18 @@ export function CaseNotesTab() {
                         interimTranscript += transcript;
                       }
                     }
-                    console.log('[v0] Final:', finalTranscript, 'Interim:', interimTranscript);
+                    
+                    // Show interim results immediately
+                    if (interimTranscript) {
+                      interimText.textContent = interimTranscript;
+                      interimText.style.display = 'block';
+                    }
+                    
+                    // Add final results to textarea
                     if (finalTranscript) {
                       const currentValue = noteContent.value || '';
                       noteContent.value = currentValue + (currentValue ? ' ' : '') + finalTranscript;
-                      console.log('[v0] Updated value:', noteContent.value);
+                      interimText.textContent = 'Listening...';
                     }
                   };
                   
@@ -573,6 +584,7 @@ export function CaseNotesTab() {
                     isListening = false;
                     dictateBtn.classList.remove('active');
                     dictateText.textContent = 'Dictate';
+                    interimText.style.display = 'none';
                   };
                   
                   recognition.onend = function() {
@@ -581,7 +593,10 @@ export function CaseNotesTab() {
                         isListening = false;
                         dictateBtn.classList.remove('active');
                         dictateText.textContent = 'Dictate';
+                        interimText.style.display = 'none';
                       }
+                    } else {
+                      interimText.style.display = 'none';
                     }
                   };
                   
