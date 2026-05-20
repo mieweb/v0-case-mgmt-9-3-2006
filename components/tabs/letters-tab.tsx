@@ -364,43 +364,51 @@ export function LettersTab() {
           <head>
             <title>${editingLetter ? "Edit Letter" : "Create Letter"}</title>
             <style>
-              body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; }
+              body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; margin: 0; }
+              .header { background: #1e40af; color: white; padding: 15px 20px; margin: -20px -20px 20px -20px; }
+              .header h2 { margin: 0; font-size: 18px; }
               .form-group { margin-bottom: 15px; }
-              label { display: block; margin-bottom: 5px; font-weight: 500; }
-              input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-              textarea { min-height: 400px; font-family: inherit; }
-              .button-group { display: flex; gap: 10px; margin-top: 20px; }
-              button { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; }
-              .btn-primary { background: #0070f3; color: white; }
-              .btn-secondary { background: #666; color: white; }
+              label { display: block; margin-bottom: 5px; font-weight: 600; color: #374151; }
+              input, select { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; }
+              .letter-content { 
+                border: 1px solid #d1d5db; 
+                border-radius: 6px; 
+                padding: 20px; 
+                min-height: 400px; 
+                background: white;
+                line-height: 1.6;
+              }
+              .letter-content table { border-collapse: collapse; width: 100%; }
+              .letter-content td { border: 1px solid #ddd; padding: 8px; }
+              .letter-content h2, .letter-content h3 { margin-top: 20px; margin-bottom: 10px; }
+              .letter-content p { margin: 10px 0; }
+              .button-group { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+              button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
+              .btn-primary { background: #1e40af; color: white; }
+              .btn-primary:hover { background: #1e3a8a; }
+              .btn-secondary { background: #6b7280; color: white; }
+              .btn-secondary:hover { background: #4b5563; }
             </style>
           </head>
           <body>
-            <h2>${editingLetter ? "Edit Letter" : "Create Letter"}</h2>
+            <div class="header">
+              <h2>${editingLetter ? "Edit Letter" : "Create Letter"}</h2>
+            </div>
             <div class="form-group">
               <label>Letter Sent From</label>
-              <input type="text" value="${sentFrom}" />
+              <input type="text" value="${sentFrom}" readonly />
             </div>
             <div class="form-group">
               <label>Letter Type</label>
-              <select>
-                <option value="">Select letter type...</option>
-                <option value="initial">Initial Contact Letter</option>
-                <option value="followup">Follow-up Letter</option>
-                <option value="closure">Case Closure Letter</option>
-                <option value="rtw">Return to Work Letter</option>
-                <option value="medical">Medical Documentation Request</option>
-                <option value="benefits">Benefits Information</option>
-              </select>
+              <input type="text" value="${template ? letterTemplates?.find(t => t.code === template)?.name || template : 'Not selected'}" readonly />
             </div>
             <div class="form-group">
               <label>Letter Content</label>
-              <textarea>${content}</textarea>
+              <div class="letter-content">${content}</div>
             </div>
             <div class="button-group">
+              <button class="btn-secondary" onclick="window.print()">Print</button>
               <button class="btn-secondary" onclick="window.close()">Close</button>
-              <button class="btn-primary">Save Draft</button>
-              <button class="btn-primary">Send Letter</button>
             </div>
           </body>
         </html>
