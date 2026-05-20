@@ -370,57 +370,59 @@ CC: Laura Higginbotham, Benefits Leader
       name: "LTD Cover Summary",
       description: "Case summary for LTD application",
       active: true,
-      content: `CASE SUMMARY
+      content: `<h2>CASE SUMMARY</h2>
 
-Please find the LTD Application for:
+<p>Please find the LTD Application for:</p>
 
-NAME:	{{employeeFirstName}} {{employeeLastName}}
-EMPLOYEE ID:	{{employeeNumber}}
-SOCIAL SECURITY #:	{{employeeSSN}}
-DATE OF BIRTH:	{{dateOfBirth}}
-RACE:	{{employeeEthnicGroup}}
-LOCATION:	{{employeeLocation}}
-UNUM POLICY #:	
-LTD COVERAGE:	60%
-DATE OF HIRE:	{{dateOfHire}}
-YEARS OF SERVICE:	
-DATE OF INJURY-INJ/ILL:	{{dateOfDisability}}
-OCCUPATIONAL/NON-OCCUPATIONAL:	
-JOB TITLE/DUTIES:	{{position}}
-LAST DAY WORKED:	
-FIRST DAY OF STD/WC:	{{stdStartDate}}
-LAST DAY OF STD/WC:	
-FIRST DAY OF LTD if approved:	
-RATE OF PAY on last day worked:	
-INCENTIVE if Salary employee:	
-FULL/PART TIME STATUS:	{{employmentType}}
-LTD BENEFIT-based on 40 hours:	40 hours
-WORK COMP Pay and Begin/End Date(s):	
-DATE OF INITIAL APPLICATION FOR SSDI:	
-DATE SSDI RECONSIDERATION FILED:	
-SSDI ENTITLEMENT/DENIAL DATE WITH DOLLAR AMOUNT:	
-DEPENDENT SSDI-AMOUNT AND EFFECTIVE DATE:	
-STD OVERPAYMENT Amount/Status:	
-MEDICAL CASE MANAGER:	{{caseManagerWithCredentials}}
-CASE MANAGER PHONE:	{{caseManagerPhone}}
+<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+  <tbody>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold; width: 40%;">NAME</td><td style="border: 1px solid #ddd; padding: 8px;">{{employeeFirstName}} {{employeeLastName}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">EMPLOYEE ID</td><td style="border: 1px solid #ddd; padding: 8px;">{{employeeNumber}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">SOCIAL SECURITY #</td><td style="border: 1px solid #ddd; padding: 8px;">{{employeeSSN}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">DATE OF BIRTH</td><td style="border: 1px solid #ddd; padding: 8px;">{{dateOfBirth}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">RACE</td><td style="border: 1px solid #ddd; padding: 8px;">{{employeeEthnicGroup}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">LOCATION</td><td style="border: 1px solid #ddd; padding: 8px;">{{employeeLocation}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">UNUM POLICY #</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">LTD COVERAGE</td><td style="border: 1px solid #ddd; padding: 8px;">60%</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">DATE OF HIRE</td><td style="border: 1px solid #ddd; padding: 8px;">{{dateOfHire}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">YEARS OF SERVICE</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">DATE OF INJURY-INJ/ILL</td><td style="border: 1px solid #ddd; padding: 8px;">{{dateOfDisability}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">OCCUPATIONAL/NON-OCCUPATIONAL</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">JOB TITLE/DUTIES</td><td style="border: 1px solid #ddd; padding: 8px;">{{position}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">LAST DAY WORKED</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">FIRST DAY OF STD/WC</td><td style="border: 1px solid #ddd; padding: 8px;">{{stdStartDate}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">LAST DAY OF STD/WC</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">FIRST DAY OF LTD if approved</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">RATE OF PAY on last day worked</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">INCENTIVE if Salary employee</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">FULL/PART TIME STATUS</td><td style="border: 1px solid #ddd; padding: 8px;">{{employmentType}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">LTD BENEFIT-based on 40 hours</td><td style="border: 1px solid #ddd; padding: 8px;">40 hours</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">WORK COMP Pay and Begin/End Date(s)</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">DATE OF INITIAL APPLICATION FOR SSDI</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">DATE SSDI RECONSIDERATION FILED</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">SSDI ENTITLEMENT/DENIAL DATE WITH DOLLAR AMOUNT</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">DEPENDENT SSDI-AMOUNT AND EFFECTIVE DATE</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">STD OVERPAYMENT Amount/Status</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">MEDICAL CASE MANAGER</td><td style="border: 1px solid #ddd; padding: 8px;">{{caseManagerWithCredentials}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">CASE MANAGER PHONE</td><td style="border: 1px solid #ddd; padding: 8px;">{{caseManagerPhone}}</td></tr>
+  </tbody>
+</table>
 
-If you need any additional information, please do not hesitate to call.
+<p>If you need any additional information, please do not hesitate to call.</p>
 
-Signature: 
-Date: {{today}}
+<p>Signature: _________________________<br/>
+Date: {{today}}</p>
 
-TREATING PHYSICIANS:
-(List all employee's currently treating and/or restricting physicians and most current medical through date.)
+<h3>TREATING PHYSICIANS:</h3>
+<p><em>(List all employee's currently treating and/or restricting physicians and most current medical through date.)</em></p>
+<p>{{diagnosis}}</p>
 
-{{diagnosis}}
+<h3>CASE HISTORY:</h3>
+<p><em>(Give a brief overview of the employee illness, treatment plan, restrictions, etc.)</em></p>
+<p>{{natureOfInjury}}</p>
 
-CASE HISTORY:
-(Give a brief overview of the employee illness, treatment plan, restrictions, etc.)
-
-{{natureOfInjury}}
-
-TESTINGS:
-(Listing of diagnostic testing and results: for example, IME, FCE)
+<h3>TESTINGS:</h3>
+<p><em>(Listing of diagnostic testing and results: for example, IME, FCE)</em></p>
 
 TREATMENTS:
 (Surgery, Chemo, Radiation, Physical Therapy, Work Hardening, Vocational rehabilitation)
