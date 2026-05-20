@@ -176,10 +176,15 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
   }
 
   const toggleDictation = () => {
+    console.log("[v0] toggleDictation called, isListening:", isListening)
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    if (!SpeechRecognition) return
+    if (!SpeechRecognition) {
+      console.log("[v0] SpeechRecognition not supported")
+      return
+    }
 
     if (isListening && recognitionRef.current) {
+      console.log("[v0] Stopping dictation")
       shouldRestartRef.current = false
       isListeningRef.current = false
       recognitionRef.current.stop()
@@ -187,6 +192,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
       return
     }
 
+    console.log("[v0] Starting new recognition")
     const recognition = new SpeechRecognition()
     recognition.continuous = true
     recognition.interimResults = true
@@ -196,23 +202,27 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     // Keep the recognition session alive longer
     const startRecognition = () => {
       try {
+        console.log("[v0] Calling recognition.start()")
         recognition.start()
       } catch (e) {
-        // Already started, ignore
+        console.log("[v0] Error starting recognition:", e)
       }
     }
 
     recognition.onstart = () => {
+      console.log("[v0] Recognition started successfully")
       setIsListening(true)
       isListeningRef.current = true
       shouldRestartRef.current = true
     }
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
+      console.log("[v0] Got result event")
       let finalTranscript = ""
       
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript
+        console.log("[v0] Transcript:", transcript, "isFinal:", event.results[i].isFinal)
         if (event.results[i].isFinal) {
           finalTranscript += transcript
         }
@@ -221,6 +231,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
       if (finalTranscript && editorRef.current) {
         // Process punctuation commands
         const processedText = processDictation(finalTranscript)
+        console.log("[v0] Processing final transcript:", processedText)
         
         editorRef.current.focus()
         const selection = window.getSelection()
@@ -241,6 +252,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     }
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      console.log("[v0] Recognition error:", event.error)
       // These are not real errors - ignore them and keep listening
       if (event.error === "no-speech" || event.error === "aborted") {
         return
@@ -248,25 +260,28 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
       
       // For network errors, try to restart
       if (event.error === "network") {
-        console.warn("Speech recognition network error, will retry...")
+        console.warn("[v0] Speech recognition network error, will retry...")
         return
       }
       
-      console.error("Speech recognition error:", event.error)
+      console.error("[v0] Speech recognition error:", event.error)
       shouldRestartRef.current = false
       isListeningRef.current = false
       setIsListening(false)
     }
 
     recognition.onend = () => {
+      console.log("[v0] Recognition ended, shouldRestart:", shouldRestartRef.current, "isListening:", isListeningRef.current)
       // Only restart if we should still be listening (user hasn't stopped it)
       if (shouldRestartRef.current && isListeningRef.current) {
         // Small delay before restarting to avoid rapid restarts
         setTimeout(() => {
           if (shouldRestartRef.current && isListeningRef.current) {
             try {
+              console.log("[v0] Restarting recognition")
               recognition.start()
-            } catch {
+            } catch (e) {
+              console.log("[v0] Failed to restart:", e)
               // If start fails, stop listening
               shouldRestartRef.current = false
               isListeningRef.current = false
