@@ -189,13 +189,20 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
       return
     }
 
+    // Check if running in an iframe (v0 preview)
+    const isInIframe = window.self !== window.top
+    
     // Request microphone permission first
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       // Stop the stream immediately - we just needed to request permission
       stream.getTracks().forEach(track => track.stop())
     } catch (err) {
-      alert("Microphone access is required for dictation. Please allow microphone access in your browser settings and try again.")
+      if (isInIframe) {
+        alert("Dictation cannot access the microphone in the preview iframe. Please click 'Publish' to deploy your app, or use the pop-out window feature to test dictation.")
+      } else {
+        alert("Microphone access is required for dictation. Please allow microphone access in your browser settings and try again.")
+      }
       return
     }
 
@@ -250,7 +257,13 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
       }
       
       if (event.error === "not-allowed") {
-        alert("Microphone access was denied. Please allow microphone access in your browser settings and try again.")
+        // Check if running in iframe
+        const isInIframe = window.self !== window.top
+        if (isInIframe) {
+          alert("Speech recognition is blocked in the preview iframe due to browser security. Please deploy your app or open it in a new window to use dictation.")
+        } else {
+          alert("Microphone access was denied. Please allow microphone access in your browser settings and try again.")
+        }
         shouldRestartRef.current = false
         isListeningRef.current = false
         setIsListening(false)
