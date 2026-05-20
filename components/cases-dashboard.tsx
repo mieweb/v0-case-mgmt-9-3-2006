@@ -657,7 +657,20 @@ export function CasesDashboard({ onViewCase }: CasesDashboardProps) {
                   <TableCell>{caseItem.caseType}</TableCell>
                   <TableCell className="text-muted-foreground">{caseItem.caseManager}</TableCell>
                   <TableCell className="text-muted-foreground">{caseItem.employeeLocation}</TableCell>
-                  <TableCell className="text-muted-foreground">{caseItem.dateOfDisability ? (() => { const d = new Date(caseItem.dateOfDisability + "T00:00:00"); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; })() : "—"}</TableCell>
+                  <TableCell className="text-muted-foreground">{caseItem.dateOfDisability ? (() => { 
+                    const dateStr = caseItem.dateOfDisability;
+                    let d: Date;
+                    // Check if date is in MM/DD/YYYY format
+                    if (dateStr.includes('/')) {
+                      const [month, day, year] = dateStr.split('/');
+                      d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                    } else {
+                      // Assume YYYY-MM-DD format
+                      d = new Date(dateStr + "T00:00:00");
+                    }
+                    if (isNaN(d.getTime())) return "—";
+                    return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; 
+                  })() : "—"}</TableCell>
                   <TableCell className="text-muted-foreground text-sm" suppressHydrationWarning>{getNextTodo(caseItem)}</TableCell>
                 </TableRow>
               ))
