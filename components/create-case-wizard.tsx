@@ -187,24 +187,12 @@ export function CreateCaseWizard({ onComplete }: CreateCaseWizardProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="location">Location</Label>
-                <Select
+                <Input
+                  id="location"
                   value={formData.employeeLocation}
-                  onValueChange={(val) => setFormData((prev) => ({ ...prev, employeeLocation: val }))}
-                >
-                  <SelectTrigger id="location">
-                    <SelectValue placeholder="Select location..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {locations
-                      .filter((loc) => loc.active)
-                      .sort((a, b) => a.name.localeCompare(b.name))
-                      .map((loc) => (
-                        <SelectItem key={loc.id} value={loc.name}>
-                          {loc.name} ({loc.region})
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
+                  placeholder="Auto-populated from employee data"
+                  disabled
+                />
               </div>
 
               {/* Show open/active cases for selected employee */}
