@@ -85,7 +85,6 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
   // Check for speech recognition support
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    console.log("[v0] SpeechRecognition check:", !!SpeechRecognition)
     setSpeechSupported(!!SpeechRecognition)
   }, [])
 
@@ -176,16 +175,13 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     return result
   }
 
-  const toggleDictation = () => {
-    console.log("[v0] toggleDictation called, isListening:", isListening)
+  const toggleDictation = async () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!SpeechRecognition) {
-      console.log("[v0] SpeechRecognition not supported")
       return
     }
 
     if (isListening && recognitionRef.current) {
-      console.log("[v0] Stopping dictation")
       shouldRestartRef.current = false
       isListeningRef.current = false
       recognitionRef.current.stop()
@@ -193,37 +189,33 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
       return
     }
 
-    console.log("[v0] Starting new recognition")
+    // Request microphone permission first
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      // Stop the stream immediately - we just needed to request permission
+      stream.getTracks().forEach(track => track.stop())
+    } catch (err) {
+      alert("Microphone access is required for dictation. Please allow microphone access in your browser settings and try again.")
+      return
+    }
+
     const recognition = new SpeechRecognition()
     recognition.continuous = true
     recognition.interimResults = true
     recognition.lang = "en-US"
     recognition.maxAlternatives = 1
 
-    // Keep the recognition session alive longer
-    const startRecognition = () => {
-      try {
-        console.log("[v0] Calling recognition.start()")
-        recognition.start()
-      } catch (e) {
-        console.log("[v0] Error starting recognition:", e)
-      }
-    }
-
     recognition.onstart = () => {
-      console.log("[v0] Recognition started successfully")
       setIsListening(true)
       isListeningRef.current = true
       shouldRestartRef.current = true
     }
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
-      console.log("[v0] Got result event")
       let finalTranscript = ""
       
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript
-        console.log("[v0] Transcript:", transcript, "isFinal:", event.results[i].isFinal)
         if (event.results[i].isFinal) {
           finalTranscript += transcript
         }
@@ -232,7 +224,6 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
       if (finalTranscript && editorRef.current) {
         // Process punctuation commands
         const processedText = processDictation(finalTranscript)
-        console.log("[v0] Processing final transcript:", processedText)
         
         editorRef.current.focus()
         const selection = window.getSelection()
@@ -253,36 +244,38 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     }
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      console.log("[v0] Recognition error:", event.error)
       // These are not real errors - ignore them and keep listening
       if (event.error === "no-speech" || event.error === "aborted") {
         return
       }
       
-      // For network errors, try to restart
-      if (event.error === "network") {
-        console.warn("[v0] Speech recognition network error, will retry...")
+      if (event.error === "not-allowed") {
+        alert("Microphone access was denied. Please allow microphone access in your browser settings and try again.")
+        shouldRestartRef.current = false
+        isListeningRef.current = false
+        setIsListening(false)
         return
       }
       
-      console.error("[v0] Speech recognition error:", event.error)
+      // For network errors, try to restart
+      if (event.error === "network") {
+        return
+      }
+      
       shouldRestartRef.current = false
       isListeningRef.current = false
       setIsListening(false)
     }
 
     recognition.onend = () => {
-      console.log("[v0] Recognition ended, shouldRestart:", shouldRestartRef.current, "isListening:", isListeningRef.current)
       // Only restart if we should still be listening (user hasn't stopped it)
       if (shouldRestartRef.current && isListeningRef.current) {
         // Small delay before restarting to avoid rapid restarts
         setTimeout(() => {
           if (shouldRestartRef.current && isListeningRef.current) {
             try {
-              console.log("[v0] Restarting recognition")
               recognition.start()
-            } catch (e) {
-              console.log("[v0] Failed to restart:", e)
+            } catch {
               // If start fails, stop listening
               shouldRestartRef.current = false
               isListeningRef.current = false
@@ -296,7 +289,12 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     }
 
     recognitionRef.current = recognition
-    startRecognition()
+    
+    try {
+      recognition.start()
+    } catch {
+      alert("Failed to start speech recognition. Please try again.")
+    }
   }
 
   const insertVariable = (variable: string) => {
@@ -522,18 +520,9 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
           type="button"
           variant={isListening ? "destructive" : "ghost"}
           size="sm"
-          onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            console.log("[v0] Dictation button clicked, speechSupported:", speechSupported)
-            toggleDictation()
-          }}
-          onMouseDown={(e) => {
-            console.log("[v0] Dictation button mousedown")
-          }}
+          onClick={toggleDictation}
           disabled={!speechSupported}
-          className={cn("h-8 px-2 gap-1 pointer-events-auto relative z-20", isListening && "animate-pulse")}
-          style={{ pointerEvents: 'auto' }}
+          className={cn("h-8 px-2 gap-1", isListening && "animate-pulse")}
           title={!speechSupported ? "Speech recognition not supported in this browser" : isListening ? "Stop Dictation" : "Start Dictation"}
         >
           {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
