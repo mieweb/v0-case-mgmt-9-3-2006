@@ -572,8 +572,38 @@ export function CaseNotesTab() {
                     
                     // Add final results to textarea
                     if (finalTranscript) {
+                      // Smart punctuation processing
+                      let processed = finalTranscript;
+                      
+                      // "period" as word: preserve when used in context
+                      processed = processed.replace(/\\b(the|a|this|that|each|every|same|time|grace|trial|waiting|probationary|pay|billing|accounting)\\s+period\\b/gi, '$1 period');
+                      processed = processed.replace(/\\bperiod\\s+(of|in|for|from|to|during|between|after|before|when|where|is|was|will|has|had)\\b/gi, 'period $1');
+                      // "period" as punctuation: at end or before new sentence
+                      processed = processed.replace(/\\s+period(\\s*$)/gi, '.$1');
+                      processed = processed.replace(/\\s+period\\s+(?=[A-Z])/g, '. ');
+                      
+                      // "comma" handling
+                      processed = processed.replace(/\\bcomma\\s+(separated|delimited)/gi, 'comma $1');
+                      processed = processed.replace(/\\s+comma\\b/gi, ',');
+                      
+                      // "colon" as word vs punctuation
+                      processed = processed.replace(/\\b(the|a|my|your|his|her|their|semicolon|ascending|descending|transverse|sigmoid)\\s+colon\\b/gi, '$1 colon');
+                      processed = processed.replace(/\\bcolon\\s+(cancer|surgery|health|polyp|scope|oscopy)/gi, 'colon $1');
+                      processed = processed.replace(/\\s+colon\\b/gi, ':');
+                      
+                      // Simple punctuation
+                      processed = processed.replace(/\\s+full stop/gi, '.');
+                      processed = processed.replace(/\\s+question mark/gi, '?');
+                      processed = processed.replace(/\\s+exclamation (point|mark)/gi, '!');
+                      processed = processed.replace(/\\s+semicolon/gi, ';');
+                      processed = processed.replace(/\\s+new line/gi, '\\n');
+                      processed = processed.replace(/\\s+new paragraph/gi, '\\n\\n');
+                      
+                      // Capitalize after sentence-ending punctuation
+                      processed = processed.replace(/([.!?])\\s+([a-z])/g, function(m, p, l) { return p + ' ' + l.toUpperCase(); });
+                      
                       const currentValue = noteContent.value || '';
-                      noteContent.value = currentValue + (currentValue ? ' ' : '') + finalTranscript;
+                      noteContent.value = currentValue + (currentValue ? ' ' : '') + processed;
                       interimText.textContent = 'Listening...';
                     }
                   };

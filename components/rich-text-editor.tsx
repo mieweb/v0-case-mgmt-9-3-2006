@@ -134,19 +134,43 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     }
   }
 
-  // Convert spoken punctuation words to actual punctuation
+  // Convert spoken punctuation words to actual punctuation with context awareness
   const processDictation = (text: string): string => {
-    const punctuationMap: Record<string, string> = {
-      " comma": ",",
-      " period": ".",
+    let result = text
+    
+    // Context-aware punctuation patterns
+    // These patterns check if the word is used as punctuation (end of phrase) vs as a word (part of phrase)
+    
+    // "period" as punctuation: at end of text, or followed by a pause/new sentence
+    // "period" as word: "the period of", "a period", "this period", "time period", etc.
+    result = result.replace(/\b(the|a|this|that|each|every|same|time|grace|trial|waiting|probationary|pay|billing|accounting)\s+period\b/gi, '$1 period')
+    result = result.replace(/\bperiod\s+(of|in|for|from|to|during|between|after|before|when|where|is|was|will|has|had)\b/gi, 'period $1')
+    // Now replace standalone "period" at end or before capital letter as punctuation
+    result = result.replace(/\s+period(\s*$)/gi, '.$1')
+    result = result.replace(/\s+period\s+(?=[A-Z])/g, '. ')
+    
+    // "comma" as punctuation vs word (less common as a word, but handle "comma separated")
+    result = result.replace(/\bcomma\s+(separated|delimited)/gi, 'comma $1')
+    result = result.replace(/\s+comma\b/gi, ',')
+    
+    // "colon" as punctuation vs word ("colon cancer", "the colon")
+    result = result.replace(/\b(the|a|my|your|his|her|their|semicolon|ascending|descending|transverse|sigmoid)\s+colon\b/gi, '$1 colon')
+    result = result.replace(/\bcolon\s+(cancer|surgery|health|polyp|scope|oscopy)/gi, 'colon $1')
+    result = result.replace(/\s+colon\b/gi, ':')
+    
+    // "dash" as punctuation vs word ("100 yard dash", "mad dash")
+    result = result.replace(/\b(yard|meter|hundred|mad|quick|wild)\s+dash\b/gi, '$1 dash')
+    result = result.replace(/\bdash\s+(to|for|of)\b/gi, 'dash $1')
+    result = result.replace(/\s+dash\b/gi, ' -')
+    
+    // Simple punctuation replacements (rarely used as words)
+    const simplePunctuation: Record<string, string> = {
       " full stop": ".",
       " question mark": "?",
       " exclamation point": "!",
       " exclamation mark": "!",
-      " colon": ":",
       " semicolon": ";",
       " semi colon": ";",
-      " dash": " -",
       " hyphen": "-",
       " open parenthesis": " (",
       " close parenthesis": ")",
@@ -162,9 +186,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
       " tab": "\t",
     }
 
-    let result = text
-    for (const [spoken, punctuation] of Object.entries(punctuationMap)) {
-      // Case-insensitive replacement
+    for (const [spoken, punctuation] of Object.entries(simplePunctuation)) {
       const regex = new RegExp(spoken, "gi")
       result = result.replace(regex, punctuation)
     }
