@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog"
 import { useCases } from "@/contexts/cases-context"
 import { useAdmin } from "@/contexts/admin-context"
+import { useUser } from "@/contexts/user-context"
 import { generateTodosFromTemplates } from "@/lib/todo-parser"
 import type { TodoItem } from "@/contexts/cases-context"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -26,6 +27,7 @@ import { triggerConfetti } from "@/lib/confetti"
 export function TodosTab() {
   const { currentCase, updateCase } = useCases()
   const { getCaseType, caseManagers: adminCaseManagers } = useAdmin()
+  const { currentUser } = useUser()
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [showGenerateDialog, setShowGenerateDialog] = useState(false)
   const [anchorDates, setAnchorDates] = useState({
@@ -258,7 +260,7 @@ export function TodosTab() {
     updateTodo(pendingCompleteTodo.id, {
       completed: true,
       dateClosed: new Date().toISOString().split("T")[0],
-      completedBy: currentCase.caseManager || "Unknown",
+      completedBy: currentUser?.name || "Unknown",
     })
 
     // Always add a case note for completed todos
@@ -355,7 +357,7 @@ export function TodosTab() {
       if (bulkCompleted === "completed") {
         updates.completed = true
         updates.dateClosed = new Date().toISOString().split("T")[0]
-        updates.completedBy = currentCase?.caseManager || "Unknown"
+        updates.completedBy = currentUser?.name || "Unknown"
       } else if (bulkCompleted === "active") {
         updates.completed = false
         updates.dateClosed = undefined
