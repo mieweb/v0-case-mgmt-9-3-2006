@@ -258,6 +258,7 @@ export function TodosTab() {
     updateTodo(pendingCompleteTodo.id, {
       completed: true,
       dateClosed: new Date().toISOString().split("T")[0],
+      completedBy: currentCase.caseManager || "Unknown",
     })
 
     // Always add a case note for completed todos
@@ -354,9 +355,11 @@ export function TodosTab() {
       if (bulkCompleted === "completed") {
         updates.completed = true
         updates.dateClosed = new Date().toISOString().split("T")[0]
+        updates.completedBy = currentCase?.caseManager || "Unknown"
       } else if (bulkCompleted === "active") {
         updates.completed = false
         updates.dateClosed = undefined
+        updates.completedBy = undefined
       }
 
       return { ...todo, ...updates }
@@ -553,8 +556,9 @@ export function TodosTab() {
               <TableHead className="w-[150px]">Date Scheduled</TableHead>
               <TableHead>Activity</TableHead>
               <TableHead className="w-[150px]">Case Manager</TableHead>
-              <TableHead className="w-[100px]">Completed</TableHead>
-              <TableHead className="w-[150px]">Date Closed</TableHead>
+<TableHead className="w-[100px]">Completed</TableHead>
+                <TableHead className="w-[150px]">Date Closed</TableHead>
+                <TableHead className="w-[150px]">Completed By</TableHead>
               <TableHead className="w-[80px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -612,6 +616,7 @@ export function TodosTab() {
                               updateTodo(todo.id, {
                                 completed: false,
                                 dateClosed: undefined,
+                                completedBy: undefined,
                               })
                             }
                           }}
@@ -626,6 +631,9 @@ export function TodosTab() {
                         onChange={(e) => updateTodo(todo.id, { dateClosed: e.target.value })}
                         disabled={!todo.completed}
                       />
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {todo.completedBy || "—"}
                     </TableCell>
                     <TableCell>
                       <Button variant="ghost" size="sm" onClick={() => deleteTodo(todo.id)}>

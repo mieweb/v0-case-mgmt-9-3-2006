@@ -187,6 +187,7 @@ export interface TodoItem {
   caseManager: string
   completed: boolean
   dateClosed?: string
+  completedBy?: string
   linkedLetterId?: string
 }
 
