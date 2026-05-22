@@ -260,7 +260,7 @@ export function PayInformationTab() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="h-5 w-5" />
-            Pay Information
+            Current Pay Information
           </CardTitle>
           <CardDescription>Manage pay dates, rates, and STD offset information</CardDescription>
         </CardHeader>
