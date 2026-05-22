@@ -105,12 +105,12 @@ export default function Page() {
               </Button>
               <Button
                 variant="ghost"
-                onClick={() => window.location.href = "/payroll-export"}
+                onClick={() => window.location.href = "/report"}
                 className="gap-1 sm:gap-2 px-2 sm:px-4"
                 size="sm"
               >
                 <FileSpreadsheet className="h-4 w-4" />
-                <span className="hidden sm:inline">Payroll Export</span>
+                <span className="hidden sm:inline">Reports</span>
               </Button>
             </div>
             <div className="navbar-right flex items-center gap-1 sm:gap-2">
@@ -223,6 +223,7 @@ export default function Page() {
                       Letter Templates
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => openAdminSection("locations")}>Locations</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openAdminSection("pay-codes")}>Pay Codes</DropdownMenuItem>
                     <DropdownMenuItem onClick={() => openAdminSection("restriction-codes")}>
                       Restriction Codes
                     </DropdownMenuItem>

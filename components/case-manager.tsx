@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { CaseTab } from "@/components/tabs/case-tab"
 import { ContactTab } from "@/components/tabs/contact-tab"
 import { AbsenceRestrictionsTab } from "@/components/tabs/absence-restrictions-tab"
+import { PayInformationTab } from "@/components/tabs/pay-information-tab"
 import { DiagnosisTab } from "@/components/tabs/diagnosis-tab"
 import { TodosTab } from "@/components/tabs/todos-tab"
 import { CaseNotesTab } from "@/components/tabs/case-notes-tab"
@@ -25,7 +26,7 @@ import { Button } from "@/components/ui/button"
 import { NoteWindow, MinimizedNoteWindow } from "@/components/note-window"
 import { RichTextEditor } from "@/components/rich-text-editor"
 
-const TAB_ORDER = ["case", "contact", "absence-restrictions", "diagnosis", "todos", "case-notes", "letters", "documents", "activity"]
+const TAB_ORDER = ["case", "contact", "absence-restrictions", "pay-information", "diagnosis", "todos", "case-notes", "letters", "documents", "activity"]
 
 const TAB_LABELS: Record<string, string> = {
   "case": "Case",
@@ -469,6 +470,12 @@ export function CaseManager() {
 Absences & Restrictions
             </TabsTrigger>
             <TabsTrigger
+              value="pay-information"
+              className="rounded-t-lg rounded-b-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2.5 font-medium"
+            >
+              Pay Information
+            </TabsTrigger>
+            <TabsTrigger
               value="diagnosis"
               className="rounded-t-lg rounded-b-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2.5 font-medium"
             >
@@ -519,6 +526,10 @@ Absences & Restrictions
             <TabsContent value="absence-restrictions" className="m-0">
               <AbsenceRestrictionsTab />
               <TabNavigation currentTab="absence-restrictions" onTabChange={setActiveTab} />
+            </TabsContent>
+            <TabsContent value="pay-information" className="m-0">
+              <PayInformationTab />
+              <TabNavigation currentTab="pay-information" onTabChange={setActiveTab} />
             </TabsContent>
             <TabsContent value="diagnosis" className="m-0">
               <DiagnosisTab />

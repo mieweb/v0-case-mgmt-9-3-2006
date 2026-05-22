@@ -79,11 +79,24 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
   const [isListening, setIsListening] = useState(false)
   const [speechSupported, setSpeechSupported] = useState(false)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const isListeningRef = useRef(false)
+  const shouldRestartRef = useRef(false)
 
   // Check for speech recognition support
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     setSpeechSupported(!!SpeechRecognition)
+  }, [])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        shouldRestartRef.current = false
+        isListeningRef.current = false
+        recognitionRef.current.stop()
+      }
+    }
   }, [])
 
   useEffect(() => {
@@ -121,19 +134,43 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     }
   }
 
-  // Convert spoken punctuation words to actual punctuation
+  // Convert spoken punctuation words to actual punctuation with context awareness
   const processDictation = (text: string): string => {
-    const punctuationMap: Record<string, string> = {
-      " comma": ",",
-      " period": ".",
+    let result = text
+    
+    // Context-aware punctuation patterns
+    // These patterns check if the word is used as punctuation (end of phrase) vs as a word (part of phrase)
+    
+    // "period" as punctuation: at end of text, or followed by a pause/new sentence
+    // "period" as word: "the period of", "a period", "this period", "time period", etc.
+    result = result.replace(/\b(the|a|this|that|each|every|same|time|grace|trial|waiting|probationary|pay|billing|accounting)\s+period\b/gi, '$1 period')
+    result = result.replace(/\bperiod\s+(of|in|for|from|to|during|between|after|before|when|where|is|was|will|has|had)\b/gi, 'period $1')
+    // Now replace standalone "period" at end or before capital letter as punctuation
+    result = result.replace(/\s+period(\s*$)/gi, '.$1')
+    result = result.replace(/\s+period\s+(?=[A-Z])/g, '. ')
+    
+    // "comma" as punctuation vs word (less common as a word, but handle "comma separated")
+    result = result.replace(/\bcomma\s+(separated|delimited)/gi, 'comma $1')
+    result = result.replace(/\s+comma\b/gi, ',')
+    
+    // "colon" as punctuation vs word ("colon cancer", "the colon")
+    result = result.replace(/\b(the|a|my|your|his|her|their|semicolon|ascending|descending|transverse|sigmoid)\s+colon\b/gi, '$1 colon')
+    result = result.replace(/\bcolon\s+(cancer|surgery|health|polyp|scope|oscopy)/gi, 'colon $1')
+    result = result.replace(/\s+colon\b/gi, ':')
+    
+    // "dash" as punctuation vs word ("100 yard dash", "mad dash")
+    result = result.replace(/\b(yard|meter|hundred|mad|quick|wild)\s+dash\b/gi, '$1 dash')
+    result = result.replace(/\bdash\s+(to|for|of)\b/gi, 'dash $1')
+    result = result.replace(/\s+dash\b/gi, ' -')
+    
+    // Simple punctuation replacements (rarely used as words)
+    const simplePunctuation: Record<string, string> = {
       " full stop": ".",
       " question mark": "?",
       " exclamation point": "!",
       " exclamation mark": "!",
-      " colon": ":",
       " semicolon": ";",
       " semi colon": ";",
-      " dash": " -",
       " hyphen": "-",
       " open parenthesis": " (",
       " close parenthesis": ")",
@@ -149,9 +186,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
       " tab": "\t",
     }
 
-    let result = text
-    for (const [spoken, punctuation] of Object.entries(punctuationMap)) {
-      // Case-insensitive replacement
+    for (const [spoken, punctuation] of Object.entries(simplePunctuation)) {
       const regex = new RegExp(spoken, "gi")
       result = result.replace(regex, punctuation)
     }
@@ -162,13 +197,34 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     return result
   }
 
-  const toggleDictation = () => {
+  const toggleDictation = async () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    if (!SpeechRecognition) return
+    if (!SpeechRecognition) {
+      return
+    }
 
     if (isListening && recognitionRef.current) {
+      shouldRestartRef.current = false
+      isListeningRef.current = false
       recognitionRef.current.stop()
       setIsListening(false)
+      return
+    }
+
+    // Check if running in an iframe (v0 preview)
+    const isInIframe = window.self !== window.top
+    
+    // Request microphone permission first
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      // Stop the stream immediately - we just needed to request permission
+      stream.getTracks().forEach(track => track.stop())
+    } catch (err) {
+      if (isInIframe) {
+        alert("Dictation cannot access the microphone in the preview iframe. Please click 'Publish' to deploy your app, or use the pop-out window feature to test dictation.")
+      } else {
+        alert("Microphone access is required for dictation. Please allow microphone access in your browser settings and try again.")
+      }
       return
     }
 
@@ -176,9 +232,12 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     recognition.continuous = true
     recognition.interimResults = true
     recognition.lang = "en-US"
+    recognition.maxAlternatives = 1
 
     recognition.onstart = () => {
       setIsListening(true)
+      isListeningRef.current = true
+      shouldRestartRef.current = true
     }
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
@@ -214,30 +273,63 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     }
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      // "no-speech" is not a real error - it just means the user hasn't spoken yet
-      // "aborted" happens when we manually stop - also not an error
+      // These are not real errors - ignore them and keep listening
       if (event.error === "no-speech" || event.error === "aborted") {
         return
       }
-      console.error("Speech recognition error:", event.error)
+      
+      if (event.error === "not-allowed") {
+        // Check if running in iframe
+        const isInIframe = window.self !== window.top
+        if (isInIframe) {
+          alert("Speech recognition is blocked in the preview iframe due to browser security. Please deploy your app or open it in a new window to use dictation.")
+        } else {
+          alert("Microphone access was denied. Please allow microphone access in your browser settings and try again.")
+        }
+        shouldRestartRef.current = false
+        isListeningRef.current = false
+        setIsListening(false)
+        return
+      }
+      
+      // For network errors, try to restart
+      if (event.error === "network") {
+        return
+      }
+      
+      shouldRestartRef.current = false
+      isListeningRef.current = false
       setIsListening(false)
     }
 
     recognition.onend = () => {
-      // If still listening (wasn't manually stopped), restart to keep listening
-      if (isListening && recognitionRef.current) {
-        try {
-          recognitionRef.current.start()
-        } catch {
-          setIsListening(false)
-        }
+      // Only restart if we should still be listening (user hasn't stopped it)
+      if (shouldRestartRef.current && isListeningRef.current) {
+        // Small delay before restarting to avoid rapid restarts
+        setTimeout(() => {
+          if (shouldRestartRef.current && isListeningRef.current) {
+            try {
+              recognition.start()
+            } catch {
+              // If start fails, stop listening
+              shouldRestartRef.current = false
+              isListeningRef.current = false
+              setIsListening(false)
+            }
+          }
+        }, 100)
       } else {
         setIsListening(false)
       }
     }
 
     recognitionRef.current = recognition
-    recognition.start()
+    
+    try {
+      recognition.start()
+    } catch {
+      alert("Failed to start speech recognition. Please try again.")
+    }
   }
 
   const insertVariable = (variable: string) => {
@@ -458,22 +550,19 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
           <span className="text-xs">{"<< >> to {{ }}"}</span>
         </Button>
 
-        {speechSupported && (
-          <>
-            <div className="w-px h-6 bg-border mx-1" />
-            <Button
-              type="button"
-              variant={isListening ? "destructive" : "ghost"}
-              size="sm"
-              onClick={toggleDictation}
-              className={cn("h-8 px-2 gap-1", isListening && "animate-pulse")}
-              title={isListening ? "Stop Dictation" : "Start Dictation"}
-            >
-              {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              <span className="text-xs">{isListening ? "Stop" : "Dictate"}</span>
-            </Button>
-          </>
-        )}
+        <div className="w-px h-6 bg-border mx-1" />
+        <Button
+          type="button"
+          variant={isListening ? "destructive" : "ghost"}
+          size="sm"
+          onClick={toggleDictation}
+          disabled={!speechSupported}
+          className={cn("h-8 px-2 gap-1", isListening && "animate-pulse")}
+          title={!speechSupported ? "Speech recognition not supported in this browser" : isListening ? "Stop Dictation" : "Start Dictation"}
+        >
+          {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+          <span className="text-xs">{isListening ? "Stop" : "Dictate"}</span>
+        </Button>
       </div>
 
       {/* Editor */}

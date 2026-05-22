@@ -31,6 +31,28 @@ export interface Location {
   active: boolean
 }
 
+// STD Plan definition
+export interface STDPlan {
+  id: string
+  planCode: string
+  planName: string
+  planType: "STD"
+  benefitPercentage: number
+  waitingPeriod: number // days
+  maxDuration: number // weeks
+  active: boolean
+}
+
+// STD coverage rule - links locations to plans
+export interface PotentialCoverageRule {
+  id: string
+  locationId: string
+  planId: string
+  effectiveDate: string // MM/DD/YYYY
+  endDate?: string // MM/DD/YYYY, null if current
+  isEligible: boolean
+}
+
 interface CodeTables {
   letterTemplates: Code[]
   caseNoteTemplates: Code[]
@@ -43,6 +65,7 @@ interface CodeTables {
   restrictionCodes: Code[]
   caseActivity: Code[]
   documentType: Code[]
+  payCodes: Code[]
 }
 
 interface AdminContextType {
@@ -63,6 +86,9 @@ interface AdminContextType {
   addCode: (table: keyof CodeTables, code: Omit<Code, "id">) => void
   updateCode: (table: keyof CodeTables, id: string, updates: Partial<Omit<Code, "id">>) => void
   deleteCode: (table: keyof CodeTables, id: string) => void
+  stdPlans: STDPlan[]
+  coverageRules: PotentialCoverageRule[]
+  getSTDCoverageForLocation: (locationName: string, asOfDate: string) => { plan: STDPlan; rule: PotentialCoverageRule } | undefined
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined)
@@ -263,16 +289,16 @@ const initialCodeTables: CodeTables = {
       name: "Initial Contact",
       description: "Initial contact letter to employee",
       active: true,
-      content: `Dear {{employeeName}},
+      content: `<p style="margin-bottom: 16px;">Dear {{employeeName}},</p>
 
-This letter is to confirm that we have received your request for leave under case number {{caseNumber}}.
+<p style="margin-bottom: 16px;">This letter is to confirm that we have received your request for leave under case number {{caseNumber}}.</p>
 
-Your case manager, {{caseManager}}, will be handling your case and will contact you within 2-3 business days to discuss next steps.
+<p style="margin-bottom: 16px;">Your case manager, {{caseManager}}, will be handling your case and will contact you within 2-3 business days to discuss next steps.</p>
 
-If you have any questions, please don't hesitate to reach out.
+<p style="margin-bottom: 16px;">If you have any questions, please don&apos;t hesitate to reach out.</p>
 
-Sincerely,
-Case Management Team`,
+<p style="margin-bottom: 16px;">Sincerely,<br/>
+Case Management Team</p>`,
     },
     {
       id: "2",
@@ -280,21 +306,23 @@ Case Management Team`,
       name: "Request Documents",
       description: "Request for medical documentation",
       active: true,
-      content: `Dear {{employeeName}},
+      content: `<p style="margin-bottom: 16px;">Dear {{employeeName}},</p>
 
-Regarding your case {{caseNumber}}, we need additional medical documentation to process your claim.
+<p style="margin-bottom: 16px;">Regarding your case {{caseNumber}}, we need additional medical documentation to process your claim.</p>
 
-Please provide the following documents by {{today}}:
-- Medical certification from your healthcare provider
-- Treatment plan and expected duration
-- Any relevant test results
+<p style="margin-bottom: 16px;">Please provide the following documents by {{today}}:</p>
+<ul style="margin-bottom: 16px;">
+  <li>Medical certification from your healthcare provider</li>
+  <li>Treatment plan and expected duration</li>
+  <li>Any relevant test results</li>
+</ul>
 
-Please submit documents to your case manager {{caseManager}}.
+<p style="margin-bottom: 16px;">Please submit documents to your case manager {{caseManager}}.</p>
 
-Thank you for your cooperation.
+<p style="margin-bottom: 16px;">Thank you for your cooperation.</p>
 
-Best regards,
-Case Management Team`,
+<p style="margin-bottom: 16px;">Best regards,<br/>
+Case Management Team</p>`,
     },
     {
       id: "3",
@@ -302,16 +330,16 @@ Case Management Team`,
       name: "Approval Letter",
       description: "Claim approval notification",
       active: true,
-      content: `Dear {{employeeName}},
+      content: `<p style="margin-bottom: 16px;">Dear {{employeeName}},</p>
 
-We are pleased to inform you that your {{caseType}} claim (Case #{{caseNumber}}) has been approved.
+<p style="margin-bottom: 16px;">We are pleased to inform you that your {{caseType}} claim (Case #{{caseNumber}}) has been approved.</p>
 
-Your benefits will begin on {{stdStartDate}} and your expected return to work date is {{expectedReturnDate}}.
+<p style="margin-bottom: 16px;">Your benefits will begin on {{stdStartDate}} and your expected return to work date is {{expectedReturnDate}}.</p>
 
-If you have any questions about your benefits, please contact {{caseManager}}.
+<p style="margin-bottom: 16px;">If you have any questions about your benefits, please contact {{caseManager}}.</p>
 
-Congratulations,
-Case Management Team`,
+<p style="margin-bottom: 16px;">Congratulations,<br/>
+Case Management Team</p>`,
     },
     {
       id: "4",
@@ -319,16 +347,16 @@ Case Management Team`,
       name: "Denial Letter",
       description: "Claim denial notification",
       active: true,
-      content: `Dear {{employeeName}},
+      content: `<p style="margin-bottom: 16px;">Dear {{employeeName}},</p>
 
-After careful review, we regret to inform you that your claim (Case #{{caseNumber}}) has been denied.
+<p style="margin-bottom: 16px;">After careful review, we regret to inform you that your claim (Case #{{caseNumber}}) has been denied.</p>
 
-Reason: [Please provide specific reason]
+<p style="margin-bottom: 16px;"><strong>Reason:</strong> [Please provide specific reason]</p>
 
-You have the right to appeal this decision within 30 days. Please contact {{caseManager}} for more information about the appeals process.
+<p style="margin-bottom: 16px;">You have the right to appeal this decision within 30 days. Please contact {{caseManager}} for more information about the appeals process.</p>
 
-Sincerely,
-Case Management Team`,
+<p style="margin-bottom: 16px;">Sincerely,<br/>
+Case Management Team</p>`,
     },
     {
       id: "5",
@@ -336,32 +364,33 @@ Case Management Team`,
       name: "STD Continuation in Question",
       description: "Letter when STD benefit continuation is in question due to missing medical documentation",
       active: true,
-      content: `{{today}}
+      content: `<p style="margin-bottom: 16px;">{{today}}</p>
 
-{{employeeFirstName}} {{employeeLastName}}
-{{employeeStreet1}} {{employeeStreet2}}
-{{employeeCity}}, {{employeeState}} {{employeeZip}}
+<p style="margin-bottom: 16px;">{{employeeFirstName}} {{employeeLastName}}<br/>
+{{employeeStreet1}} {{employeeStreet2}}<br/>
+{{employeeCity}}, {{employeeState}} {{employeeZip}}</p>
 
-Dear {{employeeFirstName}},
+<p style="margin-bottom: 16px;">Dear {{employeeFirstName}},</p>
 
-This letter is to acknowledge that the continuance of your Short Term Disability benefits is in question. According to the Owens Corning Short Term Disability [Plan Document Name] Plan Document:
+<p style="margin-bottom: 16px;">This letter is to acknowledge that the continuance of your Short Term Disability benefits is in question. According to the Owens Corning Short Term Disability [Plan Document Name] Plan Document:</p>
 
-"Benefit Termination: STD Disability Benefits will be terminated when an eligible employee:"
-
+<blockquote style="border-left: 3px solid #ccc; padding-left: 15px; margin: 16px 0; font-style: italic;">
+"Benefit Termination: STD Disability Benefits will be terminated when an eligible employee:"<br/><br/>
 [Add Plan Document Section]
+</blockquote>
 
-At this time, we have not received any current medical updates. I am requesting medical documentation to support your continued disability within 15 days of the date of this letter. Failure to follow up with your physician and provide updated documentation will result in benefits termination.
+<p style="margin-bottom: 16px;">At this time, we have not received any current medical updates. I am requesting medical documentation to support your continued disability within 15 days of the date of this letter. Failure to follow up with your physician and provide updated documentation will result in benefits termination.</p>
 
-If I can be of any assistance or if you have any questions, please call me at {{caseManagerPhone}}.
+<p style="margin-bottom: 16px;">If I can be of any assistance or if you have any questions, please call me at {{caseManagerPhone}}.</p>
 
-Sincerely,
+<p style="margin-bottom: 16px;">Sincerely,</p>
 
-{{caseManagerWithCredentials}}
-Medical Case Manager
+<p style="margin-bottom: 16px;">{{caseManagerWithCredentials}}<br/>
+Medical Case Manager</p>
 
-CC: Laura Higginbotham, Benefits Leader
-      Disability Management
-      _________, Plant HR Leader`,
+<p style="margin-bottom: 16px;"><strong>CC:</strong> Laura Higginbotham, Benefits Leader<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Disability Management<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_________, Plant HR Leader</p>`,
     },
     {
       id: "6",
@@ -369,57 +398,59 @@ CC: Laura Higginbotham, Benefits Leader
       name: "LTD Cover Summary",
       description: "Case summary for LTD application",
       active: true,
-      content: `CASE SUMMARY
+      content: `<h2>CASE SUMMARY</h2>
 
-Please find the LTD Application for:
+<p>Please find the LTD Application for:</p>
 
-NAME:	{{employeeFirstName}} {{employeeLastName}}
-EMPLOYEE ID:	{{employeeNumber}}
-SOCIAL SECURITY #:	{{employeeSSN}}
-DATE OF BIRTH:	{{dateOfBirth}}
-RACE:	{{employeeEthnicGroup}}
-LOCATION:	{{employeeLocation}}
-UNUM POLICY #:	
-LTD COVERAGE:	60%
-DATE OF HIRE:	{{dateOfHire}}
-YEARS OF SERVICE:	
-DATE OF INJURY-INJ/ILL:	{{dateOfDisability}}
-OCCUPATIONAL/NON-OCCUPATIONAL:	
-JOB TITLE/DUTIES:	{{position}}
-LAST DAY WORKED:	
-FIRST DAY OF STD/WC:	{{stdStartDate}}
-LAST DAY OF STD/WC:	
-FIRST DAY OF LTD if approved:	
-RATE OF PAY on last day worked:	
-INCENTIVE if Salary employee:	
-FULL/PART TIME STATUS:	{{employmentType}}
-LTD BENEFIT-based on 40 hours:	40 hours
-WORK COMP Pay and Begin/End Date(s):	
-DATE OF INITIAL APPLICATION FOR SSDI:	
-DATE SSDI RECONSIDERATION FILED:	
-SSDI ENTITLEMENT/DENIAL DATE WITH DOLLAR AMOUNT:	
-DEPENDENT SSDI-AMOUNT AND EFFECTIVE DATE:	
-STD OVERPAYMENT Amount/Status:	
-MEDICAL CASE MANAGER:	{{caseManagerWithCredentials}}
-CASE MANAGER PHONE:	{{caseManagerPhone}}
+<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+  <tbody>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold; width: 40%;">NAME</td><td style="border: 1px solid #ddd; padding: 8px;">{{employeeFirstName}} {{employeeLastName}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">EMPLOYEE ID</td><td style="border: 1px solid #ddd; padding: 8px;">{{employeeNumber}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">SOCIAL SECURITY #</td><td style="border: 1px solid #ddd; padding: 8px;">{{employeeSSN}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">DATE OF BIRTH</td><td style="border: 1px solid #ddd; padding: 8px;">{{dateOfBirth}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">RACE</td><td style="border: 1px solid #ddd; padding: 8px;">{{employeeEthnicGroup}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">LOCATION</td><td style="border: 1px solid #ddd; padding: 8px;">{{employeeLocation}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">UNUM POLICY #</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">LTD COVERAGE</td><td style="border: 1px solid #ddd; padding: 8px;">60%</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">DATE OF HIRE</td><td style="border: 1px solid #ddd; padding: 8px;">{{dateOfHire}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">YEARS OF SERVICE</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">DATE OF INJURY-INJ/ILL</td><td style="border: 1px solid #ddd; padding: 8px;">{{dateOfDisability}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">OCCUPATIONAL/NON-OCCUPATIONAL</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">JOB TITLE/DUTIES</td><td style="border: 1px solid #ddd; padding: 8px;">{{position}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">LAST DAY WORKED</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">FIRST DAY OF STD/WC</td><td style="border: 1px solid #ddd; padding: 8px;">{{stdStartDate}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">LAST DAY OF STD/WC</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">FIRST DAY OF LTD if approved</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">RATE OF PAY on last day worked</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">INCENTIVE if Salary employee</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">FULL/PART TIME STATUS</td><td style="border: 1px solid #ddd; padding: 8px;">{{employmentType}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">LTD BENEFIT-based on 40 hours</td><td style="border: 1px solid #ddd; padding: 8px;">40 hours</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">WORK COMP Pay and Begin/End Date(s)</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">DATE OF INITIAL APPLICATION FOR SSDI</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">DATE SSDI RECONSIDERATION FILED</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">SSDI ENTITLEMENT/DENIAL DATE WITH DOLLAR AMOUNT</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">DEPENDENT SSDI-AMOUNT AND EFFECTIVE DATE</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">STD OVERPAYMENT Amount/Status</td><td style="border: 1px solid #ddd; padding: 8px;"></td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">MEDICAL CASE MANAGER</td><td style="border: 1px solid #ddd; padding: 8px;">{{caseManagerWithCredentials}}</td></tr>
+    <tr><td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">CASE MANAGER PHONE</td><td style="border: 1px solid #ddd; padding: 8px;">{{caseManagerPhone}}</td></tr>
+  </tbody>
+</table>
 
-If you need any additional information, please do not hesitate to call.
+<p>If you need any additional information, please do not hesitate to call.</p>
 
-Signature: 
-Date: {{today}}
+<p>Signature: _________________________<br/>
+Date: {{today}}</p>
 
-TREATING PHYSICIANS:
-(List all employee's currently treating and/or restricting physicians and most current medical through date.)
+<h3>TREATING PHYSICIANS:</h3>
+<p><em>(List all employee's currently treating and/or restricting physicians and most current medical through date.)</em></p>
+<p>{{diagnosis}}</p>
 
-{{diagnosis}}
+<h3>CASE HISTORY:</h3>
+<p><em>(Give a brief overview of the employee illness, treatment plan, restrictions, etc.)</em></p>
+<p>{{natureOfInjury}}</p>
 
-CASE HISTORY:
-(Give a brief overview of the employee illness, treatment plan, restrictions, etc.)
-
-{{natureOfInjury}}
-
-TESTINGS:
-(Listing of diagnostic testing and results: for example, IME, FCE)
+<h3>TESTINGS:</h3>
+<p><em>(Listing of diagnostic testing and results: for example, IME, FCE)</em></p>
 
 TREATMENTS:
 (Surgery, Chemo, Radiation, Physical Therapy, Work Hardening, Vocational rehabilitation)
@@ -438,49 +469,51 @@ FUTURE VISITS, PROCEDURES, TESTS, ETC:
       name: "CM-Work Restrictions",
       description: "Work restrictions form for physician to complete",
       active: true,
-      content: `CM-Work Restrict
+      content: `<h3 style="margin-bottom: 16px;">CM-Work Restrict</h3>
 
-{{today}}
+<p style="margin-bottom: 16px;">{{today}}</p>
 
-Re:	{{employeeFirstName}} {{employeeLastName}}
-SSN:	{{employeeSSN}}
-DOB:	{{dateOfBirth}}
+<p style="margin-bottom: 16px;"><strong>Re:</strong> {{employeeFirstName}} {{employeeLastName}}<br/>
+<strong>SSN:</strong> {{employeeSSN}}<br/>
+<strong>DOB:</strong> {{dateOfBirth}}</p>
 
-WORK RESTRICTIONS
+<h3 style="margin-bottom: 16px;">WORK RESTRICTIONS</h3>
 
-Dear Dr. {{physicianName}}:
+<p style="margin-bottom: 16px;">Dear Dr. {{physicianName}}:</p>
 
-You indicated work restrictions are needed for {{employeeFirstName}} {{employeeLastName}}. Please assist Owens Corning with providing appropriate job duties without compromising her/his medical condition.
+<p style="margin-bottom: 16px;">You indicated work restrictions are needed for {{employeeFirstName}} {{employeeLastName}}. Please assist Owens Corning with providing appropriate job duties without compromising her/his medical condition.</p>
 
-Please address the issues below:
+<p style="margin-bottom: 16px;"><strong>Please address the issues below:</strong></p>
 
-What is the current diagnosis? ___________________________________________________
+<p style="margin-bottom: 16px;">What is the current diagnosis? ___________________________________________________</p>
 
-In the course of _________ work day, with rest breaks every ______________ how many hours can {{employeeFirstName}} {{employeeLastName}} perform each of the following activities?
+<p style="margin-bottom: 16px;">In the course of _________ work day, with rest breaks every ______________ how many hours can {{employeeFirstName}} {{employeeLastName}} perform each of the following activities?</p>
 
-Stand __________ Walk ____________ Sit ____________ Drive __________
-Climb Stairs _________ Climb Ladders ____________ (please indicate max...)
-____________ Crawl ___________ Stoop ___________ Squat _________ Bend __________
+<p style="margin-bottom: 16px;">Stand __________ Walk ____________ Sit ____________ Drive __________<br/>
+Climb Stairs _________ Climb Ladders ____________ (please indicate max...)<br/>
+____________ Crawl ___________ Stoop ___________ Squat _________ Bend __________</p>
 
-Indicate the maximum weight in the following tasks:
-Lifting _____________ Push ____________ Pulling ____________ Carry __________
+<p style="margin-bottom: 16px;"><strong>Indicate the maximum weight in the following tasks:</strong><br/>
+Lifting _____________ Push ____________ Pulling ____________ Carry __________</p>
 
-Can {{employeeFirstName}} {{employeeLastName}} perform tasks using the following? Indicate yes or no:
-- Use of vibratory Equipment Yes _________ No_______
-- Operate high speed/moving equipment Yes _________ No _________
-- Perform tasks above shoulder level Yes _________ No _________
+<p style="margin-bottom: 16px;"><strong>Can {{employeeFirstName}} {{employeeLastName}} perform tasks using the following? Indicate yes or no:</strong></p>
+<ul style="margin-bottom: 16px;">
+  <li>Use of vibratory Equipment: Yes _________ No_______</li>
+  <li>Operate high speed/moving equipment: Yes _________ No _________</li>
+  <li>Perform tasks above shoulder level: Yes _________ No _________</li>
+</ul>
 
-Please indicate any additional restrictions and or limitations for {{employeeFirstName}} {{employeeLastName}}.
+<p style="margin-bottom: 16px;">Please indicate any additional restrictions and or limitations for {{employeeFirstName}} {{employeeLastName}}.</p>
 
-Date _______________________ may return to work with these limitations: _____________
+<p style="margin-bottom: 16px;">Date _______________________ may return to work with these limitations: _____________</p>
 
-Estimated length of time for these limitations: ________________________________.
+<p style="margin-bottom: 16px;">Estimated length of time for these limitations: ________________________________.</p>
 
-MD Signature: _________________________________ Date: ________________________
+<p style="margin-bottom: 16px;">MD Signature: _________________________________ Date: ________________________</p>
 
-PLEASE FAX FORM BACK TO:
-{{caseManagerWithCredentials}}, Medical Case Manager
-419-325-0319`,
+<p style="margin-bottom: 16px;"><strong>PLEASE FAX FORM BACK TO:</strong><br/>
+{{caseManagerWithCredentials}}, Medical Case Manager<br/>
+419-325-0319</p>`,
     },
     {
       id: "8",
@@ -488,46 +521,47 @@ PLEASE FAX FORM BACK TO:
       name: "CM-WC Cover Letter",
       description: "Workers' Compensation cover letter for disability management",
       active: true,
-      content: `{{today}}
-{{employeeFirstName}} {{employeeLastName}}
-{{employeeStreet1}} {{employeeStreet2}}
-{{employeeCity}}, {{employeeState}} {{employeeZip}}
+      content: `<p style="margin-bottom: 16px;">{{today}}</p>
 
-Dear {{employeeFirstName}},
+<p style="margin-bottom: 16px;">{{employeeFirstName}} {{employeeLastName}}<br/>
+{{employeeStreet1}} {{employeeStreet2}}<br/>
+{{employeeCity}}, {{employeeState}} {{employeeZip}}</p>
 
-(Only choose one of the applicable paragraphs from the first two listed below)
+<p style="margin-bottom: 16px;">Dear {{employeeFirstName}},</p>
 
-(If WC claim being accepted):
-The Disability Management Program is aware you are off work related to your Workers' Compensation claim. Your date of disability is: {{dateOfDisability}}. Although you are receiving Workers' Compensation wages, your leave is managed under the Short Term Disability Plan. Please complete Parts 1 and 2 of the enclosed Short Term Disability Benefits Application and the Reimbursement agreement.
+<p style="margin-bottom: 16px;"><em>(Only choose one of the applicable paragraphs from the first two listed below)</em></p>
 
-(If questioning the WC claim):
-The Disability Management Program is aware you are off work and a Workers' Compensation claim has been filed. While decisions are being made about your Workers' Compensation claim, you may be eligible for Short Term Disability Benefits. To apply for Short Term Disability Benefits, please complete Parts 1 and 2 of the enclosed Short Term Disability Benefits Application and the Reimbursement Agreement. If your Workers' Compensation claim is approved, you will need to reimburse Owens Corning Short Term Disability Benefits paid to you.
+<p style="margin-bottom: 16px;"><strong>(If WC claim being accepted):</strong><br/>
+The Disability Management Program is aware you are off work related to your Workers&apos; Compensation claim. Your date of disability is: {{dateOfDisability}}. Although you are receiving Workers&apos; Compensation wages, your leave is managed under the Short Term Disability Plan. Please complete Parts 1 and 2 of the enclosed Short Term Disability Benefits Application and the Reimbursement agreement.</p>
 
-The time you are off work will be applied to your eligibility for family and medical leave (for up to twelve weeks) in accordance with the Family and Medical Leave Act (FMLA). If approved for FMLA leave, you will be granted return to work to the same or equivalent job.
+<p style="margin-bottom: 16px;"><strong>(If questioning the WC claim):</strong><br/>
+The Disability Management Program is aware you are off work and a Workers&apos; Compensation claim has been filed. While decisions are being made about your Workers&apos; Compensation claim, you may be eligible for Short Term Disability Benefits. To apply for Short Term Disability Benefits, please complete Parts 1 and 2 of the enclosed Short Term Disability Benefits Application and the Reimbursement Agreement. If your Workers&apos; Compensation claim is approved, you will need to reimburse Owens Corning Short Term Disability Benefits paid to you.</p>
 
-After you have been on a Workers' Compensation disability leave for 30 days, you are required to pay your healthcare premiums. Medical coverage, for the injury or illness which caused you to be off work, will be included as part of your Workers' Compensation claim. You will need to maintain your present healthcare coverage in case any other injury or illness requires you or your covered family members to seek medical treatment. You will receive a letter from Owens Corning's Benefits Department notifying you of the amount and due date of your monthly premium. If you have questions, please contact Benefits at 1-800-725-9335. Failure to make the required premium payments may result in discontinuation of your healthcare coverage. The estimated amount of your monthly premium is $_______.
+<p style="margin-bottom: 16px;">The time you are off work will be applied to your eligibility for family and medical leave (for up to twelve weeks) in accordance with the Family and Medical Leave Act (FMLA). If approved for FMLA leave, you will be granted return to work to the same or equivalent job.</p>
 
-Be sure to review your letter from Owens Corning Benefit Service Center and mail your monthly healthcare premium payment to:
+<p style="margin-bottom: 16px;">After you have been on a Workers&apos; Compensation disability leave for 30 days, you are required to pay your healthcare premiums. Medical coverage, for the injury or illness which caused you to be off work, will be included as part of your Workers&apos; Compensation claim. You will need to maintain your present healthcare coverage in case any other injury or illness requires you or your covered family members to seek medical treatment. You will receive a letter from Owens Corning&apos;s Benefits Department notifying you of the amount and due date of your monthly premium. If you have questions, please contact Benefits at 1-800-725-9335. Failure to make the required premium payments may result in discontinuation of your healthcare coverage. The estimated amount of your monthly premium is $_______.</p>
 
-Owens Corning
-Attn: Benefits Service Center 1B1
-One Owens Corning Parkway
-Toledo, OH 43659
+<p style="margin-bottom: 16px;">Be sure to review your letter from Owens Corning Benefit Service Center and mail your monthly healthcare premium payment to:</p>
 
-You may be covered under the Short Term Disability Plan for up to 18 months, as long as you remain disabled from performing your own job. Prior to the end of the 18 months, if you are still unable to perform your own job at Owens Corning, you may be required to apply for Long Term Disability benefits. You are not to derive any new source of income from any source (activity) on your own, while receiving disability benefits. Disability benefits are offset by other sources of disability and/or retirement.
+<p style="margin-bottom: 16px; margin-left: 20px;">Owens Corning<br/>
+Attn: Benefits Service Center 1B1<br/>
+One Owens Corning Parkway<br/>
+Toledo, OH 43659</p>
 
-Workers' Compensation disability benefits are paid based on state regulations. Your claims adjuster is {{adjuster}} and can be reached at {{adjusterPhone}}. The only deduction withheld from Workers' Compensation benefits is child support.
+<p style="margin-bottom: 16px;">You may be covered under the Short Term Disability Plan for up to 18 months, as long as you remain disabled from performing your own job. Prior to the end of the 18 months, if you are still unable to perform your own job at Owens Corning, you may be required to apply for Long Term Disability benefits. You are not to derive any new source of income from any source (activity) on your own, while receiving disability benefits. Disability benefits are offset by other sources of disability and/or retirement.</p>
 
-In addition to the Short Term Disability Application, we recommend you complete the Health Assessment through Personify Health. If you have not completed the Health Assessment this year, please complete by following the enclosed instructions. The Health Assessment can be taken on a computer or a smartphone.
+<p style="margin-bottom: 16px;">Workers&apos; Compensation disability benefits are paid based on state regulations. Your claims adjuster is {{adjuster}} and can be reached at {{adjusterPhone}}. The only deduction withheld from Workers&apos; Compensation benefits is child support.</p>
 
-If you have any questions, I may be reached at {{caseManagerPhone}}.
+<p style="margin-bottom: 16px;">In addition to the Short Term Disability Application, we recommend you complete the Health Assessment through Personify Health. If you have not completed the Health Assessment this year, please complete by following the enclosed instructions. The Health Assessment can be taken on a computer or a smartphone.</p>
 
-Sincerely,
+<p style="margin-bottom: 16px;">If you have any questions, I may be reached at {{caseManagerPhone}}.</p>
 
-{{caseManagerWithCredentials}}
-Medical Case Manager
+<p style="margin-bottom: 16px;">Sincerely,</p>
 
-Cc: Benefits`,
+<p style="margin-bottom: 16px;">{{caseManagerWithCredentials}}<br/>
+Medical Case Manager</p>
+
+<p style="margin-bottom: 16px;"><strong>Cc:</strong> Benefits</p>`,
     },
   ],
   caseNoteTemplates: [
@@ -1231,6 +1265,28 @@ Any concerns from the plant/HR, etc?`,
     { id: "70", code: "CM-XRAY", description: "X-Ray", active: true },
     { id: "71", code: "CM-XRAY-REPORT", description: "Xray report", active: true },
   ],
+  payCodes: [
+    // US Salaried
+    { id: "1", code: "US-2070", description: "Short Term Disability 100%/Salary", active: true, category: "US Salaried" },
+    { id: "2", code: "US-2080", description: "Short Term Disability 60%/Salary", active: true, category: "US Salaried" },
+    { id: "3", code: "US-2085", description: "Short Term Disab FICA ex/Salary 60% of salary", active: true, category: "US Salaried" },
+    { id: "4", code: "US-2075", description: "Short Term Disability 90%/Salary (pilots only)", active: true, category: "US Salaried" },
+    { id: "5", code: "US-2090", description: "Short Term Disab vacation/Salary (make whole when taken vacation)", active: true, category: "US Salaried" },
+    // US Hourly
+    { id: "6", code: "STD-FICA-EX", description: "Short Term Disab FICA EX $", active: true, category: "US Hourly" },
+    { id: "7", code: "STD-FICA-EX-NWK", description: "Short Term Disab FICA EX Nwk $", active: true, category: "US Hourly" },
+    { id: "8", code: "STD-NWK", description: "Short Term Disab Nwk $", active: true, category: "US Hourly" },
+    { id: "9", code: "STD", description: "Short Term Disab $", active: true, category: "US Hourly" },
+    // CA Salaried
+    { id: "10", code: "2050R_CA", description: "100% Salary", active: true, category: "CA Salaried" },
+    { id: "11", code: "2055R_CA", description: "66.67% Salary", active: true, category: "CA Salaried" },
+    { id: "12", code: "2060R_CA", description: "80% Salary", active: true, category: "CA Salaried" },
+    // CA Hourly
+    { id: "13", code: "STD-CA-FICA-EX", description: "Short Term Disab_CA FICA EX $", active: true, category: "CA Hourly" },
+    { id: "14", code: "STD-CA-FICA-EX-NWK", description: "Short Term Disab FICA_CA EX Nwk $", active: true, category: "CA Hourly" },
+    { id: "15", code: "STD-CA-NWK", description: "Short Term Disab_CA Nwk $", active: true, category: "CA Hourly" },
+    { id: "16", code: "STD-CA", description: "Short Term Disab_CA $", active: true, category: "CA Hourly" },
+  ],
 }
 
 const initialCaseManagers: CaseManager[] = [
@@ -1265,6 +1321,65 @@ const initialLocations: Location[] = [
   { id: "14", name: "Jacksonville", region: "US", active: true },
   { id: "15", name: "Toronto", region: "Canada", active: true },
   { id: "16", name: "Vancouver", region: "Canada", active: true },
+  { id: "17", name: "Cleveland", region: "US", active: true },
+  { id: "18", name: "Dayton", region: "US", active: true },
+  { id: "19", name: "Akron", region: "US", active: true },
+  { id: "20", name: "Granville", region: "US", active: true },
+  { id: "21", name: "Cincinnati", region: "US", active: true },
+]
+
+const initialSTDPlans: STDPlan[] = [
+  {
+    id: "std-1",
+    planCode: "STD-BASIC",
+    planName: "Basic Short-Term Disability",
+    planType: "STD",
+    benefitPercentage: 60,
+    waitingPeriod: 7,
+    maxDuration: 26,
+    active: true
+  },
+  {
+    id: "std-2",
+    planCode: "STD-PLUS",
+    planName: "Enhanced Short-Term Disability",
+    planType: "STD",
+    benefitPercentage: 70,
+    waitingPeriod: 14,
+    maxDuration: 26,
+    active: true
+  },
+  {
+    id: "std-3",
+    planCode: "STD-PREMIUM",
+    planName: "Premium Short-Term Disability",
+    planType: "STD",
+    benefitPercentage: 80,
+    waitingPeriod: 7,
+    maxDuration: 52,
+    active: true
+  }
+]
+
+const initialCoverageRules: PotentialCoverageRule[] = [
+  // Toledo - Basic STD
+  { id: "rule-1", locationId: "10", planId: "std-1", effectiveDate: "01/01/2020", isEligible: true },
+  // Columbus - Basic STD
+  { id: "rule-2", locationId: "11", planId: "std-1", effectiveDate: "01/01/2020", isEligible: true },
+  // Newark - Plus STD
+  { id: "rule-3", locationId: "6", planId: "std-2", effectiveDate: "01/01/2020", isEligible: true },
+  // Cleveland - Basic STD
+  { id: "rule-4", locationId: "17", planId: "std-1", effectiveDate: "01/01/2020", isEligible: true },
+  // Dayton - Plus STD
+  { id: "rule-5", locationId: "18", planId: "std-2", effectiveDate: "01/01/2020", isEligible: true },
+  // Akron - Basic STD
+  { id: "rule-6", locationId: "19", planId: "std-1", effectiveDate: "01/01/2020", isEligible: true },
+  // Granville - Premium STD
+  { id: "rule-7", locationId: "20", planId: "std-3", effectiveDate: "01/01/2020", isEligible: true },
+  // Cincinnati - Plus STD
+  { id: "rule-8", locationId: "21", planId: "std-2", effectiveDate: "01/01/2020", isEligible: true },
+  // Kansas City - Basic STD
+  { id: "rule-9", locationId: "3", planId: "std-1", effectiveDate: "01/01/2020", isEligible: true },
 ]
 
 export function AdminProvider({ children }: { children: ReactNode }) {
@@ -1351,6 +1466,41 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     }))
   }
 
+  // Helper to parse MM/DD/YYYY date
+  const parseDate = (dateStr: string): Date => {
+    const [month, day, year] = dateStr.split('/')
+    return new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+  }
+
+  // Get STD coverage for a location at a specific date
+  const getSTDCoverageForLocation = (locationName: string, asOfDate: string): { plan: STDPlan; rule: PotentialCoverageRule } | undefined => {
+    // Find the location by name (handle variations like "Toledo, OH" vs "Toledo")
+    const locationBaseName = locationName.split(',')[0].trim()
+    const location = locations.find(loc => loc.name.toLowerCase() === locationBaseName.toLowerCase())
+    if (!location) return undefined
+
+    const targetDate = parseDate(asOfDate)
+
+    // Find applicable coverage rule
+    const applicableRule = initialCoverageRules.find(rule => {
+      if (rule.locationId !== location.id) return false
+      if (!rule.isEligible) return false
+      
+      const effDate = parseDate(rule.effectiveDate)
+      const endDate = rule.endDate ? parseDate(rule.endDate) : null
+      
+      return effDate <= targetDate && (!endDate || endDate > targetDate)
+    })
+
+    if (!applicableRule) return undefined
+
+    // Find the plan
+    const plan = initialSTDPlans.find(p => p.id === applicableRule.planId && p.active)
+    if (!plan) return undefined
+
+    return { plan, rule: applicableRule }
+  }
+
   return (
     <AdminContext.Provider
       value={{
@@ -1371,6 +1521,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         addCode,
         updateCode,
         deleteCode,
+        stdPlans: initialSTDPlans,
+        coverageRules: initialCoverageRules,
+        getSTDCoverageForLocation,
       }}
     >
       {children}

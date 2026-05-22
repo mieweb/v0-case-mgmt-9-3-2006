@@ -440,39 +440,236 @@ export function CaseNotesTab() {
           <head>
             <title>${editingNote ? "Edit Note" : "Create Note"}</title>
             <style>
-              body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; }
+              body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; margin: 0; background: #f5f5f5; }
+              .header { background: #1e40af; color: white; padding: 15px 20px; margin: -20px -20px 20px -20px; }
+              .header h2 { margin: 0; font-size: 18px; }
               .form-group { margin-bottom: 15px; }
-              label { display: block; margin-bottom: 5px; font-weight: 500; }
-              input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-              textarea { min-height: 400px; font-family: inherit; }
+              label { display: block; margin-bottom: 5px; font-weight: 600; color: #374151; }
+              input, select { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; }
+              .editor-container { border: 1px solid #d1d5db; border-radius: 6px; background: white; }
+              .toolbar { display: flex; align-items: center; gap: 8px; padding: 8px; border-bottom: 1px solid #d1d5db; background: #f9fafb; }
+              .dictate-btn { 
+                display: flex; align-items: center; gap: 4px; padding: 6px 12px; 
+                border: none; border-radius: 4px; cursor: pointer; font-size: 14px;
+                background: #f3f4f6; color: #374151;
+              }
+              .dictate-btn:hover { background: #e5e7eb; }
+              .dictate-btn.active { background: #dc2626; color: white; animation: pulse 1.5s infinite; }
+              @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+              .note-textarea { 
+                width: 100%; min-height: 350px; padding: 15px; border: none; 
+                font-family: inherit; font-size: 14px; line-height: 1.6; resize: vertical;
+                box-sizing: border-box;
+              }
+              .note-textarea:focus { outline: none; }
+              .button-group { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+              button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
+              .btn-primary { background: #1e40af; color: white; }
+              .btn-primary:hover { background: #1e3a8a; }
+              .btn-secondary { background: #6b7280; color: white; }
+              .btn-secondary:hover { background: #4b5563; }
+              .mic-icon { width: 16px; height: 16px; }
             </style>
           </head>
           <body>
-            <h2>${editingNote ? "Edit Note" : "Create Note"}</h2>
+            <div class="header">
+              <h2>${editingNote ? "Edit Note" : "Create Note"}</h2>
+            </div>
             <div class="form-group">
               <label>Note Date</label>
-              <input type="date" value="${noteDate}" />
+              <input type="date" id="noteDate" value="${noteDate}" />
             </div>
             <div class="form-group">
               <label>Activity</label>
-              <select>
-                <option value="phone">Phone Call</option>
-                <option value="email">Email</option>
-                <option value="meeting">Meeting</option>
-                <option value="review">Case Review</option>
-                <option value="other">Other</option>
+              <select id="activity">
+                <option value="phone" ${activity === "phone" ? "selected" : ""}>Phone Call</option>
+                <option value="email" ${activity === "email" ? "selected" : ""}>Email</option>
+                <option value="meeting" ${activity === "meeting" ? "selected" : ""}>Meeting</option>
+                <option value="review" ${activity === "review" ? "selected" : ""}>Case Review</option>
+                <option value="other" ${activity === "other" ? "selected" : ""}>Other</option>
               </select>
             </div>
             <div class="form-group">
               <label>Notes</label>
-              <textarea>${content}</textarea>
+              <div class="editor-container">
+                <div class="toolbar">
+                  <button type="button" id="dictateBtn" class="dictate-btn">
+                    <svg class="mic-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                      <line x1="12" x2="12" y1="19" y2="22"></line>
+                    </svg>
+                    <span id="dictateText">Dictate</span>
+                  </button>
+                </div>
+                <textarea id="noteContent" class="note-textarea" placeholder="Enter your notes here...">${content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+                <div id="interimText" style="padding: 10px 15px; color: #6b7280; font-style: italic; border-top: 1px dashed #e5e7eb; display: none; min-height: 24px; background: #fefce8;"></div>
+              </div>
             </div>
+            <div class="button-group">
+              <button class="btn-secondary" onclick="window.close()">Cancel</button>
+              <button class="btn-primary" id="saveBtn">Save Note</button>
+            </div>
+            <script>
+              let recognition = null;
+              let isListening = false;
+              
+              const dictateBtn = document.getElementById('dictateBtn');
+              const dictateText = document.getElementById('dictateText');
+              const noteContent = document.getElementById('noteContent');
+              const interimText = document.getElementById('interimText');
+              
+              const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+              
+              if (SpeechRecognition) {
+                dictateBtn.addEventListener('click', async function() {
+                  if (isListening && recognition) {
+                    recognition.stop();
+                    isListening = false;
+                    dictateBtn.classList.remove('active');
+                    dictateText.textContent = 'Dictate';
+                    return;
+                  }
+                  
+                  try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    stream.getTracks().forEach(track => track.stop());
+                  } catch (err) {
+                    alert('Microphone access is required for dictation. Please allow microphone access and try again.');
+                    return;
+                  }
+                  
+                  recognition = new SpeechRecognition();
+                  recognition.continuous = true;
+                  recognition.interimResults = true;
+                  recognition.lang = 'en-US';
+                  
+                  recognition.onstart = function() {
+                    isListening = true;
+                    dictateBtn.classList.add('active');
+                    dictateText.textContent = 'Stop';
+                    interimText.style.display = 'block';
+                    interimText.textContent = 'Listening...';
+                  };
+                  
+                  recognition.onresult = function(event) {
+                    let finalTranscript = '';
+                    let interimTranscript = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                      const transcript = event.results[i][0].transcript;
+                      if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                      } else {
+                        interimTranscript += transcript;
+                      }
+                    }
+                    
+                    // Show interim results immediately
+                    if (interimTranscript) {
+                      interimText.textContent = interimTranscript;
+                      interimText.style.display = 'block';
+                    }
+                    
+                    // Add final results to textarea
+                    if (finalTranscript) {
+                      // Smart punctuation processing
+                      let processed = finalTranscript;
+                      
+                      // "period" as word: preserve when used in context
+                      processed = processed.replace(/\\b(the|a|this|that|each|every|same|time|grace|trial|waiting|probationary|pay|billing|accounting)\\s+period\\b/gi, '$1 period');
+                      processed = processed.replace(/\\bperiod\\s+(of|in|for|from|to|during|between|after|before|when|where|is|was|will|has|had)\\b/gi, 'period $1');
+                      // "period" as punctuation: at end or before new sentence
+                      processed = processed.replace(/\\s+period(\\s*$)/gi, '.$1');
+                      processed = processed.replace(/\\s+period\\s+(?=[A-Z])/g, '. ');
+                      
+                      // "comma" handling
+                      processed = processed.replace(/\\bcomma\\s+(separated|delimited)/gi, 'comma $1');
+                      processed = processed.replace(/\\s+comma\\b/gi, ',');
+                      
+                      // "colon" as word vs punctuation
+                      processed = processed.replace(/\\b(the|a|my|your|his|her|their|semicolon|ascending|descending|transverse|sigmoid)\\s+colon\\b/gi, '$1 colon');
+                      processed = processed.replace(/\\bcolon\\s+(cancer|surgery|health|polyp|scope|oscopy)/gi, 'colon $1');
+                      processed = processed.replace(/\\s+colon\\b/gi, ':');
+                      
+                      // Simple punctuation
+                      processed = processed.replace(/\\s+full stop/gi, '.');
+                      processed = processed.replace(/\\s+question mark/gi, '?');
+                      processed = processed.replace(/\\s+exclamation (point|mark)/gi, '!');
+                      processed = processed.replace(/\\s+semicolon/gi, ';');
+                      processed = processed.replace(/\\s+new line/gi, '\\n');
+                      processed = processed.replace(/\\s+new paragraph/gi, '\\n\\n');
+                      
+                      // Capitalize after sentence-ending punctuation
+                      processed = processed.replace(/([.!?])\\s+([a-z])/g, function(m, p, l) { return p + ' ' + l.toUpperCase(); });
+                      
+                      const currentValue = noteContent.value || '';
+                      noteContent.value = currentValue + (currentValue ? ' ' : '') + processed;
+                      interimText.textContent = 'Listening...';
+                    }
+                  };
+                  
+                  recognition.onerror = function(event) {
+                    if (event.error === 'no-speech' || event.error === 'aborted') return;
+                    console.error('Speech recognition error:', event.error);
+                    isListening = false;
+                    dictateBtn.classList.remove('active');
+                    dictateText.textContent = 'Dictate';
+                    interimText.style.display = 'none';
+                  };
+                  
+                  recognition.onend = function() {
+                    if (isListening) {
+                      try { recognition.start(); } catch(e) {
+                        isListening = false;
+                        dictateBtn.classList.remove('active');
+                        dictateText.textContent = 'Dictate';
+                        interimText.style.display = 'none';
+                      }
+                    } else {
+                      interimText.style.display = 'none';
+                    }
+                  };
+                  
+                  recognition.start();
+                });
+              } else {
+                dictateBtn.style.display = 'none';
+              }
+              
+              // Save button handler - send data back to parent window
+              document.getElementById('saveBtn').addEventListener('click', function() {
+                const data = {
+                  type: 'CASE_NOTE_SAVE',
+                  noteDate: document.getElementById('noteDate').value,
+                  activity: document.getElementById('activity').value,
+                  content: document.getElementById('noteContent').value
+                };
+                if (window.opener) {
+                  window.opener.postMessage(data, '*');
+                  window.close();
+                }
+              });
+            </script>
           </body>
         </html>
       `)
       newWindow.document.close()
     }
   }
+
+  // Listen for messages from pop-out window
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'CASE_NOTE_SAVE') {
+        setNoteDate(event.data.noteDate)
+        setActivity(event.data.activity)
+        setContent(event.data.content)
+      }
+    }
+    
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [])
 
   return (
     <div className="case-notes-tab space-y-6">

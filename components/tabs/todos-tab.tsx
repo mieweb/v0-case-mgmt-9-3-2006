@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog"
 import { useCases } from "@/contexts/cases-context"
 import { useAdmin } from "@/contexts/admin-context"
+import { useUser } from "@/contexts/user-context"
 import { generateTodosFromTemplates } from "@/lib/todo-parser"
 import type { TodoItem } from "@/contexts/cases-context"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -26,6 +27,7 @@ import { triggerConfetti } from "@/lib/confetti"
 export function TodosTab() {
   const { currentCase, updateCase } = useCases()
   const { getCaseType, caseManagers: adminCaseManagers } = useAdmin()
+  const { currentUser } = useUser()
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [showGenerateDialog, setShowGenerateDialog] = useState(false)
   const [anchorDates, setAnchorDates] = useState({
@@ -258,6 +260,7 @@ export function TodosTab() {
     updateTodo(pendingCompleteTodo.id, {
       completed: true,
       dateClosed: new Date().toISOString().split("T")[0],
+      completedBy: currentUser?.name || "Unknown",
     })
 
     // Always add a case note for completed todos
@@ -354,9 +357,11 @@ export function TodosTab() {
       if (bulkCompleted === "completed") {
         updates.completed = true
         updates.dateClosed = new Date().toISOString().split("T")[0]
+        updates.completedBy = currentUser?.name || "Unknown"
       } else if (bulkCompleted === "active") {
         updates.completed = false
         updates.dateClosed = undefined
+        updates.completedBy = undefined
       }
 
       return { ...todo, ...updates }
@@ -553,8 +558,9 @@ export function TodosTab() {
               <TableHead className="w-[150px]">Date Scheduled</TableHead>
               <TableHead>Activity</TableHead>
               <TableHead className="w-[150px]">Case Manager</TableHead>
-              <TableHead className="w-[100px]">Completed</TableHead>
-              <TableHead className="w-[150px]">Date Closed</TableHead>
+<TableHead className="w-[100px]">Completed</TableHead>
+                <TableHead className="w-[150px]">Date Closed</TableHead>
+                <TableHead className="w-[150px]">Completed By</TableHead>
               <TableHead className="w-[80px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -612,6 +618,7 @@ export function TodosTab() {
                               updateTodo(todo.id, {
                                 completed: false,
                                 dateClosed: undefined,
+                                completedBy: undefined,
                               })
                             }
                           }}
@@ -626,6 +633,9 @@ export function TodosTab() {
                         onChange={(e) => updateTodo(todo.id, { dateClosed: e.target.value })}
                         disabled={!todo.completed}
                       />
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {todo.completedBy || "—"}
                     </TableCell>
                     <TableCell>
                       <Button variant="ghost" size="sm" onClick={() => deleteTodo(todo.id)}>

@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
-import { useCases, Case } from "@/contexts/cases-context"
+import { useCases, Case, getCurrentPay, getCurrentJob } from "@/contexts/cases-context"
 import { useAdmin } from "@/contexts/admin-context"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -28,6 +28,7 @@ type EmployeeCase = {
   location: string
   payType: "Hourly" | "Salary"
   wageType: string
+  payCode?: string
   ppeStartDate: string
   ppeEndDate: string
   disabilityDate: string
@@ -222,9 +223,8 @@ function validateCase(caseData: EmployeeCase, stdPlan: string): string[] {
     errors.push("No Disability Date")
   }
 
-  if (!caseData.ficaDate) {
-    errors.push("Missing FICA Date")
-  }
+  // FICA Date is calculated from disability date, so no separate validation needed
+  // The date185 (FICA Date) will be calculated if disabilityDate exists
 
   if (caseData.offsetAmount && !caseData.offsetFrequency) {
     errors.push("Missing offset frequency")
@@ -283,12 +283,13 @@ export default function PayrollExportPage() {
   const [filterLocation, setFilterLocation] = useState<string>("all")
   const [filterPayType, setFilterPayType] = useState<string>("all")
   const [filterWageType, setFilterWageType] = useState<string>("all")
+  const [filterPayCode, setFilterPayCode] = useState<string>("all")
   const [filterPpeStartDate, setFilterPpeStartDate] = useState<string>("")
   const [filterPpeEndDate, setFilterPpeEndDate] = useState<string>("")
   const [showFilters, setShowFilters] = useState(false)
   
   const { cases: systemCases } = useCases()
-  const { locations: adminLocations } = useAdmin()
+  const { locations: adminLocations, codes } = useAdmin()
   
   // Filter for Short-term Disability cases only
   const stdCases = systemCases.filter(c => c.caseType === "Short-term Disability" && c.status === "Open")
@@ -306,6 +307,7 @@ export default function PayrollExportPage() {
     if (filterLocation !== "all" && c.location !== filterLocation) return false
     if (filterPayType !== "all" && c.payType !== filterPayType) return false
     if (filterWageType !== "all" && c.wageType !== filterWageType) return false
+    if (filterPayCode !== "all" && c.payCode !== filterPayCode) return false
     if (filterPpeStartDate && c.ppeStartDate < filterPpeStartDate) return false
     if (filterPpeEndDate && c.ppeEndDate > filterPpeEndDate) return false
     return true
@@ -318,15 +320,38 @@ export default function PayrollExportPage() {
   // Convert system case to EmployeeCase format
   const convertSystemCase = (systemCase: Case): EmployeeCase => {
     const locationCity = systemCase.employeeLocation.split(",")[0].trim()
+    
+    // Get current pay from compensation history
+    const currentPay = getCurrentPay(systemCase)
+    const currentJob = getCurrentJob(systemCase)
+    
+    // Determine hourly rate from compensation history
+    let hourlyRate = 25 // Default fallback
+    if (currentPay) {
+      if (currentPay.unit === "hourly") {
+        hourlyRate = currentPay.rateAmount
+      } else if (currentPay.unit === "annual") {
+        hourlyRate = currentPay.rateAmount / 2080 // Standard work hours per year
+      } else if (currentPay.unit === "monthly") {
+        hourlyRate = (currentPay.rateAmount * 12) / 2080
+      } else if (currentPay.unit === "weekly") {
+        hourlyRate = currentPay.rateAmount / 40
+      }
+    }
+    
+    // Use job location if available, otherwise use employee location
+    const jobLocation = currentJob?.locationName.split(",")[0].trim() || locationCity
+    
     return {
       employeeName: systemCase.employeeName,
       employeeId: systemCase.employeeNumber,
       caseManager: systemCase.caseManager,
       stdType: "Continuation", // Could be derived from case history
       region: "Central", // Default, would come from HRIS
-      location: locationCity,
-      payType: "Hourly", // Default, would come from HRIS
+      location: jobLocation,
+      payType: currentPay?.unit === "hourly" ? "Hourly" : "Salary",
       wageType: "Regular", // Default, would come from HRIS
+      payCode: currentPay?.payCode || (systemCase as { payCode?: string }).payCode || "",
       ppeStartDate: new Date().toISOString().split("T")[0], // Default to today
       ppeEndDate: new Date(Date.now() + 13 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // Default to 2 weeks
       disabilityDate: systemCase.dateOfDisability || "",
@@ -334,7 +359,7 @@ export default function PayrollExportPage() {
       stdEndDate: systemCase.stdEndDate || systemCase.payEndDate,
       ficaDate: systemCase.ficaDate,
       totalStdDaysToPay: 7, // Default, should be calculated from dates
-      hourlyRate: 25, // Default, would come from HRIS
+      hourlyRate: Math.round(hourlyRate * 100) / 100, // Round to 2 decimal places
       comments: `Case #${systemCase.caseNumber}`,
     }
   }
@@ -344,6 +369,7 @@ export default function PayrollExportPage() {
     setFilterLocation("all")
     setFilterPayType("all")
     setFilterWageType("all")
+    setFilterPayCode("all")
     setFilterPpeStartDate("")
     setFilterPpeEndDate("")
   }
@@ -434,8 +460,8 @@ export default function PayrollExportPage() {
       "Date of Disability",
       "STD Start Date",
       "STD End Date",
-      "185 days",
       "FICA Date",
+      "Actual FICA Date",
       "Total Days of STD to be paid",
       "Hourly Rate",
       "STD Plan",
@@ -495,7 +521,7 @@ export default function PayrollExportPage() {
     filteredCases.forEach((c, idx) => {
       const rowNum = idx + 8 // Excel row number (1-indexed, data starts at row 8)
       
-      // Column N (185 days): =K{row}+185 (Date of Disability + 185 days)
+      // Column N (FICA Date): =K{row}+185 (Date of Disability + 185 days)
       ws[`N${rowNum}`] = { f: `K${rowNum}+185` }
       
       // Column T (STD Amount): Formula based on STD Plan, Hourly Rate, and Days
@@ -538,8 +564,8 @@ export default function PayrollExportPage() {
       { wch: 15 }, // K: Date of Disability
       { wch: 15 }, // L: STD Start Date
       { wch: 15 }, // M: STD End Date
-      { wch: 12 }, // N: 185 days (formula)
-      { wch: 12 }, // O: FICA Date
+      { wch: 12 }, // N: FICA Date (formula)
+      { wch: 12 }, // O: Actual FICA Date
       { wch: 12 }, // P: Total Days
       { wch: 12 }, // Q: Hourly Rate
       { wch: 15 }, // R: STD Plan
@@ -847,6 +873,22 @@ export default function PayrollExportPage() {
                     </Select>
                   </div>
                   <div className="space-y-2">
+                    <Label className="text-xs">Pay Code</Label>
+                    <Select value={filterPayCode} onValueChange={setFilterPayCode}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="All Pay Codes" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Pay Codes</SelectItem>
+                        {codes.payCodes
+                          .filter((pc) => pc.active)
+                          .map((pc) => (
+                            <SelectItem key={pc.id} value={pc.code}>{pc.code}</SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
                     <Label className="text-xs">PPE Start Date</Label>
                     <Input 
                       type="date" 
@@ -884,11 +926,12 @@ export default function PayrollExportPage() {
                     <TableHead>Location</TableHead>
                     <TableHead>Pay Type</TableHead>
                     <TableHead>Wage Type</TableHead>
+                    <TableHead>Pay Code</TableHead>
                     <TableHead>PPE Start</TableHead>
                     <TableHead>PPE End</TableHead>
                     <TableHead>STD Plan</TableHead>
                     <TableHead>Disability Date</TableHead>
-                    <TableHead>185 Days</TableHead>
+                    <TableHead>FICA Date</TableHead>
                     <TableHead className="text-right">Days to Pay</TableHead>
                     <TableHead className="text-right">Hourly Rate</TableHead>
                     <TableHead className="text-right">STD Amount</TableHead>
@@ -909,6 +952,7 @@ export default function PayrollExportPage() {
                         <Badge variant={c.payType === "Hourly" ? "outline" : "secondary"}>{c.payType}</Badge>
                       </TableCell>
                       <TableCell>{c.wageType}</TableCell>
+                      <TableCell>{c.payCode || <span className="text-muted-foreground">—</span>}</TableCell>
                       <TableCell>{formatDate(c.ppeStartDate)}</TableCell>
                       <TableCell>{formatDate(c.ppeEndDate)}</TableCell>
                       <TableCell>
@@ -924,7 +968,7 @@ export default function PayrollExportPage() {
                         {formatCurrency(c.payThisPeriod)}
                       </TableCell>
                       <TableCell>
-                        {c.errors.length > 0 ? (
+                        {c.errors.length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             {c.errors.map((err, i) => (
                               <Badge key={i} variant="destructive" className="text-xs">
@@ -932,10 +976,6 @@ export default function PayrollExportPage() {
                               </Badge>
                             ))}
                           </div>
-                        ) : (
-                          <Badge variant="outline" className="text-green-600 border-green-600">
-                            Valid
-                          </Badge>
                         )}
                       </TableCell>
                       <TableCell>
