@@ -31,6 +31,28 @@ export interface Location {
   active: boolean
 }
 
+// STD Plan definition
+export interface STDPlan {
+  id: string
+  planCode: string
+  planName: string
+  planType: "STD"
+  benefitPercentage: number
+  waitingPeriod: number // days
+  maxDuration: number // weeks
+  active: boolean
+}
+
+// STD coverage rule - links locations to plans
+export interface PotentialCoverageRule {
+  id: string
+  locationId: string
+  planId: string
+  effectiveDate: string // MM/DD/YYYY
+  endDate?: string // MM/DD/YYYY, null if current
+  isEligible: boolean
+}
+
 interface CodeTables {
   letterTemplates: Code[]
   caseNoteTemplates: Code[]
@@ -64,6 +86,9 @@ interface AdminContextType {
   addCode: (table: keyof CodeTables, code: Omit<Code, "id">) => void
   updateCode: (table: keyof CodeTables, id: string, updates: Partial<Omit<Code, "id">>) => void
   deleteCode: (table: keyof CodeTables, id: string) => void
+  stdPlans: STDPlan[]
+  coverageRules: PotentialCoverageRule[]
+  getSTDCoverageForLocation: (locationName: string, asOfDate: string) => { plan: STDPlan; rule: PotentialCoverageRule } | undefined
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined)
@@ -1296,6 +1321,65 @@ const initialLocations: Location[] = [
   { id: "14", name: "Jacksonville", region: "US", active: true },
   { id: "15", name: "Toronto", region: "Canada", active: true },
   { id: "16", name: "Vancouver", region: "Canada", active: true },
+  { id: "17", name: "Cleveland", region: "US", active: true },
+  { id: "18", name: "Dayton", region: "US", active: true },
+  { id: "19", name: "Akron", region: "US", active: true },
+  { id: "20", name: "Granville", region: "US", active: true },
+  { id: "21", name: "Cincinnati", region: "US", active: true },
+]
+
+const initialSTDPlans: STDPlan[] = [
+  {
+    id: "std-1",
+    planCode: "STD-BASIC",
+    planName: "Basic Short-Term Disability",
+    planType: "STD",
+    benefitPercentage: 60,
+    waitingPeriod: 7,
+    maxDuration: 26,
+    active: true
+  },
+  {
+    id: "std-2",
+    planCode: "STD-PLUS",
+    planName: "Enhanced Short-Term Disability",
+    planType: "STD",
+    benefitPercentage: 70,
+    waitingPeriod: 14,
+    maxDuration: 26,
+    active: true
+  },
+  {
+    id: "std-3",
+    planCode: "STD-PREMIUM",
+    planName: "Premium Short-Term Disability",
+    planType: "STD",
+    benefitPercentage: 80,
+    waitingPeriod: 7,
+    maxDuration: 52,
+    active: true
+  }
+]
+
+const initialCoverageRules: PotentialCoverageRule[] = [
+  // Toledo - Basic STD
+  { id: "rule-1", locationId: "10", planId: "std-1", effectiveDate: "01/01/2020", isEligible: true },
+  // Columbus - Basic STD
+  { id: "rule-2", locationId: "11", planId: "std-1", effectiveDate: "01/01/2020", isEligible: true },
+  // Newark - Plus STD
+  { id: "rule-3", locationId: "6", planId: "std-2", effectiveDate: "01/01/2020", isEligible: true },
+  // Cleveland - Basic STD
+  { id: "rule-4", locationId: "17", planId: "std-1", effectiveDate: "01/01/2020", isEligible: true },
+  // Dayton - Plus STD
+  { id: "rule-5", locationId: "18", planId: "std-2", effectiveDate: "01/01/2020", isEligible: true },
+  // Akron - Basic STD
+  { id: "rule-6", locationId: "19", planId: "std-1", effectiveDate: "01/01/2020", isEligible: true },
+  // Granville - Premium STD
+  { id: "rule-7", locationId: "20", planId: "std-3", effectiveDate: "01/01/2020", isEligible: true },
+  // Cincinnati - Plus STD
+  { id: "rule-8", locationId: "21", planId: "std-2", effectiveDate: "01/01/2020", isEligible: true },
+  // Kansas City - Basic STD
+  { id: "rule-9", locationId: "3", planId: "std-1", effectiveDate: "01/01/2020", isEligible: true },
 ]
 
 export function AdminProvider({ children }: { children: ReactNode }) {
@@ -1382,6 +1466,41 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     }))
   }
 
+  // Helper to parse MM/DD/YYYY date
+  const parseDate = (dateStr: string): Date => {
+    const [month, day, year] = dateStr.split('/')
+    return new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+  }
+
+  // Get STD coverage for a location at a specific date
+  const getSTDCoverageForLocation = (locationName: string, asOfDate: string): { plan: STDPlan; rule: PotentialCoverageRule } | undefined => {
+    // Find the location by name (handle variations like "Toledo, OH" vs "Toledo")
+    const locationBaseName = locationName.split(',')[0].trim()
+    const location = locations.find(loc => loc.name.toLowerCase() === locationBaseName.toLowerCase())
+    if (!location) return undefined
+
+    const targetDate = parseDate(asOfDate)
+
+    // Find applicable coverage rule
+    const applicableRule = initialCoverageRules.find(rule => {
+      if (rule.locationId !== location.id) return false
+      if (!rule.isEligible) return false
+      
+      const effDate = parseDate(rule.effectiveDate)
+      const endDate = rule.endDate ? parseDate(rule.endDate) : null
+      
+      return effDate <= targetDate && (!endDate || endDate > targetDate)
+    })
+
+    if (!applicableRule) return undefined
+
+    // Find the plan
+    const plan = initialSTDPlans.find(p => p.id === applicableRule.planId && p.active)
+    if (!plan) return undefined
+
+    return { plan, rule: applicableRule }
+  }
+
   return (
     <AdminContext.Provider
       value={{
@@ -1402,6 +1521,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         addCode,
         updateCode,
         deleteCode,
+        stdPlans: initialSTDPlans,
+        coverageRules: initialCoverageRules,
+        getSTDCoverageForLocation,
       }}
     >
       {children}

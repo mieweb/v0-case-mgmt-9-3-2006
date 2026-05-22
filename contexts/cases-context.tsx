@@ -36,6 +36,30 @@ export interface PayEntry {
   createdAt: string
 }
 
+// Job assignment history record
+export interface JobAssignment {
+  id: string
+  effectiveDate: string      // MM/DD/YYYY
+  endDate?: string           // MM/DD/YYYY, null if current
+  jobTitle: string
+  jobCode?: string
+  locationId: string
+  locationName: string       // Denormalized for display
+  managerWorkerId?: string
+  managerName?: string       // Denormalized for display
+}
+
+// Pay rate history record
+export interface CompensationRate {
+  id: string
+  effectiveDate: string      // MM/DD/YYYY
+  endDate?: string           // MM/DD/YYYY, null if current
+  rateAmount: number
+  currency: string           // USD default
+  unit: "hourly" | "weekly" | "monthly" | "annual"
+  payCode?: string
+}
+
 export interface ADATrackingEntry {
   id: string
   date: string
@@ -169,6 +193,8 @@ export interface Case {
   payEndDate?: string
   ficaDate?: string // Added FICA tracking date field for automatic calculation
   payEntries?: PayEntry[]
+  jobHistory?: JobAssignment[]
+  compensationHistory?: CompensationRate[]
   todos?: TodoItem[]
   caseNotes?: CaseNote[]
   activityLog?: ActivityLogEntry[]
@@ -214,6 +240,48 @@ export interface CaseContact {
   isPrimary: boolean
   isActive: boolean
   caseNumber: string
+}
+
+// Helper function to parse MM/DD/YYYY date string to Date object
+export function parseDate(dateStr: string): Date {
+  const [month, day, year] = dateStr.split('/')
+  return new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+}
+
+// Get current job assignment as of a given date
+export function getCurrentJob(caseData: Case, asOfDate?: string): JobAssignment | undefined {
+  if (!caseData.jobHistory || caseData.jobHistory.length === 0) return undefined
+  
+  const targetDate = asOfDate ? parseDate(asOfDate) : new Date()
+  
+  // Sort by effective date descending and find the first record that is effective
+  const sorted = [...caseData.jobHistory].sort((a, b) => 
+    parseDate(b.effectiveDate).getTime() - parseDate(a.effectiveDate).getTime()
+  )
+  
+  return sorted.find(job => {
+    const effDate = parseDate(job.effectiveDate)
+    const endDate = job.endDate ? parseDate(job.endDate) : null
+    return effDate <= targetDate && (!endDate || endDate > targetDate)
+  })
+}
+
+// Get current compensation as of a given date
+export function getCurrentPay(caseData: Case, asOfDate?: string): CompensationRate | undefined {
+  if (!caseData.compensationHistory || caseData.compensationHistory.length === 0) return undefined
+  
+  const targetDate = asOfDate ? parseDate(asOfDate) : new Date()
+  
+  // Sort by effective date descending and find the first record that is effective
+  const sorted = [...caseData.compensationHistory].sort((a, b) => 
+    parseDate(b.effectiveDate).getTime() - parseDate(a.effectiveDate).getTime()
+  )
+  
+  return sorted.find(pay => {
+    const effDate = parseDate(pay.effectiveDate)
+    const endDate = pay.endDate ? parseDate(pay.endDate) : null
+    return effDate <= targetDate && (!endDate || endDate > targetDate)
+  })
 }
 
 interface CasesContextType {
@@ -330,6 +398,70 @@ const initialCases: Case[] = [
     homePhone: "(419) 555-0125",
     personalEmail: "john.smith@email.com",
     unionDescription: "UAW Local 12",
+    jobHistory: [
+      {
+        id: "job-js-1",
+        effectiveDate: "03/15/2010",
+        endDate: "01/14/2022",
+        jobTitle: "Assembly Line Worker",
+        jobCode: "ALW-100",
+        locationId: "loc-columbus",
+        locationName: "Columbus, OH",
+        managerWorkerId: "mgr-001",
+        managerName: "Robert Martinez"
+      },
+      {
+        id: "job-js-2",
+        effectiveDate: "01/15/2022",
+        endDate: "06/30/2024",
+        jobTitle: "Production Operator",
+        jobCode: "PO-200",
+        locationId: "loc-columbus",
+        locationName: "Columbus, OH",
+        managerWorkerId: "mgr-001",
+        managerName: "Robert Martinez"
+      },
+      {
+        id: "job-js-3",
+        effectiveDate: "07/01/2024",
+        endDate: undefined,
+        jobTitle: "Senior Production Operator",
+        jobCode: "SPO-300",
+        locationId: "loc-toledo",
+        locationName: "Toledo, OH",
+        managerWorkerId: "mgr-002",
+        managerName: "Lisa Thompson"
+      }
+    ],
+    compensationHistory: [
+      {
+        id: "pay-js-1",
+        effectiveDate: "03/15/2010",
+        endDate: "01/14/2022",
+        rateAmount: 18.50,
+        currency: "USD",
+        unit: "hourly",
+        payCode: "HRL-NONEX"
+      },
+      {
+        id: "pay-js-2",
+        effectiveDate: "01/15/2022",
+        endDate: "06/30/2024",
+        rateAmount: 22.75,
+        currency: "USD",
+        unit: "hourly",
+        payCode: "HRL-NONEX"
+      },
+      {
+        id: "pay-js-3",
+        effectiveDate: "07/01/2024",
+        endDate: undefined,
+        rateAmount: 26.50,
+        currency: "USD",
+        unit: "hourly",
+        payCode: "HRL-NONEX"
+      }
+    ],
     todos: [
       { id: "todo-ar-1", dateScheduled: getRelativeDate(-2), activity: "Review initial claim documentation", caseManager: "Arlene Rosario, CPDM", completed: false },
       { id: "todo-ar-2", dateScheduled: getRelativeDate(0), activity: "Contact employee for intake interview", caseManager: "Arlene Rosario, CPDM", completed: false },
@@ -436,6 +568,59 @@ const initialCases: Case[] = [
     homePhone: "(740) 555-0236",
     personalEmail: "sarah.johnson@email.com",
     unionDescription: "Non-Union",
+    jobHistory: [
+      {
+        id: "job-sj-1",
+        effectiveDate: "07/01/2015",
+        endDate: "03/31/2019",
+        jobTitle: "Quality Technician",
+        jobCode: "QT-100",
+        locationId: "loc-newark",
+        locationName: "Newark, OH",
+        managerWorkerId: "mgr-003",
+        managerName: "David Chen"
+      },
+      {
+        id: "job-sj-2",
+        effectiveDate: "04/01/2019",
+        endDate: undefined,
+        jobTitle: "Quality Control Specialist",
+        jobCode: "QCS-200",
+        locationId: "loc-newark",
+        locationName: "Newark, OH",
+        managerWorkerId: "mgr-003",
+        managerName: "David Chen"
+      }
+    ],
+    compensationHistory: [
+      {
+        id: "pay-sj-1",
+        effectiveDate: "07/01/2015",
+        endDate: "03/31/2019",
+        rateAmount: 42000,
+        currency: "USD",
+        unit: "annual",
+        payCode: "SAL-EXEMPT"
+      },
+      {
+        id: "pay-sj-2",
+        effectiveDate: "04/01/2019",
+        endDate: "12/31/2022",
+        rateAmount: 52000,
+        currency: "USD",
+        unit: "annual",
+        payCode: "SAL-EXEMPT"
+      },
+      {
+        id: "pay-sj-3",
+        effectiveDate: "01/01/2023",
+        endDate: undefined,
+        rateAmount: 62000,
+        currency: "USD",
+        unit: "annual",
+        payCode: "SAL-EXEMPT"
+      }
+    ],
     todos: [
       { id: "todo-ds-1", dateScheduled: getRelativeDate(-3), activity: "Review maternity leave request", caseManager: "Debbie Swann, RN, CCM", completed: false },
       { id: "todo-ds-2", dateScheduled: getRelativeDate(-1), activity: "Confirm expected delivery date", caseManager: "Debbie Swann, RN, CCM", completed: false },
@@ -598,6 +783,48 @@ const initialCases: Case[] = [
     homePhone: "(614) 555-0569",
     personalEmail: "robert.wilson@email.com",
     unionDescription: "Non-Union",
+    jobHistory: [
+      {
+        id: "job-rw-1",
+        effectiveDate: "09/05/2012",
+        endDate: undefined,
+        jobTitle: "IT Systems Analyst",
+        jobCode: "IT-200",
+        locationId: "loc-columbus",
+        locationName: "Columbus, OH",
+        managerWorkerId: "mgr-004",
+        managerName: "Patricia Williams"
+      }
+    ],
+    compensationHistory: [
+      {
+        id: "pay-rw-1",
+        effectiveDate: "09/05/2012",
+        endDate: "08/31/2017",
+        rateAmount: 55000,
+        currency: "USD",
+        unit: "annual",
+        payCode: "SAL-EXEMPT"
+      },
+      {
+        id: "pay-rw-2",
+        effectiveDate: "09/01/2017",
+        endDate: "08/31/2022",
+        rateAmount: 68000,
+        currency: "USD",
+        unit: "annual",
+        payCode: "SAL-EXEMPT"
+      },
+      {
+        id: "pay-rw-3",
+        effectiveDate: "09/01/2022",
+        endDate: undefined,
+        rateAmount: 82000,
+        currency: "USD",
+        unit: "annual",
+        payCode: "SAL-EXEMPT"
+      }
+    ],
     todos: [
       { id: "todo-ds-7", dateScheduled: getRelativeDate(-6), activity: "Review surgical pre-authorization", caseManager: "Debbie Swann, RN, CCM", completed: false },
       { id: "todo-ds-8", dateScheduled: getRelativeDate(-3), activity: "Contact surgeon office for procedure date", caseManager: "Debbie Swann, RN, CCM", completed: false },
@@ -652,6 +879,39 @@ const initialCases: Case[] = [
     homePhone: "(216) 555-0680",
     personalEmail: "jennifer.martinez@email.com",
     unionDescription: "UAW Local 1005",
+    jobHistory: [
+      {
+        id: "job-jm-1",
+        effectiveDate: "02/28/2016",
+        endDate: undefined,
+        jobTitle: "Assembly Line Worker",
+        jobCode: "ALW-100",
+        locationId: "loc-cleveland",
+        locationName: "Cleveland, OH",
+        managerWorkerId: "mgr-005",
+        managerName: "Thomas Anderson"
+      }
+    ],
+    compensationHistory: [
+      {
+        id: "pay-jm-1",
+        effectiveDate: "02/28/2016",
+        endDate: "02/27/2020",
+        rateAmount: 17.50,
+        currency: "USD",
+        unit: "hourly",
+        payCode: "HRL-NONEX"
+      },
+      {
+        id: "pay-jm-2",
+        effectiveDate: "02/28/2020",
+        endDate: undefined,
+        rateAmount: 21.25,
+        currency: "USD",
+        unit: "hourly",
+        payCode: "HRL-NONEX"
+      }
+    ],
     todos: [
       { id: "todo-kg-7", dateScheduled: getRelativeDate(-7), activity: "Review WC claim for back injury", caseManager: "Kate Gilligan, BSN, RN, CCM", completed: false },
       { id: "todo-kg-8", dateScheduled: getRelativeDate(-4), activity: "Coordinate MRI scheduling", caseManager: "Kate Gilligan, BSN, RN, CCM", completed: false },
@@ -760,6 +1020,39 @@ const initialCases: Case[] = [
     homePhone: "(937) 555-0892",
     personalEmail: "amanda.garcia@email.com",
     unionDescription: "Non-Union",
+    jobHistory: [
+      {
+        id: "job-ag-1",
+        effectiveDate: "05/15/2018",
+        endDate: undefined,
+        jobTitle: "HR Coordinator",
+        jobCode: "HR-150",
+        locationId: "loc-dayton",
+        locationName: "Dayton, OH",
+        managerWorkerId: "mgr-006",
+        managerName: "Michelle Brown"
+      }
+    ],
+    compensationHistory: [
+      {
+        id: "pay-ag-1",
+        effectiveDate: "05/15/2018",
+        endDate: "05/14/2021",
+        rateAmount: 45000,
+        currency: "USD",
+        unit: "annual",
+        payCode: "SAL-NONEX"
+      },
+      {
+        id: "pay-ag-2",
+        effectiveDate: "05/15/2021",
+        endDate: undefined,
+        rateAmount: 52000,
+        currency: "USD",
+        unit: "annual",
+        payCode: "SAL-NONEX"
+      }
+    ],
     todos: [
       { id: "todo-ds-13", dateScheduled: getRelativeDate(-9), activity: "Process maternity leave paperwork", caseManager: "Debbie Swann, RN, CCM", completed: false },
       { id: "todo-ds-14", dateScheduled: getRelativeDate(-6), activity: "Verify FMLA eligibility", caseManager: "Debbie Swann, RN, CCM", completed: false },

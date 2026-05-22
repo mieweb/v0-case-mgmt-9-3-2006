@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
-import { useCases, Case } from "@/contexts/cases-context"
+import { useCases, Case, getCurrentPay, getCurrentJob } from "@/contexts/cases-context"
 import { useAdmin } from "@/contexts/admin-context"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -320,16 +320,38 @@ export default function PayrollExportPage() {
   // Convert system case to EmployeeCase format
   const convertSystemCase = (systemCase: Case): EmployeeCase => {
     const locationCity = systemCase.employeeLocation.split(",")[0].trim()
+    
+    // Get current pay from compensation history
+    const currentPay = getCurrentPay(systemCase)
+    const currentJob = getCurrentJob(systemCase)
+    
+    // Determine hourly rate from compensation history
+    let hourlyRate = 25 // Default fallback
+    if (currentPay) {
+      if (currentPay.unit === "hourly") {
+        hourlyRate = currentPay.rateAmount
+      } else if (currentPay.unit === "annual") {
+        hourlyRate = currentPay.rateAmount / 2080 // Standard work hours per year
+      } else if (currentPay.unit === "monthly") {
+        hourlyRate = (currentPay.rateAmount * 12) / 2080
+      } else if (currentPay.unit === "weekly") {
+        hourlyRate = currentPay.rateAmount / 40
+      }
+    }
+    
+    // Use job location if available, otherwise use employee location
+    const jobLocation = currentJob?.locationName.split(",")[0].trim() || locationCity
+    
     return {
       employeeName: systemCase.employeeName,
       employeeId: systemCase.employeeNumber,
       caseManager: systemCase.caseManager,
       stdType: "Continuation", // Could be derived from case history
       region: "Central", // Default, would come from HRIS
-      location: locationCity,
-      payType: "Hourly", // Default, would come from HRIS
+      location: jobLocation,
+      payType: currentPay?.unit === "hourly" ? "Hourly" : "Salary",
       wageType: "Regular", // Default, would come from HRIS
-      payCode: (systemCase as { payCode?: string }).payCode || "",
+      payCode: currentPay?.payCode || (systemCase as { payCode?: string }).payCode || "",
       ppeStartDate: new Date().toISOString().split("T")[0], // Default to today
       ppeEndDate: new Date(Date.now() + 13 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // Default to 2 weeks
       disabilityDate: systemCase.dateOfDisability || "",
@@ -337,7 +359,7 @@ export default function PayrollExportPage() {
       stdEndDate: systemCase.stdEndDate || systemCase.payEndDate,
       ficaDate: systemCase.ficaDate,
       totalStdDaysToPay: 7, // Default, should be calculated from dates
-      hourlyRate: 25, // Default, would come from HRIS
+      hourlyRate: Math.round(hourlyRate * 100) / 100, // Round to 2 decimal places
       comments: `Case #${systemCase.caseNumber}`,
     }
   }
