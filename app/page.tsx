@@ -105,7 +105,7 @@ export default function Page() {
               </Button>
               <Button
                 variant="ghost"
-                onClick={() => window.location.href = "/payroll-export"}
+                onClick={() => window.location.href = "/report/payroll-export"}
                 className="gap-1 sm:gap-2 px-2 sm:px-4"
                 size="sm"
               >
