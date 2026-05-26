@@ -278,15 +278,16 @@ export default function WorkforceDashboard() {
     // Hourly columns (C-G) - NO fill (white)
     // Hrly Legacy (H) - purple
     headerRow.getCell(8).fill = purpleFill
-    // Hrly Doors (I) - blue
-    headerRow.getCell(9).fill = blueHeaderFill
+    // Hrly Doors (I) - purple
+    headerRow.getCell(9).fill = purpleFill
     // Salaried columns (J-L) - NO fill (white)
     // Sal Legacy (M) - purple
     headerRow.getCell(13).fill = purpleFill
-    // Sal Doors (N) - blue (same as Hrly Doors)
+    // Sal Doors (N) - blue
     headerRow.getCell(14).fill = blueHeaderFill
-    // Total Legacy & Total Doors (O-P) - purple
+    // Total Legacy (O) - purple
     headerRow.getCell(15).fill = purpleFill
+    // Total Doors (P) - purple
     headerRow.getCell(16).fill = purpleFill
 
     // Track state rows for merging
@@ -330,12 +331,12 @@ export default function WorkforceDashboard() {
       // Hourly columns (C-G) - NO fill (white)
       // Hrly Legacy (H) - purple
       row.getCell(8).fill = purpleFill
-      // Hrly Doors (I) - blue
-      row.getCell(9).fill = blueDataFill
+      // Hrly Doors (I) - purple
+      row.getCell(9).fill = purpleFill
       // Salaried columns (J-L) - NO fill (white)
       // Sal Legacy (M) - purple
       row.getCell(13).fill = purpleFill
-      // Sal Doors (N) - blue (same as Hrly Doors)
+      // Sal Doors (N) - blue
       row.getCell(14).fill = blueDataFill
       // Total Legacy (O) - purple
       row.getCell(15).fill = purpleFill
@@ -500,7 +501,7 @@ export default function WorkforceDashboard() {
                     <TableHead className="text-center whitespace-nowrap text-xs">Suspended</TableHead>
                     <TableHead className="text-center whitespace-nowrap text-xs">Unpaid Leave</TableHead>
                     <TableHead className="text-center bg-purple-200 dark:bg-purple-900 whitespace-nowrap text-xs">Hrly Legacy</TableHead>
-                    <TableHead className="text-center bg-blue-200 dark:bg-blue-900 whitespace-nowrap text-xs border-r">Hrly Doors</TableHead>
+                    <TableHead className="text-center bg-purple-200 dark:bg-purple-900 whitespace-nowrap text-xs border-r">Hrly Doors</TableHead>
                     <TableHead className="text-center whitespace-nowrap text-xs">Active</TableHead>
                     <TableHead className="text-center whitespace-nowrap text-xs">Paid Leave</TableHead>
                     <TableHead className="text-center whitespace-nowrap text-xs">Unpaid Leave</TableHead>
@@ -522,7 +523,7 @@ export default function WorkforceDashboard() {
                         <TableCell className="text-center text-sm">{row.hourlySuspended || ''}</TableCell>
                         <TableCell className="text-center text-sm">{row.hourlyUnpaidLeave || ''}</TableCell>
                         <TableCell className="text-center text-sm bg-purple-100 dark:bg-purple-950">{row.hrlyLegacy || ''}</TableCell>
-                        <TableCell className="text-center text-sm bg-blue-100 dark:bg-blue-950 border-r">{row.hrlyDoors || ''}</TableCell>
+                        <TableCell className="text-center text-sm bg-purple-100 dark:bg-purple-950 border-r">{row.hrlyDoors || ''}</TableCell>
                         <TableCell className="text-center text-sm">{row.salariedActive || ''}</TableCell>
                         <TableCell className="text-center text-sm">{row.salariedPaidLeave || ''}</TableCell>
                         <TableCell className="text-center text-sm">{row.salariedUnpaidLeave || ''}</TableCell>
@@ -542,7 +543,7 @@ export default function WorkforceDashboard() {
                     <TableCell className="text-center">{totals.hourlySuspended || ''}</TableCell>
                     <TableCell className="text-center">{totals.hourlyUnpaidLeave || ''}</TableCell>
                     <TableCell className="text-center bg-purple-100 dark:bg-purple-950">{totals.hrlyLegacy || ''}</TableCell>
-                    <TableCell className="text-center bg-blue-100 dark:bg-blue-950 border-r">{totals.hrlyDoors || ''}</TableCell>
+                    <TableCell className="text-center bg-purple-100 dark:bg-purple-950 border-r">{totals.hrlyDoors || ''}</TableCell>
                     <TableCell className="text-center">{totals.salariedActive || ''}</TableCell>
                     <TableCell className="text-center">{totals.salariedPaidLeave || ''}</TableCell>
                     <TableCell className="text-center">{totals.salariedUnpaidLeave || ''}</TableCell>
