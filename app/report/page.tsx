@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button"
 import { 
   FileSpreadsheet, 
   ArrowLeft, 
-  DollarSign
+  DollarSign,
+  Stethoscope
 } from "lucide-react"
 import Link from "next/link"
 
@@ -50,6 +51,23 @@ export default function ReportsDashboard() {
             <CardContent className="pt-0">
               <Button variant="default" className="w-full" asChild>
                 <Link href="/report/payroll-export">
+                  Open Report
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="transition-all hover:shadow-md hover:border-primary/50 cursor-pointer">
+            <CardHeader className="pb-3">
+              <div className="p-2 rounded-lg bg-primary/10 w-fit">
+                <Stethoscope className="h-5 w-5 text-primary" />
+              </div>
+              <CardTitle className="text-lg mt-3">Employee Diagnosis</CardTitle>
+              <CardDescription>View diagnosis information across all employee cases</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <Button variant="default" className="w-full" asChild>
+                <Link href="/report/employee-diagnosis">
                   Open Report
                 </Link>
               </Button>
