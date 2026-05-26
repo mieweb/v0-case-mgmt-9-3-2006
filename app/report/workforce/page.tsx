@@ -532,7 +532,14 @@ export default function WorkforceDashboard() {
                         globalRowIndex++
                         return (
                           <TableRow key={`${state}-${row.location}`} className={isGrayRow ? 'bg-gray-100 dark:bg-gray-800' : ''}>
-                            <TableCell className={`font-medium border ${idx === 0 ? 'align-middle' : ''}`}>{idx === 0 ? state : ''}</TableCell>
+                            {idx === 0 ? (
+                              <TableCell 
+                                className="font-medium border align-middle text-center" 
+                                rowSpan={locations.length}
+                              >
+                                {state}
+                              </TableCell>
+                            ) : null}
                             <TableCell className="border">{row.location}</TableCell>
                             <TableCell className={`text-center text-sm border ${isGrayRow ? '' : ''}`}>{row.hourlyActive || ''}</TableCell>
                             <TableCell className={`text-center text-sm border ${isGrayRow ? '' : ''}`}>{row.hourlyFurlough || ''}</TableCell>
