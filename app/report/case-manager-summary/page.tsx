@@ -335,20 +335,28 @@ export default function CaseManagerSummaryReport() {
         const isGrayRow = rowIndex % 2 === 1
         const row = worksheet.addRow([
           loc.location,
-          loc.headcountHourly || '',
-          loc.headcountSalaried || '',
-          { formula: `B${rowNum}+C${rowNum}` },
-          loc.currentWithLwdHourly || '',
-          loc.currentWithLwdSalaried || '',
-          { formula: `E${rowNum}+F${rowNum}` },
-          loc.openNoLwdHourly || '',
-          loc.openNoLwdSalaried || '',
-          { formula: `H${rowNum}+I${rowNum}` },
-          loc.allOpenHourly || '',
-          loc.allOpenSalaried || '',
-          { formula: `K${rowNum}+L${rowNum}` },
-          loc.percentOpen > 0 ? loc.percentOpen : ''
+          loc.headcountHourly || null,
+          loc.headcountSalaried || null,
+          null, // Total - will set formula with cached result
+          loc.currentWithLwdHourly || null,
+          loc.currentWithLwdSalaried || null,
+          null, // Total - will set formula with cached result
+          loc.openNoLwdHourly || null,
+          loc.openNoLwdSalaried || null,
+          null, // Total - will set formula with cached result
+          loc.allOpenHourly || null,
+          loc.allOpenSalaried || null,
+          null, // Total - will set formula with cached result
+          null // Percent - will set formula with cached result
         ])
+        
+        // Set formulas with cached results for calculated columns
+        row.getCell(4).value = { formula: `B${rowNum}+C${rowNum}`, result: loc.headcountTotal || 0 }
+        row.getCell(7).value = { formula: `E${rowNum}+F${rowNum}`, result: loc.currentWithLwdTotal || 0 }
+        row.getCell(10).value = { formula: `H${rowNum}+I${rowNum}`, result: loc.openNoLwdTotal || 0 }
+        row.getCell(13).value = { formula: `K${rowNum}+L${rowNum}`, result: loc.allOpenTotal || 0 }
+        row.getCell(14).value = { formula: `IF(D${rowNum}>0,M${rowNum}/D${rowNum},0)`, result: loc.percentOpen > 0 ? loc.percentOpen / 100 : 0 }
+        row.getCell(14).numFmt = '0.00%'
         
         // Apply borders and alternating colors
         for (let i = 1; i <= 14; i++) {
@@ -358,12 +366,6 @@ export default function CaseManagerSummaryReport() {
           }
         }
         
-        // Format percentage column
-        if (loc.percentOpen > 0) {
-          row.getCell(14).numFmt = '0.00%'
-          row.getCell(14).value = loc.percentOpen / 100
-        }
-        
         rowNum++
         rowIndex++
       })
@@ -371,22 +373,26 @@ export default function CaseManagerSummaryReport() {
       // Manager total row
       const totalRow = worksheet.addRow([
         'Total',
-        { formula: `SUM(B${managerStartRow}:B${rowNum - 1})` },
-        { formula: `SUM(C${managerStartRow}:C${rowNum - 1})` },
-        { formula: `SUM(D${managerStartRow}:D${rowNum - 1})` },
-        { formula: `SUM(E${managerStartRow}:E${rowNum - 1})` },
-        { formula: `SUM(F${managerStartRow}:F${rowNum - 1})` },
-        { formula: `SUM(G${managerStartRow}:G${rowNum - 1})` },
-        { formula: `SUM(H${managerStartRow}:H${rowNum - 1})` },
-        { formula: `SUM(I${managerStartRow}:I${rowNum - 1})` },
-        { formula: `SUM(J${managerStartRow}:J${rowNum - 1})` },
-        { formula: `SUM(K${managerStartRow}:K${rowNum - 1})` },
-        { formula: `SUM(L${managerStartRow}:L${rowNum - 1})` },
-        { formula: `SUM(M${managerStartRow}:M${rowNum - 1})` },
-        { formula: `IF(D${rowNum}>0,M${rowNum}/D${rowNum},0)` }
+        null, null, null, null, null, null, null, null, null, null, null, null, null
       ])
-      totalRow.font = { bold: true }
+      
+      // Set formulas with cached results for manager totals
+      totalRow.getCell(2).value = { formula: `SUM(B${managerStartRow}:B${rowNum - 1})`, result: manager.totals.headcountHourly || 0 }
+      totalRow.getCell(3).value = { formula: `SUM(C${managerStartRow}:C${rowNum - 1})`, result: manager.totals.headcountSalaried || 0 }
+      totalRow.getCell(4).value = { formula: `SUM(D${managerStartRow}:D${rowNum - 1})`, result: manager.totals.headcountTotal || 0 }
+      totalRow.getCell(5).value = { formula: `SUM(E${managerStartRow}:E${rowNum - 1})`, result: manager.totals.currentWithLwdHourly || 0 }
+      totalRow.getCell(6).value = { formula: `SUM(F${managerStartRow}:F${rowNum - 1})`, result: manager.totals.currentWithLwdSalaried || 0 }
+      totalRow.getCell(7).value = { formula: `SUM(G${managerStartRow}:G${rowNum - 1})`, result: manager.totals.currentWithLwdTotal || 0 }
+      totalRow.getCell(8).value = { formula: `SUM(H${managerStartRow}:H${rowNum - 1})`, result: manager.totals.openNoLwdHourly || 0 }
+      totalRow.getCell(9).value = { formula: `SUM(I${managerStartRow}:I${rowNum - 1})`, result: manager.totals.openNoLwdSalaried || 0 }
+      totalRow.getCell(10).value = { formula: `SUM(J${managerStartRow}:J${rowNum - 1})`, result: manager.totals.openNoLwdTotal || 0 }
+      totalRow.getCell(11).value = { formula: `SUM(K${managerStartRow}:K${rowNum - 1})`, result: manager.totals.allOpenHourly || 0 }
+      totalRow.getCell(12).value = { formula: `SUM(L${managerStartRow}:L${rowNum - 1})`, result: manager.totals.allOpenSalaried || 0 }
+      totalRow.getCell(13).value = { formula: `SUM(M${managerStartRow}:M${rowNum - 1})`, result: manager.totals.allOpenTotal || 0 }
+      totalRow.getCell(14).value = { formula: `IF(D${rowNum}>0,M${rowNum}/D${rowNum},0)`, result: manager.totals.percentOpen > 0 ? manager.totals.percentOpen / 100 : 0 }
       totalRow.getCell(14).numFmt = '0.00%'
+      
+      totalRow.font = { bold: true }
       for (let i = 1; i <= 14; i++) {
         totalRow.getCell(i).border = thinBorder
       }
@@ -397,22 +403,22 @@ export default function CaseManagerSummaryReport() {
       rowNum++
     })
     
-    // Grand Total row
+    // Grand Total row - values display immediately, no formulas needed since this is a summary
     const grandTotalRow = worksheet.addRow([
       'Grand Total',
-      grandTotals.headcountHourly,
-      grandTotals.headcountSalaried,
-      grandTotals.headcountTotal,
-      grandTotals.currentWithLwdHourly,
-      grandTotals.currentWithLwdSalaried,
-      grandTotals.currentWithLwdTotal,
-      grandTotals.openNoLwdHourly,
-      grandTotals.openNoLwdSalaried,
-      grandTotals.openNoLwdTotal,
-      grandTotals.allOpenHourly,
-      grandTotals.allOpenSalaried,
-      grandTotals.allOpenTotal,
-      grandTotals.percentOpen / 100
+      grandTotals.headcountHourly || null,
+      grandTotals.headcountSalaried || null,
+      grandTotals.headcountTotal || null,
+      grandTotals.currentWithLwdHourly || null,
+      grandTotals.currentWithLwdSalaried || null,
+      grandTotals.currentWithLwdTotal || null,
+      grandTotals.openNoLwdHourly || null,
+      grandTotals.openNoLwdSalaried || null,
+      grandTotals.openNoLwdTotal || null,
+      grandTotals.allOpenHourly || null,
+      grandTotals.allOpenSalaried || null,
+      grandTotals.allOpenTotal || null,
+      grandTotals.percentOpen > 0 ? grandTotals.percentOpen / 100 : null
     ])
     grandTotalRow.font = { bold: true }
     grandTotalRow.getCell(14).numFmt = '0.00%'
