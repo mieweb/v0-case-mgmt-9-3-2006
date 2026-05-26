@@ -9,7 +9,8 @@ import {
   Stethoscope,
   HeartPulse,
   ShieldAlert,
-  CalendarX
+  CalendarX,
+  Building2
 } from "lucide-react"
 import Link from "next/link"
 
@@ -122,6 +123,23 @@ export default function ReportsDashboard() {
             <CardContent className="pt-0">
               <Button variant="default" className="w-full" asChild>
                 <Link href="/report/absence-reason-other">
+                  Open Report
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="transition-all hover:shadow-md hover:border-primary/50 cursor-pointer">
+            <CardHeader className="pb-3">
+              <div className="p-2 rounded-lg bg-primary/10 w-fit">
+                <Building2 className="h-5 w-5 text-primary" />
+              </div>
+              <CardTitle className="text-lg mt-3">Corporate Workforce Report</CardTitle>
+              <CardDescription>Workforce distribution by location, employment type, and status</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <Button variant="default" className="w-full" asChild>
+                <Link href="/report/workforce">
                   Open Report
                 </Link>
               </Button>
