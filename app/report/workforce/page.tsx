@@ -274,6 +274,7 @@ export default function WorkforceDashboard() {
 
     // Add Data Rows with state grouping
     let currentState = ''
+    let rowNum = 4 // Data starts at row 4 (after title, group header, column header)
     filteredData.forEach((item) => {
       const stateCell = item.state !== currentState ? item.state : ''
       currentState = item.state
@@ -293,9 +294,10 @@ export default function WorkforceDashboard() {
         item.salariedUnpaidLeave || '',
         item.salLegacy || '',
         item.salDoors || '',
-        item.totalLegacy || '',
-        item.totalDoors || ''
+        { formula: `H${rowNum}+M${rowNum}` }, // Total Legacy = Hrly Legacy + Sal Legacy
+        { formula: `I${rowNum}+N${rowNum}` }  // Total Doors = Hrly Doors + Sal Doors
       ])
+      rowNum++
       
       // Apply purple background to Legacy/Doors data cells
       row.getCell(8).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E6CCFF' } }
