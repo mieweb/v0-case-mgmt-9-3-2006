@@ -7,7 +7,8 @@ import {
   ArrowLeft, 
   DollarSign,
   Stethoscope,
-  HeartPulse
+  HeartPulse,
+  ShieldAlert
 } from "lucide-react"
 import Link from "next/link"
 
@@ -86,6 +87,23 @@ export default function ReportsDashboard() {
             <CardContent className="pt-0">
               <Button variant="default" className="w-full" asChild>
                 <Link href="/report/lifestyles">
+                  Open Report
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="transition-all hover:shadow-md hover:border-primary/50 cursor-pointer">
+            <CardHeader className="pb-3">
+              <div className="p-2 rounded-lg bg-primary/10 w-fit">
+                <ShieldAlert className="h-5 w-5 text-primary" />
+              </div>
+              <CardTitle className="text-lg mt-3">Permanent Restrictions</CardTitle>
+              <CardDescription>View and export employee restriction data across all cases</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <Button variant="default" className="w-full" asChild>
+                <Link href="/report/permanent-restrictions">
                   Open Report
                 </Link>
               </Button>
