@@ -229,58 +229,90 @@ export default function WorkforceDashboard() {
     // Title Row
     const today = new Date()
     const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    
+    // Colors matching screenshot
+    const blueHeaderFill = { type: 'pattern' as const, pattern: 'solid' as const, fgColor: { argb: 'B8CCE4' } }
+    const blueDataFill = { type: 'pattern' as const, pattern: 'solid' as const, fgColor: { argb: 'B8CCE4' } }
+    const purpleFill = { type: 'pattern' as const, pattern: 'solid' as const, fgColor: { argb: 'CDA0CD' } }
+    
+    // Row 1: Export date
     worksheet.addRow([`Exported to Excel on ${dateStr}`])
     worksheet.mergeCells('A1:P1')
-    worksheet.getRow(1).font = { italic: true, color: { argb: '7F8C8D' } }
-
-    // Header Group Row
+    worksheet.getRow(1).font = { italic: true }
+    
+    // Row 2: Empty
+    worksheet.addRow([])
+    
+    // Row 3: Empty (dotted line separator in screenshot)
+    worksheet.addRow([])
+    
+    // Row 4: Group Headers (Hourly / Salaried)
     const groupHeaders = ['', '', 'Hourly', '', '', '', '', '', '', 'Salaried', '', '', '', '', '', '']
     worksheet.addRow(groupHeaders)
-    const groupRow = worksheet.getRow(2)
-    // Merge Hourly header (C2:I2)
-    worksheet.mergeCells('C2:I2')
-    // Merge Salaried header (J2:N2)
-    worksheet.mergeCells('J2:N2')
+    const groupRow = worksheet.getRow(4)
+    worksheet.mergeCells('C4:I4')
+    worksheet.mergeCells('J4:N4')
     groupRow.font = { bold: true }
     groupRow.alignment = { horizontal: 'center' }
-    // Style Hourly group header
+    // Style Hourly group header (C4:I4)
     for (let i = 3; i <= 9; i++) {
-      groupRow.getCell(i).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '6699CC' } }
+      groupRow.getCell(i).fill = blueHeaderFill
+    }
+    // Style Salaried group header (J4:N4)
+    for (let i = 10; i <= 14; i++) {
+      groupRow.getCell(i).fill = blueHeaderFill
     }
 
-    // Column Headers
+    // Row 5: Column Headers
     const headers = [
-      'State', 'Location', 'Active', 'Furlough', 'Paid Leave', 'Suspended', 'Unpaid Leave', 
+      '', '', 'Active', 'Furlough', 'Paid Leave', 'Suspended', 'Unpaid Leave', 
       'Hrly Legacy', 'Hrly Doors', 'Active', 'Paid Leave', 'Unpaid Leave', 
       'Sal Legacy', 'Sal Doors', 'Total Legacy', 'Total Doors'
     ]
     worksheet.addRow(headers)
     
-    // Style Header Row
-    const headerRow = worksheet.getRow(3)
+    // Style Header Row (Row 5)
+    const headerRow = worksheet.getRow(5)
     headerRow.font = { bold: true }
-    headerRow.alignment = { horizontal: 'center' }
-    // Apply blue background to Hourly columns (C-I)
+    headerRow.alignment = { horizontal: 'center', wrapText: true }
+    // Hourly columns (C-G) - blue
     for (let i = 3; i <= 7; i++) {
-      headerRow.getCell(i).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '6699CC' } }
+      headerRow.getCell(i).fill = blueHeaderFill
     }
-    // Apply purple background to Legacy/Doors columns
-    headerRow.getCell(8).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'CC99FF' } }
-    headerRow.getCell(9).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'CC99FF' } }
-    headerRow.getCell(13).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'CC99FF' } }
-    headerRow.getCell(14).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'CC99FF' } }
-    headerRow.getCell(15).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'CC99FF' } }
-    headerRow.getCell(16).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'CC99FF' } }
+    // Hrly Legacy & Hrly Doors (H-I) - purple
+    headerRow.getCell(8).fill = purpleFill
+    headerRow.getCell(9).fill = purpleFill
+    // Salaried columns (J-L) - blue
+    for (let i = 10; i <= 12; i++) {
+      headerRow.getCell(i).fill = blueHeaderFill
+    }
+    // Sal Legacy & Sal Doors (M-N) - purple
+    headerRow.getCell(13).fill = purpleFill
+    headerRow.getCell(14).fill = purpleFill
+    // Total Legacy & Total Doors (O-P) - purple
+    headerRow.getCell(15).fill = purpleFill
+    headerRow.getCell(16).fill = purpleFill
 
-    // Add Data Rows with state grouping
-    let currentState = ''
-    let rowNum = 4 // Data starts at row 4 (after title, group header, column header)
-    filteredData.forEach((item) => {
-      const stateCell = item.state !== currentState ? item.state : ''
-      currentState = item.state
+    // Track state rows for merging
+    const stateStartRows: { [state: string]: number } = {}
+    const stateEndRows: { [state: string]: number } = {}
+    
+    // Add Data Rows starting at row 6
+    let rowNum = 6
+    let prevState = ''
+    
+    filteredData.forEach((item, index) => {
+      // Track state row ranges for merging
+      if (item.state !== prevState) {
+        if (prevState) {
+          stateEndRows[prevState] = rowNum - 1
+        }
+        stateStartRows[item.state] = rowNum
+        prevState = item.state
+      }
       
       const row = worksheet.addRow([
-        stateCell,
+        item.state,
         item.location,
         item.hourlyActive || '', 
         item.hourlyFurlough || '',
@@ -294,28 +326,70 @@ export default function WorkforceDashboard() {
         item.salariedUnpaidLeave || '',
         item.salLegacy || '',
         item.salDoors || '',
-        { formula: `H${rowNum}+M${rowNum}` }, // Total Legacy = Hrly Legacy + Sal Legacy
-        { formula: `I${rowNum}+N${rowNum}` }  // Total Doors = Hrly Doors + Sal Doors
+        { formula: `H${rowNum}+M${rowNum}` },
+        { formula: `I${rowNum}+N${rowNum}` }
       ])
-      rowNum++
       
-      // Apply purple background to Legacy/Doors data cells
-      row.getCell(8).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E6CCFF' } }
-      row.getCell(9).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '99CCFF' } }
-      row.getCell(13).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E6CCFF' } }
-      row.getCell(14).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E6CCFF' } }
-      row.getCell(15).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E6CCFF' } }
-      row.getCell(16).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E6CCFF' } }
+      // Apply colors to data cells
+      // Hourly columns (C-G) - blue
+      for (let i = 3; i <= 7; i++) {
+        row.getCell(i).fill = blueDataFill
+      }
+      // Hrly Legacy (H) - purple
+      row.getCell(8).fill = purpleFill
+      // Hrly Doors (I) - blue
+      row.getCell(9).fill = blueDataFill
+      // Salaried columns (J-L) - blue
+      for (let i = 10; i <= 12; i++) {
+        row.getCell(i).fill = blueDataFill
+      }
+      // Sal Legacy (M) - purple
+      row.getCell(13).fill = purpleFill
+      // Sal Doors (N) - purple
+      row.getCell(14).fill = purpleFill
+      // Total Legacy (O) - purple
+      row.getCell(15).fill = purpleFill
+      // Total Doors (P) - purple
+      row.getCell(16).fill = purpleFill
+      
+      // Add borders to all cells
+      for (let i = 1; i <= 16; i++) {
+        row.getCell(i).border = {
+          top: { style: 'thin', color: { argb: '000000' } },
+          left: { style: 'thin', color: { argb: '000000' } },
+          bottom: { style: 'thin', color: { argb: '000000' } },
+          right: { style: 'thin', color: { argb: '000000' } }
+        }
+      }
+      
+      rowNum++
     })
+    
+    // Record the last state's end row
+    if (prevState) {
+      stateEndRows[prevState] = rowNum - 1
+    }
+    
+    // Merge state cells vertically
+    Object.keys(stateStartRows).forEach((state) => {
+      const startRow = stateStartRows[state]
+      const endRow = stateEndRows[state]
+      if (startRow && endRow && endRow > startRow) {
+        worksheet.mergeCells(`A${startRow}:A${endRow}`)
+      }
+    })
+    
+    // Style state column - vertical alignment
+    for (let r = 6; r < rowNum; r++) {
+      const cell = worksheet.getRow(r).getCell(1)
+      cell.alignment = { vertical: 'middle' }
+    }
 
     // Add Grand Total Row
-    const totalRowNum = filteredData.length + 4
     const totalRowData: (string | number | { formula: string })[] = ['Grand Total', '']
-    
-    // Inject dynamic vertical SUM formulas for columns C through P
     for (let col = 3; col <= 16; col++) {
       const colLetter = String.fromCharCode(64 + col)
-      totalRowData.push({ formula: `SUM(${colLetter}4:${colLetter}${totalRowNum - 1})` })
+      totalRowData.push({ formula: `SUM(${colLetter}6:${colLetter}${rowNum - 1})` })
     }
     const totalRow = worksheet.addRow(totalRowData)
     totalRow.font = { bold: true }
@@ -325,9 +399,9 @@ export default function WorkforceDashboard() {
 
     // Adjust Column Widths
     worksheet.getColumn(1).width = 15
-    worksheet.getColumn(2).width = 25
+    worksheet.getColumn(2).width = 22
     for (let i = 3; i <= 16; i++) {
-      worksheet.getColumn(i).width = 12
+      worksheet.getColumn(i).width = 10
     }
 
     // Trigger Browser Download
