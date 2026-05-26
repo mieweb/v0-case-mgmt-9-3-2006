@@ -255,7 +255,7 @@ export default function EmployeeDiagnosisReport() {
                     <TableHead className="whitespace-nowrap">Diagnosis No</TableHead>
                     <TableHead className="whitespace-nowrap">Medical Code Description</TableHead>
                     <TableHead className="whitespace-nowrap">Medical Code</TableHead>
-                    <TableHead className="whitespace-nowrap">H/S Code</TableHead>
+                    <TableHead className="whitespace-nowrap">Hourly or Salary</TableHead>
                     <TableHead className="whitespace-nowrap">Date of Birth</TableHead>
                     <TableHead className="whitespace-nowrap">Age</TableHead>
                     <TableHead className="whitespace-nowrap">Gender</TableHead>
