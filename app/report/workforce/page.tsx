@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Download, Search, ArrowLeft, Building2 } from "lucide-react"
 import ExcelJS from 'exceljs'
+import { useCases, getCurrentPay } from "@/contexts/cases-context"
 
 interface LocationData {
   state: string
@@ -28,35 +29,158 @@ interface LocationData {
   totalDoors: number
 }
 
-// Sample workforce data matching the screenshot format
-const workforceData: LocationData[] = [
-  { state: "Alabama", location: "Alabama Resident Office", hourlyActive: 0, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 0, hrlyDoors: 0, salariedActive: 10, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 6, salDoors: 4, totalLegacy: 6, totalDoors: 4 },
-  { state: "Alabama", location: "Haleyville", hourlyActive: 214, hourlyFurlough: 0, hourlyPaidLeave: 1, hourlySuspended: 0, hourlyUnpaidLeave: 7, hrlyLegacy: 222, hrlyDoors: 18, salariedActive: 0, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 18, salDoors: 0, totalLegacy: 0, totalDoors: 240 },
-  { state: "Arizona", location: "Arizona Resident Office", hourlyActive: 0, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 0, hrlyDoors: 13, salariedActive: 0, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 13, salDoors: 0, totalLegacy: 13, totalDoors: 0 },
-  { state: "Arizona", location: "Eloy AZ Western Ins Plt", hourlyActive: 0, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 1, hrlyDoors: 1, salariedActive: 0, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 1, salDoors: 1, totalLegacy: 1, totalDoors: 1 },
-  { state: "Arkansas", location: "Arkansas Resident Office", hourlyActive: 0, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 0, hrlyDoors: 9, salariedActive: 0, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 9, salDoors: 0, totalLegacy: 9, totalDoors: 0 },
-  { state: "Arkansas", location: "Fort Smith Plant", hourlyActive: 114, hourlyFurlough: 0, hourlyPaidLeave: 1, hourlySuspended: 0, hourlyUnpaidLeave: 1, hrlyLegacy: 116, hrlyDoors: 42, salariedActive: 0, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 42, salDoors: 0, totalLegacy: 158, totalDoors: 0 },
-  { state: "Arkansas", location: "Russellville Plant", hourlyActive: 49, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 49, hrlyDoors: 6, salariedActive: 0, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 6, salDoors: 0, totalLegacy: 55, totalDoors: 0 },
-  { state: "California", location: "California Resident Office", hourlyActive: 2, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 2, hrlyDoors: 54, salariedActive: 1, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 37, salDoors: 18, totalLegacy: 39, totalDoors: 18 },
-  { state: "California", location: "Compton Asphalt Plant", hourlyActive: 15, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 15, hrlyDoors: 2, salariedActive: 0, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 2, salDoors: 0, totalLegacy: 17, totalDoors: 0 },
-  { state: "California", location: "Compton Roofing Plant", hourlyActive: 99, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 2, hourlyUnpaidLeave: 0, hrlyLegacy: 101, hrlyDoors: 19, salariedActive: 0, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 19, salDoors: 0, totalLegacy: 120, totalDoors: 0 },
-  { state: "California", location: "Corona", hourlyActive: 212, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 15, hrlyLegacy: 227, hrlyDoors: 52, salariedActive: 0, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 52, salDoors: 0, totalLegacy: 0, totalDoors: 279 },
-  { state: "California", location: "Moreno Valley", hourlyActive: 137, hourlyFurlough: 0, hourlyPaidLeave: 1, hourlySuspended: 0, hourlyUnpaidLeave: 28, hrlyLegacy: 166, hrlyDoors: 16, salariedActive: 0, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 16, salDoors: 0, totalLegacy: 0, totalDoors: 182 },
-  { state: "Colorado", location: "Colorado Resident Office", hourlyActive: 0, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 0, hrlyDoors: 31, salariedActive: 0, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 26, salDoors: 5, totalLegacy: 26, totalDoors: 5 },
-  { state: "Colorado", location: "Denver Asphalt Plant", hourlyActive: 23, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 23, hrlyDoors: 1, salariedActive: 0, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 1, salDoors: 0, totalLegacy: 24, totalDoors: 0 },
-  { state: "Ohio", location: "Toledo, OH", hourlyActive: 1, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 1, hrlyDoors: 0, salariedActive: 0, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 0, salDoors: 0, totalLegacy: 1, totalDoors: 0 },
-  { state: "Ohio", location: "Newark, OH", hourlyActive: 0, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 0, hrlyDoors: 0, salariedActive: 1, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 1, salDoors: 0, totalLegacy: 1, totalDoors: 0 },
-  { state: "Ohio", location: "Columbus, OH", hourlyActive: 0, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 0, hrlyDoors: 0, salariedActive: 2, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 2, salDoors: 0, totalLegacy: 2, totalDoors: 0 },
-  { state: "Ohio", location: "Cleveland, OH", hourlyActive: 1, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 1, hrlyDoors: 0, salariedActive: 0, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 0, salDoors: 0, totalLegacy: 1, totalDoors: 0 },
-  { state: "Ohio", location: "Dayton, OH", hourlyActive: 0, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 0, hrlyDoors: 0, salariedActive: 1, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 1, salDoors: 0, totalLegacy: 1, totalDoors: 0 },
-  { state: "Ohio", location: "Cincinnati, OH", hourlyActive: 0, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 0, hrlyDoors: 0, salariedActive: 1, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 1, salDoors: 0, totalLegacy: 1, totalDoors: 0 },
-  { state: "Ohio", location: "Akron, OH", hourlyActive: 1, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 1, hrlyDoors: 0, salariedActive: 0, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 0, salDoors: 0, totalLegacy: 1, totalDoors: 0 },
-  { state: "Ohio", location: "Granville, OH", hourlyActive: 0, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 0, hrlyDoors: 0, salariedActive: 1, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 1, salDoors: 0, totalLegacy: 1, totalDoors: 0 },
-  { state: "Kansas", location: "Kansas City, KS", hourlyActive: 1, hourlyFurlough: 0, hourlyPaidLeave: 0, hourlySuspended: 0, hourlyUnpaidLeave: 0, hrlyLegacy: 1, hrlyDoors: 0, salariedActive: 0, salariedPaidLeave: 0, salariedUnpaidLeave: 0, salLegacy: 0, salDoors: 0, totalLegacy: 1, totalDoors: 0 },
-]
+// Helper to extract state from location string like "Toledo, OH" -> "Ohio"
+const stateAbbreviations: Record<string, string> = {
+  'OH': 'Ohio',
+  'KS': 'Kansas',
+  'CA': 'California',
+  'TX': 'Texas',
+  'NY': 'New York',
+  'FL': 'Florida',
+  'IL': 'Illinois',
+  'PA': 'Pennsylvania',
+  'MI': 'Michigan',
+  'GA': 'Georgia',
+  'NC': 'North Carolina',
+  'NJ': 'New Jersey',
+  'VA': 'Virginia',
+  'WA': 'Washington',
+  'AZ': 'Arizona',
+  'MA': 'Massachusetts',
+  'TN': 'Tennessee',
+  'IN': 'Indiana',
+  'MO': 'Missouri',
+  'MD': 'Maryland',
+  'WI': 'Wisconsin',
+  'CO': 'Colorado',
+  'MN': 'Minnesota',
+  'SC': 'South Carolina',
+  'AL': 'Alabama',
+  'LA': 'Louisiana',
+  'KY': 'Kentucky',
+  'OR': 'Oregon',
+  'OK': 'Oklahoma',
+  'CT': 'Connecticut',
+  'UT': 'Utah',
+  'IA': 'Iowa',
+  'NV': 'Nevada',
+  'AR': 'Arkansas',
+  'MS': 'Mississippi',
+  'NE': 'Nebraska',
+  'NM': 'New Mexico',
+  'WV': 'West Virginia',
+  'ID': 'Idaho',
+  'HI': 'Hawaii',
+  'NH': 'New Hampshire',
+  'ME': 'Maine',
+  'MT': 'Montana',
+  'RI': 'Rhode Island',
+  'DE': 'Delaware',
+  'SD': 'South Dakota',
+  'ND': 'North Dakota',
+  'AK': 'Alaska',
+  'VT': 'Vermont',
+  'WY': 'Wyoming',
+  'DC': 'District of Columbia',
+}
+
+function getStateFromLocation(location: string): string {
+  // Try to extract state abbreviation from "City, ST" format
+  const parts = location.split(',')
+  if (parts.length >= 2) {
+    const stateAbbr = parts[parts.length - 1].trim()
+    return stateAbbreviations[stateAbbr] || stateAbbr
+  }
+  return location
+}
 
 export default function WorkforceDashboard() {
+  const { cases } = useCases()
   const [searchTerm, setSearchTerm] = useState('')
+
+  // Aggregate case data into location-based workforce data
+  const workforceData: LocationData[] = useMemo(() => {
+    const locationMap = new Map<string, LocationData>()
+
+    cases.forEach(caseItem => {
+      const location = caseItem.employeeLocation || 'Unknown'
+      const state = getStateFromLocation(location)
+      
+      // Determine if hourly or salaried from compensation history
+      const currentPay = getCurrentPay(caseItem)
+      const isHourly = currentPay?.unit === 'hourly'
+      
+      // Get or create location entry
+      if (!locationMap.has(location)) {
+        locationMap.set(location, {
+          state,
+          location,
+          hourlyActive: 0,
+          hourlyFurlough: 0,
+          hourlyPaidLeave: 0,
+          hourlySuspended: 0,
+          hourlyUnpaidLeave: 0,
+          hrlyLegacy: 0,
+          hrlyDoors: 0,
+          salariedActive: 0,
+          salariedPaidLeave: 0,
+          salariedUnpaidLeave: 0,
+          salLegacy: 0,
+          salDoors: 0,
+          totalLegacy: 0,
+          totalDoors: 0,
+        })
+      }
+      
+      const locData = locationMap.get(location)!
+      
+      // Determine status category based on case status and absence data
+      const status = caseItem.status?.toLowerCase() || ''
+      const hasAbsence = caseItem.absences && caseItem.absences.length > 0
+      const latestAbsence = hasAbsence ? caseItem.absences[caseItem.absences.length - 1] : null
+      const absenceType = latestAbsence?.type?.toLowerCase() || ''
+      
+      // Categorize into the appropriate bucket
+      if (isHourly) {
+        if (status === 'closed' || status === 'furlough') {
+          locData.hourlyFurlough++
+        } else if (absenceType.includes('paid') || absenceType === 'continuous') {
+          locData.hourlyPaidLeave++
+        } else if (absenceType.includes('unpaid') || absenceType === 'intermittent') {
+          locData.hourlyUnpaidLeave++
+        } else if (status === 'suspended') {
+          locData.hourlySuspended++
+        } else {
+          locData.hourlyActive++
+        }
+        // Legacy = sum of all hourly statuses, Doors = active only
+        locData.hrlyLegacy = locData.hourlyActive + locData.hourlyFurlough + locData.hourlyPaidLeave + locData.hourlySuspended + locData.hourlyUnpaidLeave
+        locData.hrlyDoors = locData.hourlyActive
+      } else {
+        // Salaried
+        if (absenceType.includes('paid') || absenceType === 'continuous') {
+          locData.salariedPaidLeave++
+        } else if (absenceType.includes('unpaid') || absenceType === 'intermittent') {
+          locData.salariedUnpaidLeave++
+        } else {
+          locData.salariedActive++
+        }
+        // Legacy = sum of all salaried statuses, Doors = active only
+        locData.salLegacy = locData.salariedActive + locData.salariedPaidLeave + locData.salariedUnpaidLeave
+        locData.salDoors = locData.salariedActive
+      }
+      
+      // Update totals
+      locData.totalLegacy = locData.hrlyLegacy + locData.salLegacy
+      locData.totalDoors = locData.hrlyDoors + locData.salDoors
+    })
+
+    // Convert to array and sort by state then location
+    return Array.from(locationMap.values()).sort((a, b) => {
+      if (a.state !== b.state) return a.state.localeCompare(b.state)
+      return a.location.localeCompare(b.location)
+    })
+  }, [cases])
 
   const filteredData = workforceData.filter(row => 
     row.state.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -321,56 +445,46 @@ export default function WorkforceDashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredData.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={16} className="text-center py-8 text-muted-foreground">
-                        No data found
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    <>
-                      {Object.entries(groupedData).map(([state, locations]) => (
-                        locations.map((row, i) => (
-                          <TableRow key={`${state}-${i}`}>
-                            <TableCell className="font-medium whitespace-nowrap">{i === 0 ? state : ''}</TableCell>
-                            <TableCell className="whitespace-nowrap">{row.location}</TableCell>
-                            <TableCell className="text-center bg-blue-50 dark:bg-blue-950/20">{row.hourlyActive || ''}</TableCell>
-                            <TableCell className="text-center bg-blue-50 dark:bg-blue-950/20">{row.hourlyFurlough || ''}</TableCell>
-                            <TableCell className="text-center bg-blue-50 dark:bg-blue-950/20">{row.hourlyPaidLeave || ''}</TableCell>
-                            <TableCell className="text-center bg-blue-50 dark:bg-blue-950/20">{row.hourlySuspended || ''}</TableCell>
-                            <TableCell className="text-center bg-blue-50 dark:bg-blue-950/20">{row.hourlyUnpaidLeave || ''}</TableCell>
-                            <TableCell className="text-center bg-purple-100 dark:bg-purple-950/30">{row.hrlyLegacy || ''}</TableCell>
-                            <TableCell className="text-center bg-blue-100 dark:bg-blue-900/30">{row.hrlyDoors || ''}</TableCell>
-                            <TableCell className="text-center">{row.salariedActive || ''}</TableCell>
-                            <TableCell className="text-center">{row.salariedPaidLeave || ''}</TableCell>
-                            <TableCell className="text-center">{row.salariedUnpaidLeave || ''}</TableCell>
-                            <TableCell className="text-center bg-purple-100 dark:bg-purple-950/30">{row.salLegacy || ''}</TableCell>
-                            <TableCell className="text-center bg-purple-100 dark:bg-purple-950/30">{row.salDoors || ''}</TableCell>
-                            <TableCell className="text-center bg-purple-100 dark:bg-purple-950/30 font-medium">{row.totalLegacy || ''}</TableCell>
-                            <TableCell className="text-center bg-purple-100 dark:bg-purple-950/30 font-medium">{row.totalDoors || ''}</TableCell>
-                          </TableRow>
-                        ))
-                      ))}
-                      {/* Totals Row */}
-                      <TableRow className="bg-muted font-bold border-t-2">
-                        <TableCell colSpan={2}>Grand Total</TableCell>
-                        <TableCell className="text-center">{totals.hourlyActive}</TableCell>
-                        <TableCell className="text-center">{totals.hourlyFurlough}</TableCell>
-                        <TableCell className="text-center">{totals.hourlyPaidLeave}</TableCell>
-                        <TableCell className="text-center">{totals.hourlySuspended}</TableCell>
-                        <TableCell className="text-center">{totals.hourlyUnpaidLeave}</TableCell>
-                        <TableCell className="text-center bg-purple-200 dark:bg-purple-900/50">{totals.hrlyLegacy}</TableCell>
-                        <TableCell className="text-center bg-blue-200 dark:bg-blue-800/50">{totals.hrlyDoors}</TableCell>
-                        <TableCell className="text-center">{totals.salariedActive}</TableCell>
-                        <TableCell className="text-center">{totals.salariedPaidLeave}</TableCell>
-                        <TableCell className="text-center">{totals.salariedUnpaidLeave}</TableCell>
-                        <TableCell className="text-center bg-purple-200 dark:bg-purple-900/50">{totals.salLegacy}</TableCell>
-                        <TableCell className="text-center bg-purple-200 dark:bg-purple-900/50">{totals.salDoors}</TableCell>
-                        <TableCell className="text-center bg-purple-200 dark:bg-purple-900/50">{totals.totalLegacy}</TableCell>
-                        <TableCell className="text-center bg-purple-200 dark:bg-purple-900/50">{totals.totalDoors}</TableCell>
+                  {Object.entries(groupedData).map(([state, locations]) => (
+                    locations.map((row, idx) => (
+                      <TableRow key={`${state}-${row.location}`} className="hover:bg-muted/50">
+                        <TableCell className="font-medium border-r">{idx === 0 ? state : ''}</TableCell>
+                        <TableCell className="border-r">{row.location}</TableCell>
+                        <TableCell className="text-center text-sm">{row.hourlyActive || ''}</TableCell>
+                        <TableCell className="text-center text-sm">{row.hourlyFurlough || ''}</TableCell>
+                        <TableCell className="text-center text-sm">{row.hourlyPaidLeave || ''}</TableCell>
+                        <TableCell className="text-center text-sm">{row.hourlySuspended || ''}</TableCell>
+                        <TableCell className="text-center text-sm">{row.hourlyUnpaidLeave || ''}</TableCell>
+                        <TableCell className="text-center text-sm bg-purple-100 dark:bg-purple-950">{row.hrlyLegacy || ''}</TableCell>
+                        <TableCell className="text-center text-sm bg-blue-100 dark:bg-blue-950 border-r">{row.hrlyDoors || ''}</TableCell>
+                        <TableCell className="text-center text-sm">{row.salariedActive || ''}</TableCell>
+                        <TableCell className="text-center text-sm">{row.salariedPaidLeave || ''}</TableCell>
+                        <TableCell className="text-center text-sm">{row.salariedUnpaidLeave || ''}</TableCell>
+                        <TableCell className="text-center text-sm bg-purple-100 dark:bg-purple-950">{row.salLegacy || ''}</TableCell>
+                        <TableCell className="text-center text-sm bg-purple-100 dark:bg-purple-950 border-r">{row.salDoors || ''}</TableCell>
+                        <TableCell className="text-center text-sm bg-purple-100 dark:bg-purple-950">{row.totalLegacy || ''}</TableCell>
+                        <TableCell className="text-center text-sm bg-purple-100 dark:bg-purple-950">{row.totalDoors || ''}</TableCell>
                       </TableRow>
-                    </>
-                  )}
+                    ))
+                  ))}
+                  {/* Grand Total Row */}
+                  <TableRow className="font-bold bg-muted border-t-2">
+                    <TableCell colSpan={2} className="border-r">Grand Total</TableCell>
+                    <TableCell className="text-center">{totals.hourlyActive || ''}</TableCell>
+                    <TableCell className="text-center">{totals.hourlyFurlough || ''}</TableCell>
+                    <TableCell className="text-center">{totals.hourlyPaidLeave || ''}</TableCell>
+                    <TableCell className="text-center">{totals.hourlySuspended || ''}</TableCell>
+                    <TableCell className="text-center">{totals.hourlyUnpaidLeave || ''}</TableCell>
+                    <TableCell className="text-center bg-purple-100 dark:bg-purple-950">{totals.hrlyLegacy || ''}</TableCell>
+                    <TableCell className="text-center bg-blue-100 dark:bg-blue-950 border-r">{totals.hrlyDoors || ''}</TableCell>
+                    <TableCell className="text-center">{totals.salariedActive || ''}</TableCell>
+                    <TableCell className="text-center">{totals.salariedPaidLeave || ''}</TableCell>
+                    <TableCell className="text-center">{totals.salariedUnpaidLeave || ''}</TableCell>
+                    <TableCell className="text-center bg-purple-100 dark:bg-purple-950">{totals.salLegacy || ''}</TableCell>
+                    <TableCell className="text-center bg-purple-100 dark:bg-purple-950 border-r">{totals.salDoors || ''}</TableCell>
+                    <TableCell className="text-center bg-purple-100 dark:bg-purple-950">{totals.totalLegacy || ''}</TableCell>
+                    <TableCell className="text-center bg-purple-100 dark:bg-purple-950">{totals.totalDoors || ''}</TableCell>
+                  </TableRow>
                 </TableBody>
               </Table>
             </div>
