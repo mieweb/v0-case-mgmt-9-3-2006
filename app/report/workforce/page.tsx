@@ -319,15 +319,15 @@ export default function WorkforceDashboard() {
         item.hourlyPaidLeave || '',
         item.hourlySuspended || '',
         item.hourlyUnpaidLeave || '',
-        item.hrlyLegacy || '',
-        item.hrlyDoors || '',
+        { formula: `C${rowNum}+D${rowNum}+E${rowNum}+F${rowNum}+G${rowNum}` }, // Hrly Legacy = sum of hourly columns
+        { formula: `C${rowNum}+D${rowNum}+E${rowNum}+F${rowNum}+G${rowNum}` }, // Hrly Doors = sum of hourly columns
         item.salariedActive || '',
         item.salariedPaidLeave || '',
         item.salariedUnpaidLeave || '',
-        item.salLegacy || '',
-        item.salDoors || '',
-        { formula: `H${rowNum}+M${rowNum}` },
-        { formula: `I${rowNum}+N${rowNum}` }
+        { formula: `J${rowNum}+K${rowNum}+L${rowNum}` }, // Sal Legacy = sum of salaried columns
+        { formula: `J${rowNum}+K${rowNum}+L${rowNum}` }, // Sal Doors = sum of salaried columns
+        { formula: `H${rowNum}+M${rowNum}` }, // Total Legacy = Hrly Legacy + Sal Legacy
+        { formula: `I${rowNum}+N${rowNum}` }  // Total Doors = Hrly Doors + Sal Doors
       ])
       
       // Apply colors to data cells
