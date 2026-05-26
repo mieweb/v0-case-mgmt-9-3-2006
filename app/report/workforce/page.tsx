@@ -434,7 +434,7 @@ export default function WorkforceDashboard() {
             <div>
               <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
                 <Building2 className="h-8 w-8 text-primary" />
-                Corporate Workforce Report
+                Employee List-Status by State for Disability
               </h1>
               <p className="text-muted-foreground mt-2">
                 Workforce distribution by state, location, and employment status

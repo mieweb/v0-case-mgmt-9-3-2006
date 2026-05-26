@@ -134,7 +134,7 @@ export default function ReportsDashboard() {
               <div className="p-2 rounded-lg bg-primary/10 w-fit">
                 <Building2 className="h-5 w-5 text-primary" />
               </div>
-              <CardTitle className="text-lg mt-3">Corporate Workforce Report</CardTitle>
+              <CardTitle className="text-lg mt-3">Employee List-Status by State for Disability</CardTitle>
               <CardDescription>Workforce distribution by location, employment type, and status</CardDescription>
             </CardHeader>
             <CardContent className="pt-0">
