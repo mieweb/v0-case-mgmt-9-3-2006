@@ -329,15 +329,15 @@ export default function WorkforceDashboard() {
         item.hourlyPaidLeave || null,
         item.hourlySuspended || null,
         item.hourlyUnpaidLeave || null,
-        { formula: `SUM(C${rowNum}:G${rowNum})` }, // Hrly Legacy = sum of all hourly
-        { formula: `C${rowNum}` }, // Hrly Doors = Active only
+        item.hrlyLegacy || null, // Hrly Legacy - use pre-calculated value
+        item.hrlyDoors || null, // Hrly Doors - use pre-calculated value
         item.salariedActive || null,
         item.salariedPaidLeave || null,
         item.salariedUnpaidLeave || null,
-        { formula: `SUM(J${rowNum}:L${rowNum})` }, // Sal Legacy = sum of all salaried
-        { formula: `J${rowNum}` }, // Sal Doors = Active only
-        { formula: `H${rowNum}+M${rowNum}` }, // Total Legacy = Hrly Legacy + Sal Legacy
-        { formula: `I${rowNum}+N${rowNum}` } // Total Doors = Hrly Doors + Sal Doors
+        item.salLegacy || null, // Sal Legacy - use pre-calculated value
+        item.salDoors || null, // Sal Doors - use pre-calculated value
+        item.totalLegacy || null, // Total Legacy - use pre-calculated value
+        item.totalDoors || null // Total Doors - use pre-calculated value
       ])
       
       // Alternating row colors for non-colored cells (white/gray)
@@ -388,12 +388,25 @@ export default function WorkforceDashboard() {
       cell.alignment = { vertical: 'middle', horizontal: 'center' }
     })
 
-    // Add Grand Total Row
-    const totalRowData: (string | number | { formula: string })[] = ['Grand Total', '']
-    for (let col = 3; col <= 16; col++) {
-      const colLetter = String.fromCharCode(64 + col)
-      totalRowData.push({ formula: `SUM(${colLetter}6:${colLetter}${rowNum - 1})` })
-    }
+    // Add Grand Total Row - use pre-calculated totals
+    const totalRowData: (string | number | null)[] = [
+      'Grand Total', 
+      '',
+      totals.hourlyActive || null,
+      totals.hourlyFurlough || null,
+      totals.hourlyPaidLeave || null,
+      totals.hourlySuspended || null,
+      totals.hourlyUnpaidLeave || null,
+      totals.hrlyLegacy || null,
+      totals.hrlyDoors || null,
+      totals.salariedActive || null,
+      totals.salariedPaidLeave || null,
+      totals.salariedUnpaidLeave || null,
+      totals.salLegacy || null,
+      totals.salDoors || null,
+      totals.totalLegacy || null,
+      totals.totalDoors || null
+    ]
     const totalRow = worksheet.addRow(totalRowData)
     totalRow.font = { bold: true }
     for (let i = 1; i <= 16; i++) {
