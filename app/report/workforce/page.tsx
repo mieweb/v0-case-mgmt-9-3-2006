@@ -329,16 +329,24 @@ export default function WorkforceDashboard() {
         item.hourlyPaidLeave || null,
         item.hourlySuspended || null,
         item.hourlyUnpaidLeave || null,
-        item.hrlyLegacy || null, // Hrly Legacy - use pre-calculated value
-        item.hrlyDoors || null, // Hrly Doors - use pre-calculated value
+        null, // Hrly Legacy - will set formula with cached result
+        null, // Hrly Doors - will set formula with cached result
         item.salariedActive || null,
         item.salariedPaidLeave || null,
         item.salariedUnpaidLeave || null,
-        item.salLegacy || null, // Sal Legacy - use pre-calculated value
-        item.salDoors || null, // Sal Doors - use pre-calculated value
-        item.totalLegacy || null, // Total Legacy - use pre-calculated value
-        item.totalDoors || null // Total Doors - use pre-calculated value
+        null, // Sal Legacy - will set formula with cached result
+        null, // Sal Doors - will set formula with cached result
+        null, // Total Legacy - will set formula with cached result
+        null // Total Doors - will set formula with cached result
       ])
+      
+      // Set formulas with cached results for calculated columns
+      row.getCell(8).value = { formula: `SUM(C${rowNum}:G${rowNum})`, result: item.hrlyLegacy || 0 }
+      row.getCell(9).value = { formula: `C${rowNum}`, result: item.hrlyDoors || 0 }
+      row.getCell(13).value = { formula: `SUM(J${rowNum}:L${rowNum})`, result: item.salLegacy || 0 }
+      row.getCell(14).value = { formula: `J${rowNum}`, result: item.salDoors || 0 }
+      row.getCell(15).value = { formula: `H${rowNum}+M${rowNum}`, result: item.totalLegacy || 0 }
+      row.getCell(16).value = { formula: `I${rowNum}+N${rowNum}`, result: item.totalDoors || 0 }
       
       // Alternating row colors for non-colored cells (white/gray)
       const isGrayRow = rowIndex % 2 === 1
@@ -388,7 +396,7 @@ export default function WorkforceDashboard() {
       cell.alignment = { vertical: 'middle', horizontal: 'center' }
     })
 
-    // Add Grand Total Row - use pre-calculated totals
+    // Add Grand Total Row with formulas and cached results
     const totalRowData: (string | number | null)[] = [
       'Grand Total', 
       '',
@@ -397,17 +405,35 @@ export default function WorkforceDashboard() {
       totals.hourlyPaidLeave || null,
       totals.hourlySuspended || null,
       totals.hourlyUnpaidLeave || null,
-      totals.hrlyLegacy || null,
-      totals.hrlyDoors || null,
+      null, // Hrly Legacy - will set formula
+      null, // Hrly Doors - will set formula
       totals.salariedActive || null,
       totals.salariedPaidLeave || null,
       totals.salariedUnpaidLeave || null,
-      totals.salLegacy || null,
-      totals.salDoors || null,
-      totals.totalLegacy || null,
-      totals.totalDoors || null
+      null, // Sal Legacy - will set formula
+      null, // Sal Doors - will set formula
+      null, // Total Legacy - will set formula
+      null // Total Doors - will set formula
     ]
     const totalRow = worksheet.addRow(totalRowData)
+    
+    // Set formulas with cached results for Grand Total calculated columns
+    const lastDataRow = rowNum - 1
+    totalRow.getCell(3).value = { formula: `SUM(C6:C${lastDataRow})`, result: totals.hourlyActive || 0 }
+    totalRow.getCell(4).value = { formula: `SUM(D6:D${lastDataRow})`, result: totals.hourlyFurlough || 0 }
+    totalRow.getCell(5).value = { formula: `SUM(E6:E${lastDataRow})`, result: totals.hourlyPaidLeave || 0 }
+    totalRow.getCell(6).value = { formula: `SUM(F6:F${lastDataRow})`, result: totals.hourlySuspended || 0 }
+    totalRow.getCell(7).value = { formula: `SUM(G6:G${lastDataRow})`, result: totals.hourlyUnpaidLeave || 0 }
+    totalRow.getCell(8).value = { formula: `SUM(H6:H${lastDataRow})`, result: totals.hrlyLegacy || 0 }
+    totalRow.getCell(9).value = { formula: `SUM(I6:I${lastDataRow})`, result: totals.hrlyDoors || 0 }
+    totalRow.getCell(10).value = { formula: `SUM(J6:J${lastDataRow})`, result: totals.salariedActive || 0 }
+    totalRow.getCell(11).value = { formula: `SUM(K6:K${lastDataRow})`, result: totals.salariedPaidLeave || 0 }
+    totalRow.getCell(12).value = { formula: `SUM(L6:L${lastDataRow})`, result: totals.salariedUnpaidLeave || 0 }
+    totalRow.getCell(13).value = { formula: `SUM(M6:M${lastDataRow})`, result: totals.salLegacy || 0 }
+    totalRow.getCell(14).value = { formula: `SUM(N6:N${lastDataRow})`, result: totals.salDoors || 0 }
+    totalRow.getCell(15).value = { formula: `SUM(O6:O${lastDataRow})`, result: totals.totalLegacy || 0 }
+    totalRow.getCell(16).value = { formula: `SUM(P6:P${lastDataRow})`, result: totals.totalDoors || 0 }
+    
     totalRow.font = { bold: true }
     for (let i = 1; i <= 16; i++) {
       totalRow.getCell(i).border = thinBorder
