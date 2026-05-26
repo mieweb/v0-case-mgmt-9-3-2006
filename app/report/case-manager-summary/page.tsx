@@ -508,16 +508,16 @@ export default function CaseManagerSummaryReport() {
                   <TableRow>
                     <TableHead className="text-center whitespace-nowrap text-xs border">Hourly</TableHead>
                     <TableHead className="text-center whitespace-nowrap text-xs border">Salaried</TableHead>
-                    <TableHead className="text-center whitespace-nowrap text-xs border">Total</TableHead>
+                    <TableHead className="text-center whitespace-nowrap text-xs border-2 border-r-gray-500">Total</TableHead>
                     <TableHead className="text-center whitespace-nowrap text-xs border">Hourly</TableHead>
                     <TableHead className="text-center whitespace-nowrap text-xs border">Salaried</TableHead>
-                    <TableHead className="text-center whitespace-nowrap text-xs border">Total</TableHead>
+                    <TableHead className="text-center whitespace-nowrap text-xs border-2 border-r-gray-500">Total</TableHead>
                     <TableHead className="text-center whitespace-nowrap text-xs border">Hourly</TableHead>
                     <TableHead className="text-center whitespace-nowrap text-xs border">Salaried</TableHead>
-                    <TableHead className="text-center whitespace-nowrap text-xs border">Total</TableHead>
+                    <TableHead className="text-center whitespace-nowrap text-xs border-2 border-r-gray-500">Total</TableHead>
                     <TableHead className="text-center whitespace-nowrap text-xs border">Hourly</TableHead>
                     <TableHead className="text-center whitespace-nowrap text-xs border">Salaried</TableHead>
-                    <TableHead className="text-center whitespace-nowrap text-xs border">Total</TableHead>
+                    <TableHead className="text-center whitespace-nowrap text-xs border-2 border-r-gray-500">Total</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -535,16 +535,16 @@ export default function CaseManagerSummaryReport() {
                             <TableCell className="border pl-6">{loc.location}</TableCell>
                             <TableCell className="text-center text-sm border">{loc.headcountHourly || ''}</TableCell>
                             <TableCell className="text-center text-sm border">{loc.headcountSalaried || ''}</TableCell>
-                            <TableCell className="text-center text-sm border font-medium">{loc.headcountTotal || ''}</TableCell>
+                            <TableCell className="text-center text-sm border-2 border-r-gray-500 font-medium">{loc.headcountTotal || ''}</TableCell>
                             <TableCell className="text-center text-sm border">{loc.currentWithLwdHourly || ''}</TableCell>
                             <TableCell className="text-center text-sm border">{loc.currentWithLwdSalaried || ''}</TableCell>
-                            <TableCell className="text-center text-sm border font-medium">{loc.currentWithLwdTotal || ''}</TableCell>
+                            <TableCell className="text-center text-sm border-2 border-r-gray-500 font-medium">{loc.currentWithLwdTotal || ''}</TableCell>
                             <TableCell className="text-center text-sm border">{loc.openNoLwdHourly || ''}</TableCell>
                             <TableCell className="text-center text-sm border">{loc.openNoLwdSalaried || ''}</TableCell>
-                            <TableCell className="text-center text-sm border font-medium">{loc.openNoLwdTotal || ''}</TableCell>
+                            <TableCell className="text-center text-sm border-2 border-r-gray-500 font-medium">{loc.openNoLwdTotal || ''}</TableCell>
                             <TableCell className="text-center text-sm border">{loc.allOpenHourly || ''}</TableCell>
                             <TableCell className="text-center text-sm border">{loc.allOpenSalaried || ''}</TableCell>
-                            <TableCell className="text-center text-sm border font-medium">{loc.allOpenTotal || ''}</TableCell>
+                            <TableCell className="text-center text-sm border-2 border-r-gray-500 font-medium">{loc.allOpenTotal || ''}</TableCell>
                             <TableCell className="text-center text-sm border">{loc.percentOpen > 0 ? `${loc.percentOpen.toFixed(2)}%` : ''}</TableCell>
                           </TableRow>
                         )
@@ -554,16 +554,16 @@ export default function CaseManagerSummaryReport() {
                         <TableCell className="border">Total</TableCell>
                         <TableCell className="text-center border">{manager.totals.headcountHourly || ''}</TableCell>
                         <TableCell className="text-center border">{manager.totals.headcountSalaried || ''}</TableCell>
-                        <TableCell className="text-center border">{manager.totals.headcountTotal || ''}</TableCell>
+                        <TableCell className="text-center border-2 border-r-gray-500">{manager.totals.headcountTotal || ''}</TableCell>
                         <TableCell className="text-center border">{manager.totals.currentWithLwdHourly || ''}</TableCell>
                         <TableCell className="text-center border">{manager.totals.currentWithLwdSalaried || ''}</TableCell>
-                        <TableCell className="text-center border">{manager.totals.currentWithLwdTotal || ''}</TableCell>
+                        <TableCell className="text-center border-2 border-r-gray-500">{manager.totals.currentWithLwdTotal || ''}</TableCell>
                         <TableCell className="text-center border">{manager.totals.openNoLwdHourly || ''}</TableCell>
                         <TableCell className="text-center border">{manager.totals.openNoLwdSalaried || ''}</TableCell>
-                        <TableCell className="text-center border">{manager.totals.openNoLwdTotal || ''}</TableCell>
+                        <TableCell className="text-center border-2 border-r-gray-500">{manager.totals.openNoLwdTotal || ''}</TableCell>
                         <TableCell className="text-center border">{manager.totals.allOpenHourly || ''}</TableCell>
                         <TableCell className="text-center border">{manager.totals.allOpenSalaried || ''}</TableCell>
-                        <TableCell className="text-center border">{manager.totals.allOpenTotal || ''}</TableCell>
+                        <TableCell className="text-center border-2 border-r-gray-500">{manager.totals.allOpenTotal || ''}</TableCell>
                         <TableCell className="text-center border">{manager.totals.percentOpen > 0 ? `${manager.totals.percentOpen.toFixed(2)}%` : ''}</TableCell>
                       </TableRow>
                     </React.Fragment>
@@ -573,16 +573,16 @@ export default function CaseManagerSummaryReport() {
                     <TableCell className="border">Grand Total</TableCell>
                     <TableCell className="text-center border">{grandTotals.headcountHourly || ''}</TableCell>
                     <TableCell className="text-center border">{grandTotals.headcountSalaried || ''}</TableCell>
-                    <TableCell className="text-center border">{grandTotals.headcountTotal || ''}</TableCell>
+                    <TableCell className="text-center border-2 border-r-gray-500">{grandTotals.headcountTotal || ''}</TableCell>
                     <TableCell className="text-center border">{grandTotals.currentWithLwdHourly || ''}</TableCell>
                     <TableCell className="text-center border">{grandTotals.currentWithLwdSalaried || ''}</TableCell>
-                    <TableCell className="text-center border">{grandTotals.currentWithLwdTotal || ''}</TableCell>
+                    <TableCell className="text-center border-2 border-r-gray-500">{grandTotals.currentWithLwdTotal || ''}</TableCell>
                     <TableCell className="text-center border">{grandTotals.openNoLwdHourly || ''}</TableCell>
                     <TableCell className="text-center border">{grandTotals.openNoLwdSalaried || ''}</TableCell>
-                    <TableCell className="text-center border">{grandTotals.openNoLwdTotal || ''}</TableCell>
+                    <TableCell className="text-center border-2 border-r-gray-500">{grandTotals.openNoLwdTotal || ''}</TableCell>
                     <TableCell className="text-center border">{grandTotals.allOpenHourly || ''}</TableCell>
                     <TableCell className="text-center border">{grandTotals.allOpenSalaried || ''}</TableCell>
-                    <TableCell className="text-center border">{grandTotals.allOpenTotal || ''}</TableCell>
+                    <TableCell className="text-center border-2 border-r-gray-500">{grandTotals.allOpenTotal || ''}</TableCell>
                     <TableCell className="text-center border">{grandTotals.percentOpen > 0 ? `${grandTotals.percentOpen.toFixed(2)}%` : ''}</TableCell>
                   </TableRow>
                 </TableBody>
