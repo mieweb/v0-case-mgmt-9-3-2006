@@ -283,8 +283,8 @@ export default function WorkforceDashboard() {
     // Salaried columns (J-L) - NO fill (white)
     // Sal Legacy (M) - purple
     headerRow.getCell(13).fill = purpleFill
-    // Sal Doors (N) - purple
-    headerRow.getCell(14).fill = purpleFill
+    // Sal Doors (N) - blue (same as Hrly Doors)
+    headerRow.getCell(14).fill = blueHeaderFill
     // Total Legacy & Total Doors (O-P) - purple
     headerRow.getCell(15).fill = purpleFill
     headerRow.getCell(16).fill = purpleFill
@@ -335,8 +335,8 @@ export default function WorkforceDashboard() {
       // Salaried columns (J-L) - NO fill (white)
       // Sal Legacy (M) - purple
       row.getCell(13).fill = purpleFill
-      // Sal Doors (N) - purple
-      row.getCell(14).fill = purpleFill
+      // Sal Doors (N) - blue (same as Hrly Doors)
+      row.getCell(14).fill = blueDataFill
       // Total Legacy (O) - purple
       row.getCell(15).fill = purpleFill
       // Total Doors (P) - purple
@@ -505,7 +505,7 @@ export default function WorkforceDashboard() {
                     <TableHead className="text-center whitespace-nowrap text-xs">Paid Leave</TableHead>
                     <TableHead className="text-center whitespace-nowrap text-xs">Unpaid Leave</TableHead>
                     <TableHead className="text-center bg-purple-200 dark:bg-purple-900 whitespace-nowrap text-xs">Sal Legacy</TableHead>
-                    <TableHead className="text-center bg-purple-200 dark:bg-purple-900 whitespace-nowrap text-xs border-r">Sal Doors</TableHead>
+                    <TableHead className="text-center bg-blue-200 dark:bg-blue-900 whitespace-nowrap text-xs border-r">Sal Doors</TableHead>
                     <TableHead className="text-center bg-purple-200 dark:bg-purple-900 whitespace-nowrap text-xs">Total Legacy</TableHead>
                     <TableHead className="text-center bg-purple-200 dark:bg-purple-900 whitespace-nowrap text-xs">Total Doors</TableHead>
                   </TableRow>
@@ -527,7 +527,7 @@ export default function WorkforceDashboard() {
                         <TableCell className="text-center text-sm">{row.salariedPaidLeave || ''}</TableCell>
                         <TableCell className="text-center text-sm">{row.salariedUnpaidLeave || ''}</TableCell>
                         <TableCell className="text-center text-sm bg-purple-100 dark:bg-purple-950">{row.salLegacy || ''}</TableCell>
-                        <TableCell className="text-center text-sm bg-purple-100 dark:bg-purple-950 border-r">{row.salDoors || ''}</TableCell>
+                        <TableCell className="text-center text-sm bg-blue-100 dark:bg-blue-950 border-r">{row.salDoors || ''}</TableCell>
                         <TableCell className="text-center text-sm bg-purple-100 dark:bg-purple-950">{row.totalLegacy || ''}</TableCell>
                         <TableCell className="text-center text-sm bg-purple-100 dark:bg-purple-950">{row.totalDoors || ''}</TableCell>
                       </TableRow>
@@ -547,7 +547,7 @@ export default function WorkforceDashboard() {
                     <TableCell className="text-center">{totals.salariedPaidLeave || ''}</TableCell>
                     <TableCell className="text-center">{totals.salariedUnpaidLeave || ''}</TableCell>
                     <TableCell className="text-center bg-purple-100 dark:bg-purple-950">{totals.salLegacy || ''}</TableCell>
-                    <TableCell className="text-center bg-purple-100 dark:bg-purple-950 border-r">{totals.salDoors || ''}</TableCell>
+                    <TableCell className="text-center bg-blue-100 dark:bg-blue-950 border-r">{totals.salDoors || ''}</TableCell>
                     <TableCell className="text-center bg-purple-100 dark:bg-purple-950">{totals.totalLegacy || ''}</TableCell>
                     <TableCell className="text-center bg-purple-100 dark:bg-purple-950">{totals.totalDoors || ''}</TableCell>
                   </TableRow>
