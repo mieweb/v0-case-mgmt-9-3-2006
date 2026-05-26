@@ -329,15 +329,15 @@ export default function WorkforceDashboard() {
         item.hourlyPaidLeave || '',
         item.hourlySuspended || '',
         item.hourlyUnpaidLeave || '',
-        { formula: `C${rowNum}+D${rowNum}+E${rowNum}+F${rowNum}+G${rowNum}` },
-        { formula: `C${rowNum}+D${rowNum}+E${rowNum}+F${rowNum}+G${rowNum}` },
+        { formula: `C${rowNum}+D${rowNum}+E${rowNum}+F${rowNum}+G${rowNum}` }, // Hrly Legacy = sum of all hourly
+        { formula: `C${rowNum}` }, // Hrly Doors = Active only
         item.salariedActive || '',
         item.salariedPaidLeave || '',
         item.salariedUnpaidLeave || '',
-        { formula: `J${rowNum}+K${rowNum}+L${rowNum}` },
-        { formula: `J${rowNum}+K${rowNum}+L${rowNum}` },
-        { formula: `H${rowNum}+M${rowNum}` },
-        { formula: `I${rowNum}+N${rowNum}` }
+        { formula: `J${rowNum}+K${rowNum}+L${rowNum}` }, // Sal Legacy = sum of all salaried
+        { formula: `J${rowNum}` }, // Sal Doors = Active only
+        { formula: `H${rowNum}+M${rowNum}` }, // Total Legacy = Hrly Legacy + Sal Legacy
+        { formula: `I${rowNum}+N${rowNum}` } // Total Doors = Hrly Doors + Sal Doors
       ])
       
       // Alternating row colors for non-colored cells (white/gray)
