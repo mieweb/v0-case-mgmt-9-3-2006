@@ -130,13 +130,13 @@ export default function EmployeeDiagnosisReport() {
 
     const ws = XLSX.utils.json_to_sheet(exportData)
     const wb = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(wb, ws, "Employee Diagnosis Report")
+    XLSX.utils.book_append_sheet(wb, ws, "Disability Dashboard Quarterly")
     
     // Auto-size columns
     const colWidths = Object.keys(exportData[0] || {}).map(key => ({ wch: Math.max(key.length, 15) }))
     ws['!cols'] = colWidths
     
-    XLSX.writeFile(wb, `employee-diagnosis-report-${new Date().toISOString().split('T')[0]}.xlsx`)
+    XLSX.writeFile(wb, `disability-dashboard-quarterly-${new Date().toISOString().split('T')[0]}.xlsx`)
   }
 
   return (
@@ -166,10 +166,10 @@ export default function EmployeeDiagnosisReport() {
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
             <FileSpreadsheet className="h-8 w-8 text-primary" />
-            Employee Diagnosis Report
+            Disability Dashboard Quarterly Report
           </h1>
           <p className="text-muted-foreground mt-2">
-            View diagnosis information across all employee cases
+            Quarterly overview of diagnosis information across all disability cases
           </p>
         </div>
 

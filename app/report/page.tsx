@@ -62,8 +62,8 @@ export default function ReportsDashboard() {
               <div className="p-2 rounded-lg bg-primary/10 w-fit">
                 <Stethoscope className="h-5 w-5 text-primary" />
               </div>
-              <CardTitle className="text-lg mt-3">Employee Diagnosis</CardTitle>
-              <CardDescription>View diagnosis information across all employee cases</CardDescription>
+              <CardTitle className="text-lg mt-3">Disability Dashboard Quarterly Report</CardTitle>
+              <CardDescription>Quarterly overview of diagnosis information across all disability cases</CardDescription>
             </CardHeader>
             <CardContent className="pt-0">
               <Button variant="default" className="w-full" asChild>
