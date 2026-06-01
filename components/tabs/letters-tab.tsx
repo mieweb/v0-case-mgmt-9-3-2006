@@ -949,11 +949,29 @@ export function LettersTab() {
 
           <div className="space-y-1">
             <Label className="text-xs">Letter Content</Label>
+            {/* Letterhead Preview */}
+            <div className="border rounded-t-md bg-white p-4">
+              <div className="flex justify-between items-start">
+                <div className="text-[10px] leading-tight text-gray-700">
+                  <p className="font-bold">{letterheadSettings.companyName}</p>
+                  <p>{letterheadSettings.addressLine1}</p>
+                  <p>{letterheadSettings.addressLine2}</p>
+                  <p>{letterheadSettings.phone}</p>
+                </div>
+                {letterheadSettings.logoDataUrl && (
+                  <img
+                    src={letterheadSettings.logoDataUrl}
+                    alt="Company Logo"
+                    className="max-w-[100px] max-h-[50px] object-contain"
+                  />
+                )}
+              </div>
+            </div>
             <RichTextEditor
               value={content}
               onChange={setContent}
               placeholder="Type your letter content here or select a template..."
-              className="phi-data"
+              className="phi-data rounded-t-none border-t-0"
             />
           </div>
 
