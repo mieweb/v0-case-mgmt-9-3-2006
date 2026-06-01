@@ -206,7 +206,7 @@ export function DocumentsTab() {
                   <title>${doc.fileName || 'Document'}</title>
                   <style>
                     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; line-height: 1.6; }
-                    img { max-width: 100%; }
+                    img { max-width: 150px; max-height: 80px; width: auto; height: auto; }
                     table { border-collapse: collapse; width: 100%; }
                     td, th { border: 1px solid #ddd; padding: 8px; }
                   </style>
