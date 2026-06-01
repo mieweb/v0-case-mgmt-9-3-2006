@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
-import { Plus, Trash2, Edit2, Check, X, TestTube, AlertTriangle, Info, FileBarChart, Calendar, Users, Filter } from "lucide-react"
+import { Plus, Trash2, Edit2, Check, X, TestTube, AlertTriangle, Info, FileBarChart, Calendar, Users, Filter, Upload, Image } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { generateTodosFromTemplates, type ParsedTodo } from "@/lib/todo-parser"
@@ -32,6 +32,146 @@ import { format } from "date-fns"
 
 interface AdminPanelProps {
   activeSection?: string
+}
+
+// Letterhead Manager Component
+function LetterheadManager() {
+  const { letterheadSettings, updateLetterheadSettings } = useAdmin()
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setLogoFile(file)
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        updateLetterheadSettings({ logoDataUrl: event.target?.result as string })
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleRemoveLogo = () => {
+    setLogoFile(null)
+    updateLetterheadSettings({ logoDataUrl: null })
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Image className="h-5 w-5" />
+          Letterhead Settings
+        </CardTitle>
+        <CardDescription>
+          Configure the company letterhead that will appear on all generated letters
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Logo Upload Section */}
+        <div className="space-y-3">
+          <Label>Company Logo</Label>
+          <div className="flex items-start gap-4">
+            {letterheadSettings.logoDataUrl ? (
+              <div className="relative border rounded-md p-2 bg-muted/30">
+                <img
+                  src={letterheadSettings.logoDataUrl}
+                  alt="Company Logo"
+                  className="max-w-[200px] max-h-[100px] object-contain"
+                />
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="absolute -top-2 -right-2 h-6 w-6 p-0"
+                  onClick={handleRemoveLogo}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed rounded-md p-6 text-center bg-muted/30 w-[200px]">
+                <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">No logo uploaded</p>
+              </div>
+            )}
+            <div className="space-y-2">
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                className="w-auto"
+              />
+              <p className="text-xs text-muted-foreground">
+                Recommended size: 200x100 pixels. PNG or JPG format.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Company Information */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="companyName">Company Name</Label>
+            <Input
+              id="companyName"
+              value={letterheadSettings.companyName}
+              onChange={(e) => updateLetterheadSettings({ companyName: e.target.value })}
+              placeholder="Enter company name"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone">Phone Number</Label>
+            <Input
+              id="phone"
+              value={letterheadSettings.phone}
+              onChange={(e) => updateLetterheadSettings({ phone: e.target.value })}
+              placeholder="Enter phone number"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="addressLine1">Address Line 1</Label>
+            <Input
+              id="addressLine1"
+              value={letterheadSettings.addressLine1}
+              onChange={(e) => updateLetterheadSettings({ addressLine1: e.target.value })}
+              placeholder="Street address"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="addressLine2">Address Line 2</Label>
+            <Input
+              id="addressLine2"
+              value={letterheadSettings.addressLine2}
+              onChange={(e) => updateLetterheadSettings({ addressLine2: e.target.value })}
+              placeholder="City, State ZIP"
+            />
+          </div>
+        </div>
+
+        {/* Preview Section */}
+        <div className="space-y-2">
+          <Label>Letterhead Preview</Label>
+          <div className="border rounded-md p-6 bg-white">
+            <div className="flex justify-between items-start">
+              <div className="text-xs space-y-0.5">
+                <p className="font-bold">{letterheadSettings.companyName || "Company Name"}</p>
+                <p>{letterheadSettings.addressLine1 || "Address Line 1"}</p>
+                <p>{letterheadSettings.addressLine2 || "City, State ZIP"}</p>
+                <p>{letterheadSettings.phone || "Phone Number"}</p>
+              </div>
+              {letterheadSettings.logoDataUrl && (
+                <img
+                  src={letterheadSettings.logoDataUrl}
+                  alt="Logo Preview"
+                  className="max-w-[120px] max-h-[60px] object-contain"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
 }
 
 export function AdminPanel({ activeSection: initialSection = "work-status-report" }: AdminPanelProps) {
@@ -144,6 +284,7 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
           <TabsTrigger value="case-managers">Case Managers</TabsTrigger>
           <TabsTrigger value="locations">Locations</TabsTrigger>
           <TabsTrigger value="case-types">Case Types</TabsTrigger>
+          <TabsTrigger value="letterhead">Letterhead</TabsTrigger>
           <TabsTrigger value="letter-templates">Letter Templates</TabsTrigger>
           <TabsTrigger value="case-note-templates">Case Note Templates</TabsTrigger>
           <TabsTrigger value="case-status-codes">Case Status</TabsTrigger>
@@ -376,6 +517,10 @@ export function AdminPanel({ activeSection: initialSection = "work-status-report
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="letterhead" className="space-y-6">
+          <LetterheadManager />
         </TabsContent>
 
         <TabsContent value="letter-templates" className="space-y-6">

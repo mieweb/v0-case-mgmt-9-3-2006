@@ -69,9 +69,24 @@ interface Letter {
 
 export function LettersTab() {
   const { currentCase, updateCase } = useCases()
-  const { codes, addCode, caseManagers } = useAdmin()
+  const { codes, addCode, caseManagers, letterheadSettings } = useAdmin()
   const { employees } = useEmployees()
   const letterTemplates = codes.letterTemplates
+
+  // Generate letterhead HTML
+  const generateLetterheadHtml = () => {
+    return `
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e5e7eb;">
+        <div style="font-size: 11px; line-height: 1.4;">
+          <p style="margin: 0; font-weight: bold;">${letterheadSettings.companyName}</p>
+          <p style="margin: 0;">${letterheadSettings.addressLine1}</p>
+          <p style="margin: 0;">${letterheadSettings.addressLine2}</p>
+          <p style="margin: 0;">${letterheadSettings.phone}</p>
+        </div>
+        ${letterheadSettings.logoDataUrl ? `<img src="${letterheadSettings.logoDataUrl}" alt="Company Logo" style="max-width: 120px; max-height: 60px; object-fit: contain;" />` : ''}
+      </div>
+    `
+  }
 
   // Find a Case Manager Leader to assign the todo
   const getCaseManagerLeader = () => {
@@ -425,10 +440,32 @@ export function LettersTab() {
               .btn-secondary:hover { background: #4b5563; }
               .mic-icon { width: 16px; height: 16px; }
               #interimText { padding: 10px 15px; color: #6b7280; font-style: italic; border-top: 1px dashed #e5e7eb; display: none; min-height: 24px; background: #fefce8; }
-              @media print { img { max-width: 150px !important; max-height: 80px !important; } }
+              .letterhead { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e5e7eb; }
+              .letterhead-text { font-size: 11px; line-height: 1.4; }
+              .letterhead-text p { margin: 0; }
+              .letterhead-text .company-name { font-weight: bold; }
+              .letterhead-logo { max-width: 120px; max-height: 60px; object-fit: contain; }
+              @media print { 
+                img { max-width: 150px !important; max-height: 80px !important; } 
+                .header, .form-group label, .toolbar, .button-group { display: none !important; }
+                body { padding: 40px !important; background: white !important; }
+                .editor-container { border: none !important; }
+                .letter-content { border: none !important; padding: 0 !important; }
+                .print-letterhead { display: flex !important; }
+              }
+              .print-letterhead { display: none; }
             </style>
           </head>
           <body>
+            <div class="print-letterhead letterhead">
+              <div class="letterhead-text">
+                <p class="company-name">${letterheadSettings.companyName}</p>
+                <p>${letterheadSettings.addressLine1}</p>
+                <p>${letterheadSettings.addressLine2}</p>
+                <p>${letterheadSettings.phone}</p>
+              </div>
+              ${letterheadSettings.logoDataUrl ? `<img class="letterhead-logo" src="${letterheadSettings.logoDataUrl}" alt="Company Logo" />` : ''}
+            </div>
             <div class="header">
               <h2>${editingLetter ? "Edit Letter" : "Create Letter"}</h2>
             </div>
@@ -838,7 +875,7 @@ export function LettersTab() {
                   <div
                     className="prose prose-sm max-w-none"
                     dangerouslySetInnerHTML={{
-                      __html: letter.content || "<p class='text-muted-foreground italic'>No content</p>",
+                      __html: generateLetterheadHtml() + (letter.content || "<p class='text-muted-foreground italic'>No content</p>"),
                     }}
                   />
                 </div>

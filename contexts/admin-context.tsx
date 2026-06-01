@@ -68,6 +68,14 @@ interface CodeTables {
   payCodes: Code[]
 }
 
+interface LetterheadSettings {
+  companyName: string
+  addressLine1: string
+  addressLine2: string
+  phone: string
+  logoDataUrl: string | null
+}
+
 interface AdminContextType {
   caseTypes: CaseType[]
   addCaseType: (caseType: Omit<CaseType, "id">) => void
@@ -89,6 +97,8 @@ interface AdminContextType {
   stdPlans: STDPlan[]
   coverageRules: PotentialCoverageRule[]
   getSTDCoverageForLocation: (locationName: string, asOfDate: string) => { plan: STDPlan; rule: PotentialCoverageRule } | undefined
+  letterheadSettings: LetterheadSettings
+  updateLetterheadSettings: (settings: Partial<LetterheadSettings>) => void
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined)
@@ -1387,6 +1397,17 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const [caseManagers, setCaseManagers] = useState<CaseManager[]>(initialCaseManagers)
   const [locations, setLocations] = useState<Location[]>(initialLocations)
   const [codes, setCodes] = useState<CodeTables>(initialCodeTables)
+  const [letterheadSettings, setLetterheadSettings] = useState<LetterheadSettings>({
+    companyName: "OWENS CORNING WORLD HEADQUARTERS",
+    addressLine1: "ONE OWENS CORNING PARKWAY",
+    addressLine2: "TOLEDO, OHIO  43659",
+    phone: "419.248.8000",
+    logoDataUrl: null,
+  })
+
+  const updateLetterheadSettings = (settings: Partial<LetterheadSettings>) => {
+    setLetterheadSettings((prev) => ({ ...prev, ...settings }))
+  }
 
   const addCaseType = (caseType: Omit<CaseType, "id">) => {
     const newCaseType: CaseType = {
@@ -1524,6 +1545,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         stdPlans: initialSTDPlans,
         coverageRules: initialCoverageRules,
         getSTDCoverageForLocation,
+        letterheadSettings,
+        updateLetterheadSettings,
       }}
     >
       {children}
