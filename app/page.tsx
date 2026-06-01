@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { CasesDashboard } from "@/components/cases-dashboard"
 import { CaseManager } from "@/components/case-manager"
 import { CreateCaseWizard } from "@/components/create-case-wizard"
@@ -23,21 +23,33 @@ import { useEmployees } from "@/contexts/employees-context"
 import { Badge } from "@/components/ui/badge"
 import { isDebugMode, setDebugMode } from "@/lib/debug"
 
-export default function Page() {
+// Separate component that uses useSearchParams - must be wrapped in Suspense
+function SearchParamsHandler({ onViewChange }: { onViewChange: (view: "backlog" | null) => void }) {
   const searchParams = useSearchParams()
+  
+  useEffect(() => {
+    const view = searchParams.get("view")
+    if (view === "backlog") {
+      onViewChange("backlog")
+    }
+  }, [searchParams, onViewChange])
+  
+  return null
+}
+
+export default function Page() {
   const [activeView, setActiveView] = useState<"dashboard" | "case" | "create" | "admin" | "backlog">("dashboard")
   const [adminSection, setAdminSection] = useState<string>("work-status-report")
   const { users, currentUser, setCurrentUser } = useUser()
   const { employees } = useEmployees()
   const [debugEnabled, setDebugEnabled] = useState(false)
 
-  // Handle URL query param for view navigation
-  useEffect(() => {
-    const view = searchParams.get("view")
+  // Handle view change from URL params
+  const handleViewChange = (view: "backlog" | null) => {
     if (view === "backlog") {
       setActiveView("backlog")
     }
-  }, [searchParams])
+  }
 
   useEffect(() => {
     setDebugEnabled(isDebugMode())
@@ -71,6 +83,11 @@ export default function Page() {
 
   return (
     <div className="app-container min-h-screen bg-muted/30">
+      {/* Suspense wrapper for useSearchParams */}
+      <Suspense fallback={null}>
+        <SearchParamsHandler onViewChange={handleViewChange} />
+      </Suspense>
+      
       {/* Navigation Bar */}
       <div className="navbar border-b bg-card shadow-sm sticky top-0 z-50">
         <div className="container mx-auto px-2 sm:px-4 md:px-6">
