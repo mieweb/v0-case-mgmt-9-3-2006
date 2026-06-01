@@ -372,7 +372,10 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
     // Group selected todos by case
     const todosByCase = new Map<string, string[]>()
     selectedTodos.forEach((key) => {
-      const [caseNumber, todoId] = key.split("-")
+      // Key format is "caseNumber-todoId" - find last dash to split properly
+      const lastDashIndex = key.lastIndexOf("-")
+      const caseNumber = key.substring(0, lastDashIndex)
+      const todoId = key.substring(lastDashIndex + 1)
       if (!todosByCase.has(caseNumber)) {
         todosByCase.set(caseNumber, [])
       }
@@ -419,7 +422,10 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
     // Group selected todos by case
     const todosByCase = new Map<string, string[]>()
     selectedTodos.forEach((key) => {
-      const [caseNumber, todoId] = key.split("-")
+      // Key format is "caseNumber-todoId" - find last dash to split properly
+      const lastDashIndex = key.lastIndexOf("-")
+      const caseNumber = key.substring(0, lastDashIndex)
+      const todoId = key.substring(lastDashIndex + 1)
       if (!todosByCase.has(caseNumber)) {
         todosByCase.set(caseNumber, [])
       }
@@ -455,7 +461,10 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
     // Group selected todos by case
     const todosByCase = new Map<string, string[]>()
     selectedTodos.forEach((key) => {
-      const [caseNumber, todoId] = key.split("-")
+      // Key format is "caseNumber-todoId" - find last dash to split properly
+      const lastDashIndex = key.lastIndexOf("-")
+      const caseNumber = key.substring(0, lastDashIndex)
+      const todoId = key.substring(lastDashIndex + 1)
       if (!todosByCase.has(caseNumber)) {
         todosByCase.set(caseNumber, [])
       }
