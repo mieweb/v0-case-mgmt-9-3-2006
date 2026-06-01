@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Upload, FileText, Pencil, Trash2, X, Check, Eye } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useAdmin } from "@/contexts/admin-context"
-import { useCases, type Document } from "@/contexts/cases-context"
+import { useCases, type Document, type TodoItem } from "@/contexts/cases-context"
 import {
   Dialog,
   DialogContent,
@@ -82,9 +82,30 @@ export function DocumentsTab() {
     
     const updatedDocuments = [...documents, newDocument]
     
+    // Check if an invoice document type was uploaded - create a todo to pay it
+    const isInvoice = documentType === "CM-INVOICE" || 
+                      documentType === "CM-A2K Invoice" || 
+                      documentType.toLowerCase().includes("invoice")
+    
+    let updatedTodos = currentCase.todos || []
+    
+    if (isInvoice) {
+      const invoiceTodo: TodoItem = {
+        id: `todo-invoice-${Date.now()}`,
+        activity: `Pay invoice: ${description || selectedFile?.name || documentType}`,
+        caseManager: currentCase.caseManager || "",
+        dateScheduled: new Date().toISOString().split("T")[0],
+        completed: false,
+      }
+      updatedTodos = [...updatedTodos, invoiceTodo]
+    }
+    
     updateCase(
       currentCase.caseNumber,
-      { documents: updatedDocuments },
+      { 
+        documents: updatedDocuments,
+        ...(isInvoice && { todos: updatedTodos })
+      },
       {
         action: "added",
         field: "document",
