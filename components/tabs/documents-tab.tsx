@@ -196,10 +196,24 @@ export function DocumentsTab() {
           const mammoth = await import('mammoth')
           const base64Data = doc.fileDataUrl.split('base64,')[1]
           const arrayBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)).buffer
-          const result = await mammoth.convertToHtml({ arrayBuffer })
+          
+          // Convert with options to include headers/footers and embedded images
+          const result = await mammoth.convertToHtml({ 
+            arrayBuffer,
+          }, {
+            includeDefaultStyleMap: true,
+            convertImage: mammoth.images.imgElement(async (image) => {
+              const imageBuffer = await image.read("base64")
+              return {
+                src: `data:${image.contentType};base64,${imageBuffer}`
+              }
+            })
+          })
           
           const newWindow = window.open()
           if (newWindow) {
+            // Note: mammoth.js cannot extract Word headers/footers - they are not included in conversion
+            // Headers/footers must be part of the document body or document should be uploaded as PDF
             newWindow.document.write(`
               <html>
                 <head>
@@ -209,9 +223,13 @@ export function DocumentsTab() {
                     img { max-width: 150px; max-height: 80px; width: auto; height: auto; }
                     table { border-collapse: collapse; width: 100%; }
                     td, th { border: 1px solid #ddd; padding: 8px; }
+                    .notice { background: #fef3c7; border: 1px solid #f59e0b; padding: 10px; margin-bottom: 20px; border-radius: 4px; font-size: 12px; color: #92400e; }
                   </style>
                 </head>
-                <body>${result.value}</body>
+                <body>
+                  <div class="notice">Note: Word document headers and footers cannot be displayed in this preview. For full fidelity, please upload documents as PDF.</div>
+                  ${result.value}
+                </body>
               </html>
             `)
             newWindow.document.close()
