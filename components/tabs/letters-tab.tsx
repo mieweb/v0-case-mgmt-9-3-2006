@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Pencil, Trash2, List, LayoutList, Paperclip, X, FileText, Send } from "lucide-react"
+import { Plus, Pencil, Trash2, List, LayoutList, Paperclip, X, FileText, Send, Eye } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RichTextEditor } from "@/components/rich-text-editor"
 import { useCases, type TodoItem } from "@/contexts/cases-context"
@@ -392,6 +392,89 @@ export function LettersTab() {
         description: `Marked letter "${letter.letterType || "Untitled"}" as sent`,
       }
     )
+  }
+
+  const handlePreviewLetter = (letter: Letter) => {
+    const previewWindow = window.open("", "_blank", "width=850,height=1000")
+    if (previewWindow) {
+      previewWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Letter Preview - ${letter.letterType || "Untitled"}</title>
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body { 
+                font-family: 'Times New Roman', Times, serif; 
+                padding: 60px; 
+                max-width: 8.5in; 
+                margin: 0 auto; 
+                background: #f5f5f5;
+              }
+              .page {
+                background: white;
+                padding: 60px;
+                min-height: 11in;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+              }
+              .letterhead {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 40px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #e0e0e0;
+              }
+              .letterhead-text {
+                font-size: 11px;
+                line-height: 1.5;
+                font-family: Arial, sans-serif;
+              }
+              .letterhead-text .company-name {
+                font-weight: bold;
+              }
+              .letterhead-logo {
+                max-width: 150px;
+                max-height: 80px;
+                object-fit: contain;
+              }
+              .letter-content {
+                font-size: 12pt;
+                line-height: 1.6;
+              }
+              .letter-content p { margin-bottom: 12px; }
+              .letter-content blockquote {
+                margin: 16px 0 16px 24px;
+                padding-left: 16px;
+                border-left: 3px solid #ccc;
+                font-style: italic;
+              }
+              @media print {
+                body { background: white; padding: 0; }
+                .page { box-shadow: none; padding: 40px; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="page">
+              <div class="letterhead">
+                <div class="letterhead-text">
+                  <p class="company-name">${letterheadSettings.companyName}</p>
+                  <p>${letterheadSettings.addressLine1}</p>
+                  <p>${letterheadSettings.addressLine2}</p>
+                  <p>${letterheadSettings.phone}</p>
+                </div>
+                ${letterheadSettings.logoDataUrl ? `<img class="letterhead-logo" src="${letterheadSettings.logoDataUrl}" alt="Company Logo" />` : ''}
+              </div>
+              <div class="letter-content">
+                ${letter.content || '<p style="color: #999; font-style: italic;">No content</p>'}
+              </div>
+            </div>
+          </body>
+        </html>
+      `)
+      previewWindow.document.close()
+    }
   }
 
   const handleOpenInNewWindow = () => {
@@ -804,6 +887,9 @@ export function LettersTab() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="sm" onClick={() => handlePreviewLetter(letter)} title="Preview Letter">
+                          <Eye className="h-4 w-4" />
+                        </Button>
                         {letter.status !== "Sent" && (
                           <Button variant="ghost" size="sm" onClick={() => handleMarkAsSent(letter.id)} title="Mark as Sent">
                             <Send className="h-4 w-4" />
@@ -853,6 +939,10 @@ export function LettersTab() {
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => handlePreviewLetter(letter)}>
+                      <Eye className="h-4 w-4 mr-1" />
+                      Preview
+                    </Button>
                     {letter.status !== "Sent" && (
                       <Button variant="outline" size="sm" onClick={() => handleMarkAsSent(letter.id)}>
                         <Send className="h-4 w-4 mr-1" />
