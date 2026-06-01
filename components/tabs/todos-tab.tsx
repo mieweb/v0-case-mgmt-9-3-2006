@@ -304,14 +304,21 @@ export function TodosTab() {
     setCompletionNote("")
   }
 
-  const filteredTodos = todos.filter((todo) => {
-    // Filter by active status (completed vs not completed)
-    if (filterActive === "active" && todo.completed) return false
-    if (filterActive === "inactive" && !todo.completed) return false
+  const filteredTodos = todos
+    .filter((todo) => {
+      // Filter by active status (completed vs not completed)
+      if (filterActive === "active" && todo.completed) return false
+      if (filterActive === "inactive" && !todo.completed) return false
 
-    // Filter by case (todos don't have caseNumber yet, future enhancement)
-    return true
-  })
+      // Filter by case (todos don't have caseNumber yet, future enhancement)
+      return true
+    })
+    .sort((a, b) => {
+      // Sort by dateScheduled (oldest first)
+      const dateA = a.dateScheduled ? new Date(a.dateScheduled).getTime() : 0
+      const dateB = b.dateScheduled ? new Date(b.dateScheduled).getTime() : 0
+      return dateA - dateB
+    })
 
   // Toggle single todo selection
   const toggleTodoSelection = (todoId: string) => {

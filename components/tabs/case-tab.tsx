@@ -79,7 +79,6 @@ export function CaseTab() {
 
   const [status, setStatus] = useState("")
   const [caseType, setCaseType] = useState("Non-occupational injury / illness")
-  const [caseSeverity, setCaseSeverity] = useState("")
   const [caseManager, setCaseManager] = useState(currentCase?.caseManager || "Unassigned")
   const [dateOfDisability, setDateOfDisability] = useState("")
   const [caseIncidentDate, setCaseIncidentDate] = useState("")
@@ -206,7 +205,6 @@ export function CaseTab() {
     if (currentCase) {
       setStatus(currentCase.status || "Open")
       setCaseType(currentCase.caseType || "Non-occupational injury / illness")
-      setCaseSeverity(currentCase.caseSeverity || "")
       setCaseManager(currentCase.caseManager || "Unassigned")
       setIsConfidential(currentCase.confidential || false)
       setDateOfDisability(currentCase.dateOfDisability || "")
@@ -502,21 +500,6 @@ export function CaseTab() {
                   })}
               </SelectContent>
             </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="case-severity" className="text-sm text-muted-foreground">
-              Case severity
-            </Label>
-            <Input
-              id="case-severity"
-              placeholder="Enter case severity..."
-              className="bg-background"
-              value={caseSeverity}
-              onChange={(e) => {
-                setCaseSeverity(e.target.value)
-                handleFieldUpdate("caseSeverity", e.target.value)
-              }}
-            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="case-manager" className="text-sm text-muted-foreground">

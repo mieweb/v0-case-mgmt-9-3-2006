@@ -74,9 +74,20 @@ export function PayInformationTab() {
   const calculateFicaDate = (): string => {
     if (!currentCase?.dateOfDisability) return "—"
     
-    // Parse MM/DD/YYYY
-    const [month, day, year] = currentCase.dateOfDisability.split('/')
-    const disabilityDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+    let disabilityDate: Date
+    
+    // Handle both YYYY-MM-DD (from date input) and MM/DD/YYYY formats
+    if (currentCase.dateOfDisability.includes('-')) {
+      // YYYY-MM-DD format
+      disabilityDate = new Date(currentCase.dateOfDisability + 'T00:00:00')
+    } else if (currentCase.dateOfDisability.includes('/')) {
+      // MM/DD/YYYY format
+      const [month, day, year] = currentCase.dateOfDisability.split('/')
+      disabilityDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+    } else {
+      return "—"
+    }
+    
     if (isNaN(disabilityDate.getTime())) return "—"
 
     const sixMonthsLater = new Date(disabilityDate)

@@ -238,23 +238,6 @@ export function LettersTab() {
       }
       newTodos.push(letterTodo)
       
-      // Create a TODO for each attachment item type that needs to be added
-      if (selectedAttachmentTypes.length > 0) {
-        const attachmentLabels = selectedAttachmentTypes
-          .map((typeId) => ATTACHMENT_ITEM_TYPES.find((t) => t.id === typeId)?.label || typeId)
-          .join(", ")
-        
-        const attachmentTodo: TodoItem = {
-          id: `todo-attachment-${Date.now()}`,
-          activity: `Attach files to letter "${templateName}": ${attachmentLabels}`,
-          caseManager: getCaseManagerLeader(),
-          dateScheduled: new Date().toISOString().split("T")[0],
-          completed: false,
-          linkedLetterId: letterId,
-        }
-        newTodos.push(attachmentTodo)
-      }
-      
       const updatedTodos = [...(currentCase.todos || []), ...newTodos]
       
       updateCase(
