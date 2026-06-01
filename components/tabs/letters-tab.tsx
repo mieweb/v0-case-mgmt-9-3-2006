@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Pencil, Trash2, List, LayoutList, Paperclip, X, FileText } from "lucide-react"
+import { Plus, Pencil, Trash2, List, LayoutList, Paperclip, X, FileText, Send } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RichTextEditor } from "@/components/rich-text-editor"
 import { useCases, type TodoItem } from "@/contexts/cases-context"
@@ -336,6 +336,47 @@ export function LettersTab() {
         },
       )
     }
+  }
+
+  const handleMarkAsSent = (letterId: string) => {
+    if (!currentCase) return
+    
+    const letter = letters.find((l) => l.id === letterId)
+    if (!letter) return
+    
+    const now = new Date().toISOString()
+    
+    // Update letter status to Sent
+    setLetters((prev) =>
+      prev.map((l) =>
+        l.id === letterId
+          ? { ...l, status: "Sent" as const, sentDate: now }
+          : l
+      )
+    )
+    
+    // Find and complete the linked todo for this letter
+    const updatedTodos = (currentCase.todos || []).map((todo) => {
+      if (todo.linkedLetterId === letterId && !todo.completed) {
+        return {
+          ...todo,
+          completed: true,
+          dateClosed: new Date().toISOString().split("T")[0],
+        }
+      }
+      return todo
+    })
+    
+    updateCase(
+      currentCase.caseNumber,
+      { todos: updatedTodos },
+      {
+        action: "updated",
+        field: "letter",
+        newValue: "Sent",
+        description: `Marked letter "${letter.letterType || "Untitled"}" as sent`,
+      }
+    )
   }
 
   const handleOpenInNewWindow = () => {
@@ -726,6 +767,11 @@ export function LettersTab() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
+                        {letter.status !== "Sent" && (
+                          <Button variant="ghost" size="sm" onClick={() => handleMarkAsSent(letter.id)} title="Mark as Sent">
+                            <Send className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button variant="ghost" size="sm" onClick={() => handleEditLetter(letter)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
@@ -770,6 +816,12 @@ export function LettersTab() {
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    {letter.status !== "Sent" && (
+                      <Button variant="outline" size="sm" onClick={() => handleMarkAsSent(letter.id)}>
+                        <Send className="h-4 w-4 mr-1" />
+                        Mark as Sent
+                      </Button>
+                    )}
                     <Button variant="outline" size="sm" onClick={() => handleEditLetter(letter)}>
                       <Pencil className="h-4 w-4 mr-1" />
                       Edit
