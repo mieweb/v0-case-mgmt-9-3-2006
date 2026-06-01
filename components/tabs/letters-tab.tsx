@@ -375,6 +375,7 @@ export function LettersTab() {
                 box-sizing: border-box;
               }
               .letter-content:focus { outline: none; }
+              .letter-content img { max-width: 150px; max-height: 80px; width: auto; height: auto; }
               .button-group { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
               button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
               .btn-primary { background: #1e40af; color: white; }
@@ -383,6 +384,7 @@ export function LettersTab() {
               .btn-secondary:hover { background: #4b5563; }
               .mic-icon { width: 16px; height: 16px; }
               #interimText { padding: 10px 15px; color: #6b7280; font-style: italic; border-top: 1px dashed #e5e7eb; display: none; min-height: 24px; background: #fefce8; }
+              @media print { img { max-width: 150px !important; max-height: 80px !important; } }
             </style>
           </head>
           <body>

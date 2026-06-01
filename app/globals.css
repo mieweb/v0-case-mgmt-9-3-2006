@@ -95,3 +95,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Letter content image constraints - prevent logos from being too large */
+.letter-content img,
+.prose img {
+  max-width: 150px;
+  max-height: 80px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
