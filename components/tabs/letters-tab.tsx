@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Pencil, Trash2, List, LayoutList, Paperclip, X, FileText, Send, Eye } from "lucide-react"
+import { Plus, Pencil, Trash2, List, LayoutList, Paperclip, X, FileText, Send } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RichTextEditor } from "@/components/rich-text-editor"
 import { useCases, type TodoItem } from "@/contexts/cases-context"
@@ -69,24 +69,9 @@ interface Letter {
 
 export function LettersTab() {
   const { currentCase, updateCase } = useCases()
-  const { codes, addCode, caseManagers, letterheadSettings } = useAdmin()
+  const { codes, addCode, caseManagers } = useAdmin()
   const { employees } = useEmployees()
   const letterTemplates = codes.letterTemplates
-
-  // Generate letterhead HTML
-  const generateLetterheadHtml = () => {
-    return `
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e5e7eb;">
-        <div style="font-size: 11px; line-height: 1.4;">
-          <p style="margin: 0; font-weight: bold;">${letterheadSettings.companyName}</p>
-          <p style="margin: 0;">${letterheadSettings.addressLine1}</p>
-          <p style="margin: 0;">${letterheadSettings.addressLine2}</p>
-          <p style="margin: 0;">${letterheadSettings.phone}</p>
-        </div>
-        ${letterheadSettings.logoDataUrl ? `<img src="${letterheadSettings.logoDataUrl}" alt="Company Logo" style="max-width: 120px; max-height: 60px; object-fit: contain;" />` : ''}
-      </div>
-    `
-  }
 
   // Find a Case Manager Leader to assign the todo
   const getCaseManagerLeader = () => {
@@ -394,89 +379,6 @@ export function LettersTab() {
     )
   }
 
-  const handlePreviewLetter = (letter: Letter) => {
-    const previewWindow = window.open("", "_blank", "width=850,height=1000")
-    if (previewWindow) {
-      previewWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Letter Preview - ${letter.letterType || "Untitled"}</title>
-            <style>
-              * { margin: 0; padding: 0; box-sizing: border-box; }
-              body { 
-                font-family: 'Times New Roman', Times, serif; 
-                padding: 60px; 
-                max-width: 8.5in; 
-                margin: 0 auto; 
-                background: #f5f5f5;
-              }
-              .page {
-                background: white;
-                padding: 60px;
-                min-height: 11in;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-              }
-              .letterhead {
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
-                margin-bottom: 40px;
-                padding-bottom: 20px;
-                border-bottom: 1px solid #e0e0e0;
-              }
-              .letterhead-text {
-                font-size: 11px;
-                line-height: 1.5;
-                font-family: Arial, sans-serif;
-              }
-              .letterhead-text .company-name {
-                font-weight: bold;
-              }
-              .letterhead-logo {
-                max-width: 150px;
-                max-height: 80px;
-                object-fit: contain;
-              }
-              .letter-content {
-                font-size: 12pt;
-                line-height: 1.6;
-              }
-              .letter-content p { margin-bottom: 12px; }
-              .letter-content blockquote {
-                margin: 16px 0 16px 24px;
-                padding-left: 16px;
-                border-left: 3px solid #ccc;
-                font-style: italic;
-              }
-              @media print {
-                body { background: white; padding: 0; }
-                .page { box-shadow: none; padding: 40px; }
-              }
-            </style>
-          </head>
-          <body>
-            <div class="page">
-              <div class="letterhead">
-                <div class="letterhead-text">
-                  <p class="company-name">${letterheadSettings.companyName}</p>
-                  <p>${letterheadSettings.addressLine1}</p>
-                  <p>${letterheadSettings.addressLine2}</p>
-                  <p>${letterheadSettings.phone}</p>
-                </div>
-                ${letterheadSettings.logoDataUrl ? `<img class="letterhead-logo" src="${letterheadSettings.logoDataUrl}" alt="Company Logo" />` : ''}
-              </div>
-              <div class="letter-content">
-                ${letter.content || '<p style="color: #999; font-style: italic;">No content</p>'}
-              </div>
-            </div>
-          </body>
-        </html>
-      `)
-      previewWindow.document.close()
-    }
-  }
-
   const handleOpenInNewWindow = () => {
     const newWindow = window.open("", "_blank", "width=900,height=700")
     if (newWindow) {
@@ -523,32 +425,10 @@ export function LettersTab() {
               .btn-secondary:hover { background: #4b5563; }
               .mic-icon { width: 16px; height: 16px; }
               #interimText { padding: 10px 15px; color: #6b7280; font-style: italic; border-top: 1px dashed #e5e7eb; display: none; min-height: 24px; background: #fefce8; }
-              .letterhead { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e5e7eb; }
-              .letterhead-text { font-size: 11px; line-height: 1.4; }
-              .letterhead-text p { margin: 0; }
-              .letterhead-text .company-name { font-weight: bold; }
-              .letterhead-logo { max-width: 120px; max-height: 60px; object-fit: contain; }
-              @media print { 
-                img { max-width: 150px !important; max-height: 80px !important; } 
-                .header, .form-group label, .toolbar, .button-group { display: none !important; }
-                body { padding: 40px !important; background: white !important; }
-                .editor-container { border: none !important; }
-                .letter-content { border: none !important; padding: 0 !important; }
-                .print-letterhead { display: flex !important; }
-              }
-              .print-letterhead { display: none; }
+              @media print { img { max-width: 150px !important; max-height: 80px !important; } }
             </style>
           </head>
           <body>
-            <div class="print-letterhead letterhead">
-              <div class="letterhead-text">
-                <p class="company-name">${letterheadSettings.companyName}</p>
-                <p>${letterheadSettings.addressLine1}</p>
-                <p>${letterheadSettings.addressLine2}</p>
-                <p>${letterheadSettings.phone}</p>
-              </div>
-              ${letterheadSettings.logoDataUrl ? `<img class="letterhead-logo" src="${letterheadSettings.logoDataUrl}" alt="Company Logo" />` : ''}
-            </div>
             <div class="header">
               <h2>${editingLetter ? "Edit Letter" : "Create Letter"}</h2>
             </div>
@@ -887,9 +767,6 @@ export function LettersTab() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => handlePreviewLetter(letter)} title="Preview Letter">
-                          <Eye className="h-4 w-4" />
-                        </Button>
                         {letter.status !== "Sent" && (
                           <Button variant="ghost" size="sm" onClick={() => handleMarkAsSent(letter.id)} title="Mark as Sent">
                             <Send className="h-4 w-4" />
@@ -939,10 +816,6 @@ export function LettersTab() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handlePreviewLetter(letter)}>
-                      <Eye className="h-4 w-4 mr-1" />
-                      Preview
-                    </Button>
                     {letter.status !== "Sent" && (
                       <Button variant="outline" size="sm" onClick={() => handleMarkAsSent(letter.id)}>
                         <Send className="h-4 w-4 mr-1" />
@@ -965,7 +838,7 @@ export function LettersTab() {
                   <div
                     className="prose prose-sm max-w-none"
                     dangerouslySetInnerHTML={{
-                      __html: generateLetterheadHtml() + (letter.content || "<p class='text-muted-foreground italic'>No content</p>"),
+                      __html: letter.content || "<p class='text-muted-foreground italic'>No content</p>",
                     }}
                   />
                 </div>
@@ -1039,29 +912,11 @@ export function LettersTab() {
 
           <div className="space-y-1">
             <Label className="text-xs">Letter Content</Label>
-            {/* Letterhead Preview */}
-            <div className="border rounded-t-md bg-white p-4">
-              <div className="flex justify-between items-start">
-                <div className="text-[10px] leading-tight text-gray-700">
-                  <p className="font-bold">{letterheadSettings.companyName}</p>
-                  <p>{letterheadSettings.addressLine1}</p>
-                  <p>{letterheadSettings.addressLine2}</p>
-                  <p>{letterheadSettings.phone}</p>
-                </div>
-                {letterheadSettings.logoDataUrl && (
-                  <img
-                    src={letterheadSettings.logoDataUrl}
-                    alt="Company Logo"
-                    className="max-w-[100px] max-h-[50px] object-contain"
-                  />
-                )}
-              </div>
-            </div>
             <RichTextEditor
               value={content}
               onChange={setContent}
               placeholder="Type your letter content here or select a template..."
-              className="phi-data rounded-t-none border-t-0"
+              className="phi-data"
             />
           </div>
 
