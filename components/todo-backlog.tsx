@@ -412,6 +412,41 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
     setBulkCompleted("")
   }
 
+  // Mark selected todos as complete (quick action)
+  const markSelectedComplete = () => {
+    if (selectedTodos.size === 0) return
+
+    // Group selected todos by case
+    const todosByCase = new Map<string, string[]>()
+    selectedTodos.forEach((key) => {
+      const [caseNumber, todoId] = key.split("-")
+      if (!todosByCase.has(caseNumber)) {
+        todosByCase.set(caseNumber, [])
+      }
+      todosByCase.get(caseNumber)!.push(todoId)
+    })
+
+    // Update each case
+    todosByCase.forEach((todoIds, caseNumber) => {
+      const caseData = cases.find((c) => c.caseNumber === caseNumber)
+      if (!caseData) return
+
+      const updatedTodos = caseData.todos.map((todo) => {
+        if (!todoIds.includes(todo.id)) return todo
+        return {
+          ...todo,
+          completed: true,
+          dateClosed: new Date().toISOString().split("T")[0]
+        }
+      })
+
+      updateCase(caseNumber, { todos: updatedTodos })
+    })
+
+    // Reset selection
+    setSelectedTodos(new Set())
+  }
+
   // Bulk delete selected todos
   const bulkDeleteTodos = () => {
     if (selectedTodos.size === 0) return
@@ -709,6 +744,10 @@ export function TodoBacklog({ onBack, onViewCase }: TodoBacklogProps) {
               
               {!bulkEditMode ? (
                 <>
+                  <Button size="sm" variant="default" onClick={markSelectedComplete}>
+                    <CheckCircle2 className="h-4 w-4 mr-2" />
+                    Mark Complete
+                  </Button>
                   <Button size="sm" variant="outline" onClick={() => setBulkEditMode(true)}>
                     <Edit2 className="h-4 w-4 mr-2" />
                     Edit Selected
