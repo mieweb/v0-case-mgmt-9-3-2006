@@ -1,0 +1,900 @@
+================================================================================
+PAY INFORMATION TAB - CODE & FUNCTIONAL DOCUMENTATION
+File: components/tabs/pay-information-tab.tsx
+================================================================================
+
+--------------------------------------------------------------------------------
+1. OVERVIEW
+--------------------------------------------------------------------------------
+The Pay Information Tab displays and manages an employee's job assignments and
+compensation for a case. It is a fully client-side component ("use client") that
+reads from and writes to the Cases context. It has five main sections:
+
+  1. Current Position summary card
+  2. Current Compensation summary card (includes calculated FICA Date)
+  3. Job Assignment History table (add / edit / delete)
+  4. Pay Rate History table (add / edit / delete)
+  5. STD Coverage Lookup (read-only, date-driven)
+
+Two modal dialogs power the add/edit flows: one for Job Assignments and one for
+Pay Rates.
+
+--------------------------------------------------------------------------------
+2. DATA MODEL (defined in contexts/cases-context.tsx)
+--------------------------------------------------------------------------------
+
+interface JobAssignment {
+  id: string
+  effectiveDate: string      // MM/DD/YYYY
+  endDate?: string           // MM/DD/YYYY, undefined if current
+  jobTitle: string
+  jobCode?: string
+  locationId: string
+  locationName: string       // Denormalized for display
+  managerWorkerId?: string
+  managerName?: string       // Denormalized for display
+}
+
+interface CompensationRate {
+  id: string
+  effectiveDate: string      // MM/DD/YYYY
+  endDate?: string           // MM/DD/YYYY, undefined if current
+  rateAmount: number
+  currency: string           // "USD" default
+  unit: "hourly" | "weekly" | "monthly" | "annual"
+  payCode?: string
+}
+
+Both histories live on the Case object as:
+  - currentCase.jobHistory: JobAssignment[]
+  - currentCase.compensationHistory: CompensationRate[]
+
+--------------------------------------------------------------------------------
+3. HOW "CURRENT" RECORDS ARE DERIVED
+--------------------------------------------------------------------------------
+The tab does NOT store a separate "current job/pay" field. Instead it derives
+the current record from history using helper functions:
+
+getCurrentJob(caseData, asOfDate?)   -> JobAssignment | undefined
+getCurrentPay(caseData, asOfDate?)   -> CompensationRate | undefined
+
+Logic for both (from cases-context.tsx):
+  1. If no history, return undefined.
+  2. targetDate = asOfDate if provided, otherwise today's date.
+  3. Sort history by effectiveDate DESCENDING (newest first).
+  4. Return the first record where:
+        effectiveDate <= targetDate  AND  (no endDate OR endDate > targetDate)
+
+This means the "current" record is the most recent entry whose date range
+contains today. If two records overlap, the one with the latest effective date
+wins.
+
+--------------------------------------------------------------------------------
+4. SECTION-BY-SECTION BEHAVIOR
+--------------------------------------------------------------------------------
+
+4.1 CURRENT POSITION CARD
+  - Shows Job Title, Location, Manager, Effective Date from getCurrentJob().
+  - If no job assignment exists, shows: "No job assignment found. Add one below."
+
+4.2 CURRENT COMPENSATION CARD
+  - Shows Rate (formatted currency + unit), Effective Date, Pay Code, FICA Date.
+  - Rate is formatted via formatCurrency() -> e.g. "$25.00/hr".
+  - FICA Date is computed by calculateFicaDate() (see section 5).
+  - If no compensation exists, shows: "No compensation found. Add one below."
+
+4.3 JOB ASSIGNMENT HISTORY TABLE
+  - Columns: Effective Date, End Date, Job Title, Location, Manager, Actions.
+  - Rows are sorted by effective date DESCENDING (sortedJobHistory).
+  - "Add Entry" button opens the Job dialog in add mode.
+  - Each row has Edit (pencil) and Delete (trash) icon buttons.
+  - Empty state: "No job history entries. Click 'Add Entry' to create one."
+
+4.4 PAY RATE HISTORY TABLE
+  - Columns: Effective Date, End Date, Rate, Unit, Pay Code, Actions.
+  - Rows are sorted by effective date DESCENDING (sortedPayHistory).
+  - Rate shown as plain USD currency; Unit shown capitalized.
+  - "Add Entry" opens the Pay dialog in add mode; rows have Edit/Delete.
+  - Empty state: "No pay history entries. Click 'Add Entry' to create one."
+
+4.5 STD COVERAGE LOOKUP
+  - An "As-of Date" text input (MM/DD/YYYY) defaults to the case's
+    dateOfDisability via a useEffect on mount.
+  - Location used for the lookup = current job location, else the case's
+    employeeLocation, else "Unknown".
+  - Whenever the date (or job/location) changes, a useEffect calls
+    getSTDCoverageForLocation(location, date) from the Admin context.
+  - If coverage is found, a table shows: Plan Code, Plan Name, Benefit %,
+    Waiting Period (days), Max Duration (weeks).
+  - If a date is entered but no plan matches, an amber warning box appears:
+    "No STD coverage found for this location and date combination."
+  - If no date is entered, nothing is shown.
+
+--------------------------------------------------------------------------------
+5. KEY CALCULATIONS & HELPERS
+--------------------------------------------------------------------------------
+
+5.1 calculateFicaDate()
+  Purpose: Compute the FICA date from the case's date of disability.
+  Steps:
+    1. If no dateOfDisability, return "—".
+    2. Parse the date, supporting BOTH "YYYY-MM-DD" and "MM/DD/YYYY" formats.
+    3. If invalid, return "—".
+    4. Add 6 months to the disability date.
+    5. Add 1 more month and set the day to the 1st.
+    6. Return formatted as MM/DD/YYYY.
+  Net effect: FICA Date = the 1st day of the 7th month following the date of
+  disability. (The day-of-month of the disability date does not affect the
+  result because step 5 snaps to the 1st.)
+  Example: Disability 01/15/2026 -> +6mo = 07/15/2026 -> next month day 1
+           -> 08/01/2026.
+
+5.2 formatCurrency(amount, unit)
+  - Formats a number as USD via Intl.NumberFormat.
+  - Appends a unit suffix: hourly "/hr", weekly "/wk", monthly "/mo",
+    annual "/yr".
+
+5.3 Sorting (sortedJobHistory / sortedPayHistory)
+  - Copies the history array and sorts by effectiveDate descending so the newest
+    entries appear at the top of each table.
+
+--------------------------------------------------------------------------------
+6. STATE MANAGEMENT
+--------------------------------------------------------------------------------
+Dialog visibility & edit tracking:
+  - showJobDialog / showPayDialog  : booleans controlling the two dialogs.
+  - editingJobId / editingPayId    : the id being edited, or null for "add" mode.
+
+STD lookup:
+  - stdLookupDate : the as-of date string.
+  - stdCoverage   : the resolved plan+rule object, or undefined.
+
+Form state:
+  - jobForm : { effectiveDate, endDate, jobTitle, jobCode, locationId,
+               locationName, managerName }
+  - payForm : { effectiveDate, endDate, rateAmount, unit, payCode }
+
+Reset helpers (resetJobForm / resetPayForm) clear the form and the editing id.
+
+--------------------------------------------------------------------------------
+7. ADD / EDIT / DELETE FLOWS
+--------------------------------------------------------------------------------
+
+JOBS
+  handleAddJob()    : resets form, opens dialog (add mode).
+  handleEditJob(job): loads job into form, sets editingJobId, opens dialog.
+  handleSaveJob()   : validates required fields (effectiveDate, jobTitle,
+                      locationName). If editing, maps over jobHistory and
+                      replaces the matching entry; otherwise creates a new
+                      JobAssignment with id `job-<timestamp>` and appends it.
+                      Persists via updateCase(caseNumber, { jobHistory }).
+  handleDeleteJob(id): filters the entry out of jobHistory and persists.
+
+PAY
+  handleAddPay()    : resets form, opens dialog (add mode).
+  handleEditPay(pay): loads pay into form, sets editingPayId, opens dialog.
+  handleSavePay()   : validates required fields (effectiveDate, rateAmount).
+                      rateAmount is parsed to a float. If editing, replaces the
+                      matching compensation entry; otherwise creates a new
+                      CompensationRate with id `pay-<timestamp>`,
+                      currency "USD", and appends it. Persists via
+                      updateCase(caseNumber, { compensationHistory }).
+  handleDeletePay(id): filters the entry out of compensationHistory and persists.
+
+VALIDATION NOTES
+  - Job dialog Save button is disabled unless effectiveDate, jobTitle and
+    locationName are filled.
+  - Pay dialog Save button is disabled unless effectiveDate and rateAmount are
+    filled.
+  - Rate input sanitizes keystrokes: strips non-numeric characters, allows a
+    single decimal point, and limits to 2 decimal places.
+
+--------------------------------------------------------------------------------
+8. DEPENDENCIES / INTEGRATION POINTS
+--------------------------------------------------------------------------------
+  - useCases()  -> currentCase, updateCase (read/write the case data).
+  - useAdmin()  -> locations (for the Location dropdown),
+                   getSTDCoverageForLocation (STD plan lookup).
+  - getCurrentJob / getCurrentPay -> derive current records from history.
+  - UI: shadcn/ui components (Card, Table, Dialog, Select, Input, Button, Label)
+    and lucide-react icons (Pencil, Plus, Trash2, DollarSign, Briefcase, Shield,
+    Calendar).
+
+================================================================================
+9. FULL SOURCE CODE
+================================================================================
+
+"use client"
+
+import { useState, useEffect } from "react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Pencil, Plus, Trash2, DollarSign, Briefcase, Shield, Calendar } from 'lucide-react'
+import { useCases, JobAssignment, CompensationRate, getCurrentJob, getCurrentPay } from "@/contexts/cases-context"
+import { useAdmin } from "@/contexts/admin-context"
+
+export function PayInformationTab() {
+  const { currentCase, updateCase } = useCases()
+  const { locations, getSTDCoverageForLocation } = useAdmin()
+
+  // Current job and pay (derived from history)
+  const currentJob = currentCase ? getCurrentJob(currentCase) : undefined
+  const currentPay = currentCase ? getCurrentPay(currentCase) : undefined
+
+  // Dialog states
+  const [showJobDialog, setShowJobDialog] = useState(false)
+  const [showPayDialog, setShowPayDialog] = useState(false)
+  const [editingJobId, setEditingJobId] = useState<string | null>(null)
+  const [editingPayId, setEditingPayId] = useState<string | null>(null)
+
+  // STD Coverage lookup
+  const [stdLookupDate, setStdLookupDate] = useState("")
+  const [stdCoverage, setStdCoverage] = useState<{ plan: { planCode: string; planName: string; benefitPercentage: number; waitingPeriod: number; maxDuration: number }; rule: { effectiveDate: string } } | undefined>(undefined)
+
+  // Job form state
+  const [jobForm, setJobForm] = useState({
+    effectiveDate: "",
+    endDate: "",
+    jobTitle: "",
+    jobCode: "",
+    locationId: "",
+    locationName: "",
+    managerName: ""
+  })
+
+  // Pay form state
+  const [payForm, setPayForm] = useState({
+    effectiveDate: "",
+    endDate: "",
+    rateAmount: "",
+    unit: "hourly" as "hourly" | "weekly" | "monthly" | "annual",
+    payCode: ""
+  })
+
+  // Initialize STD lookup date from date of disability
+  useEffect(() => {
+    if (currentCase?.dateOfDisability && !stdLookupDate) {
+      setStdLookupDate(currentCase.dateOfDisability)
+    }
+  }, [currentCase?.dateOfDisability, stdLookupDate])
+
+  // Lookup STD coverage when date changes
+  useEffect(() => {
+    if (stdLookupDate && currentJob) {
+      const coverage = getSTDCoverageForLocation(currentJob.locationName, stdLookupDate)
+      setStdCoverage(coverage)
+    } else if (stdLookupDate && currentCase?.employeeLocation) {
+      const coverage = getSTDCoverageForLocation(currentCase.employeeLocation, stdLookupDate)
+      setStdCoverage(coverage)
+    } else {
+      setStdCoverage(undefined)
+    }
+  }, [stdLookupDate, currentJob, currentCase?.employeeLocation, getSTDCoverageForLocation])
+
+  // Calculate FICA date (date of disability + 6 months + first day of next month)
+  const calculateFicaDate = (): string => {
+    if (!currentCase?.dateOfDisability) return "—"
+
+    let disabilityDate: Date
+
+    // Handle both YYYY-MM-DD (from date input) and MM/DD/YYYY formats
+    if (currentCase.dateOfDisability.includes('-')) {
+      // YYYY-MM-DD format
+      disabilityDate = new Date(currentCase.dateOfDisability + 'T00:00:00')
+    } else if (currentCase.dateOfDisability.includes('/')) {
+      // MM/DD/YYYY format
+      const [month, day, year] = currentCase.dateOfDisability.split('/')
+      disabilityDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+    } else {
+      return "—"
+    }
+
+    if (isNaN(disabilityDate.getTime())) return "—"
+
+    const sixMonthsLater = new Date(disabilityDate)
+    sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6)
+
+    const nextMonth = new Date(sixMonthsLater)
+    nextMonth.setMonth(nextMonth.getMonth() + 1)
+    nextMonth.setDate(1)
+
+    return `${String(nextMonth.getMonth() + 1).padStart(2, '0')}/${String(nextMonth.getDate()).padStart(2, '0')}/${nextMonth.getFullYear()}`
+  }
+
+  // Format currency
+  const formatCurrency = (amount: number, unit: string): string => {
+    const formatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount)
+    const unitLabel = unit === "hourly" ? "/hr" : unit === "weekly" ? "/wk" : unit === "monthly" ? "/mo" : "/yr"
+    return `${formatted}${unitLabel}`
+  }
+
+  // Reset job form
+  const resetJobForm = () => {
+    setJobForm({
+      effectiveDate: "",
+      endDate: "",
+      jobTitle: "",
+      jobCode: "",
+      locationId: "",
+      locationName: "",
+      managerName: ""
+    })
+    setEditingJobId(null)
+  }
+
+  // Reset pay form
+  const resetPayForm = () => {
+    setPayForm({
+      effectiveDate: "",
+      endDate: "",
+      rateAmount: "",
+      unit: "hourly",
+      payCode: ""
+    })
+    setEditingPayId(null)
+  }
+
+  // Handle job dialog open for add
+  const handleAddJob = () => {
+    resetJobForm()
+    setShowJobDialog(true)
+  }
+
+  // Handle job dialog open for edit
+  const handleEditJob = (job: JobAssignment) => {
+    setJobForm({
+      effectiveDate: job.effectiveDate,
+      endDate: job.endDate || "",
+      jobTitle: job.jobTitle,
+      jobCode: job.jobCode || "",
+      locationId: job.locationId,
+      locationName: job.locationName,
+      managerName: job.managerName || ""
+    })
+    setEditingJobId(job.id)
+    setShowJobDialog(true)
+  }
+
+  // Save job
+  const handleSaveJob = () => {
+    if (!currentCase || !jobForm.effectiveDate || !jobForm.jobTitle || !jobForm.locationName) return
+
+    const jobHistory = currentCase.jobHistory || []
+
+    if (editingJobId) {
+      // Update existing
+      const updated = jobHistory.map(job =>
+        job.id === editingJobId
+          ? { ...job, ...jobForm, endDate: jobForm.endDate || undefined }
+          : job
+      )
+      updateCase(currentCase.caseNumber, { jobHistory: updated })
+    } else {
+      // Add new
+      const newJob: JobAssignment = {
+        id: `job-${Date.now()}`,
+        effectiveDate: jobForm.effectiveDate,
+        endDate: jobForm.endDate || undefined,
+        jobTitle: jobForm.jobTitle,
+        jobCode: jobForm.jobCode || undefined,
+        locationId: jobForm.locationId || `loc-${jobForm.locationName.toLowerCase().replace(/\s/g, '-')}`,
+        locationName: jobForm.locationName,
+        managerName: jobForm.managerName || undefined
+      }
+      updateCase(currentCase.caseNumber, { jobHistory: [...jobHistory, newJob] })
+    }
+
+    setShowJobDialog(false)
+    resetJobForm()
+  }
+
+  // Delete job
+  const handleDeleteJob = (id: string) => {
+    if (!currentCase) return
+    const updated = (currentCase.jobHistory || []).filter(job => job.id !== id)
+    updateCase(currentCase.caseNumber, { jobHistory: updated })
+  }
+
+  // Handle pay dialog open for add
+  const handleAddPay = () => {
+    resetPayForm()
+    setShowPayDialog(true)
+  }
+
+  // Handle pay dialog open for edit
+  const handleEditPay = (pay: CompensationRate) => {
+    setPayForm({
+      effectiveDate: pay.effectiveDate,
+      endDate: pay.endDate || "",
+      rateAmount: pay.rateAmount.toString(),
+      unit: pay.unit,
+      payCode: pay.payCode || ""
+    })
+    setEditingPayId(pay.id)
+    setShowPayDialog(true)
+  }
+
+  // Save pay
+  const handleSavePay = () => {
+    if (!currentCase || !payForm.effectiveDate || !payForm.rateAmount) return
+
+    const compensationHistory = currentCase.compensationHistory || []
+
+    if (editingPayId) {
+      // Update existing
+      const updated = compensationHistory.map(pay =>
+        pay.id === editingPayId
+          ? { ...pay, ...payForm, rateAmount: parseFloat(payForm.rateAmount), endDate: payForm.endDate || undefined }
+          : pay
+      )
+      updateCase(currentCase.caseNumber, { compensationHistory: updated })
+    } else {
+      // Add new
+      const newPay: CompensationRate = {
+        id: `pay-${Date.now()}`,
+        effectiveDate: payForm.effectiveDate,
+        endDate: payForm.endDate || undefined,
+        rateAmount: parseFloat(payForm.rateAmount),
+        currency: "USD",
+        unit: payForm.unit,
+        payCode: payForm.payCode || undefined
+      }
+      updateCase(currentCase.caseNumber, { compensationHistory: [...compensationHistory, newPay] })
+    }
+
+    setShowPayDialog(false)
+    resetPayForm()
+  }
+
+  // Delete pay
+  const handleDeletePay = (id: string) => {
+    if (!currentCase) return
+    const updated = (currentCase.compensationHistory || []).filter(pay => pay.id !== id)
+    updateCase(currentCase.caseNumber, { compensationHistory: updated })
+  }
+
+  // Sort history by effective date descending
+  const sortedJobHistory = [...(currentCase?.jobHistory || [])].sort((a, b) => {
+    const dateA = new Date(a.effectiveDate.split('/').reverse().join('-'))
+    const dateB = new Date(b.effectiveDate.split('/').reverse().join('-'))
+    return dateB.getTime() - dateA.getTime()
+  })
+
+  const sortedPayHistory = [...(currentCase?.compensationHistory || [])].sort((a, b) => {
+    const dateA = new Date(a.effectiveDate.split('/').reverse().join('-'))
+    const dateB = new Date(b.effectiveDate.split('/').reverse().join('-'))
+    return dateB.getTime() - dateA.getTime()
+  })
+
+  return (
+    <div className="space-y-6">
+      {/* Current Position & Compensation Summary */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Current Position Card */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Briefcase className="h-4 w-4" />
+              Current Position
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {currentJob ? (
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Job Title</p>
+                  <p className="font-medium">{currentJob.jobTitle}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Location</p>
+                  <p className="font-medium">{currentJob.locationName}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Manager</p>
+                  <p className="font-medium">{currentJob.managerName || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Effective Date</p>
+                  <p className="font-medium">{currentJob.effectiveDate}</p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-sm">No job assignment found. Add one below.</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Current Compensation Card */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <DollarSign className="h-4 w-4" />
+              Current Compensation
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {currentPay ? (
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Rate</p>
+                  <p className="font-medium text-lg">{formatCurrency(currentPay.rateAmount, currentPay.unit)}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Effective Date</p>
+                  <p className="font-medium">{currentPay.effectiveDate}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Pay Code</p>
+                  <p className="font-medium">{currentPay.payCode || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">FICA Date</p>
+                  <p className="font-medium">{calculateFicaDate()}</p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-sm">No compensation found. Add one below.</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Job Assignment History */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Briefcase className="h-5 w-5" />
+              Job Assignment History
+            </CardTitle>
+            <CardDescription>Track job title, location, and manager changes over time</CardDescription>
+          </div>
+          <Button onClick={handleAddJob} size="sm">
+            <Plus className="mr-2 h-4 w-4" />
+            Add Entry
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {sortedJobHistory.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">
+              No job history entries. Click &quot;Add Entry&quot; to create one.
+            </p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Effective Date</TableHead>
+                  <TableHead>End Date</TableHead>
+                  <TableHead>Job Title</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Manager</TableHead>
+                  <TableHead className="w-[100px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedJobHistory.map((job) => (
+                  <TableRow key={job.id}>
+                    <TableCell>{job.effectiveDate}</TableCell>
+                    <TableCell>{job.endDate || "—"}</TableCell>
+                    <TableCell className="font-medium">{job.jobTitle}</TableCell>
+                    <TableCell>{job.locationName}</TableCell>
+                    <TableCell>{job.managerName || "—"}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => handleEditJob(job)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteJob(job.id)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Pay Rate History */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5" />
+              Pay Rate History
+            </CardTitle>
+            <CardDescription>Track compensation changes with effective dates</CardDescription>
+          </div>
+          <Button onClick={handleAddPay} size="sm">
+            <Plus className="mr-2 h-4 w-4" />
+            Add Entry
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {sortedPayHistory.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">
+              No pay history entries. Click &quot;Add Entry&quot; to create one.
+            </p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Effective Date</TableHead>
+                  <TableHead>End Date</TableHead>
+                  <TableHead>Rate</TableHead>
+                  <TableHead>Unit</TableHead>
+                  <TableHead>Pay Code</TableHead>
+                  <TableHead className="w-[100px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedPayHistory.map((pay) => (
+                  <TableRow key={pay.id}>
+                    <TableCell>{pay.effectiveDate}</TableCell>
+                    <TableCell>{pay.endDate || "—"}</TableCell>
+                    <TableCell className="font-medium">
+                      {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(pay.rateAmount)}
+                    </TableCell>
+                    <TableCell className="capitalize">{pay.unit}</TableCell>
+                    <TableCell>{pay.payCode || "—"}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => handleEditPay(pay)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDeletePay(pay.id)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* STD Coverage Lookup */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5" />
+            STD Coverage Lookup
+          </CardTitle>
+          <CardDescription>View eligible STD plan based on employee location at a given date</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-end gap-4">
+            <div className="space-y-2">
+              <Label>As-of Date</Label>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="MM/DD/YYYY"
+                  value={stdLookupDate}
+                  onChange={(e) => setStdLookupDate(e.target.value)}
+                  className="w-[150px]"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Defaults to Date of Disability
+              </p>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Location: <span className="font-medium text-foreground">{currentJob?.locationName || currentCase?.employeeLocation || "Unknown"}</span>
+            </div>
+          </div>
+
+          {stdCoverage ? (
+            <div className="border rounded-lg p-4 bg-muted/30">
+              <h4 className="font-medium mb-3">Eligible STD Coverage</h4>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Plan Code</TableHead>
+                    <TableHead>Plan Name</TableHead>
+                    <TableHead>Benefit %</TableHead>
+                    <TableHead>Waiting Period</TableHead>
+                    <TableHead>Max Duration</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className="font-mono">{stdCoverage.plan.planCode}</TableCell>
+                    <TableCell>{stdCoverage.plan.planName}</TableCell>
+                    <TableCell>{stdCoverage.plan.benefitPercentage}%</TableCell>
+                    <TableCell>{stdCoverage.plan.waitingPeriod} days</TableCell>
+                    <TableCell>{stdCoverage.plan.maxDuration} weeks</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </div>
+          ) : stdLookupDate ? (
+            <div className="border rounded-lg p-4 bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-200">
+              <p className="text-sm">No STD coverage found for this location and date combination.</p>
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
+
+      {/* Job Assignment Dialog */}
+      <Dialog open={showJobDialog} onOpenChange={setShowJobDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingJobId ? "Edit Job Assignment" : "Add Job Assignment"}</DialogTitle>
+            <DialogDescription>Enter job assignment details with effective dates.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Effective Date *</Label>
+                <Input
+                  type="text"
+                  placeholder="MM/DD/YYYY"
+                  value={jobForm.effectiveDate}
+                  onChange={(e) => setJobForm({ ...jobForm, effectiveDate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>End Date</Label>
+                <Input
+                  type="text"
+                  placeholder="MM/DD/YYYY"
+                  value={jobForm.endDate}
+                  onChange={(e) => setJobForm({ ...jobForm, endDate: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Job Title *</Label>
+                <Input
+                  value={jobForm.jobTitle}
+                  onChange={(e) => setJobForm({ ...jobForm, jobTitle: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Job Code</Label>
+                <Input
+                  value={jobForm.jobCode}
+                  onChange={(e) => setJobForm({ ...jobForm, jobCode: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Location *</Label>
+                <Select
+                  value={jobForm.locationName}
+                  onValueChange={(val) => {
+                    const loc = locations.find(l => l.name === val)
+                    setJobForm({ ...jobForm, locationName: val, locationId: loc?.id || "" })
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select location..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {locations.filter(l => l.active).map((loc) => (
+                      <SelectItem key={loc.id} value={loc.name}>{loc.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Manager</Label>
+                <Input
+                  value={jobForm.managerName}
+                  onChange={(e) => setJobForm({ ...jobForm, managerName: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowJobDialog(false)}>Cancel</Button>
+            <Button onClick={handleSaveJob} disabled={!jobForm.effectiveDate || !jobForm.jobTitle || !jobForm.locationName}>
+              {editingJobId ? "Save Changes" : "Add Entry"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Pay Rate Dialog */}
+      <Dialog open={showPayDialog} onOpenChange={setShowPayDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingPayId ? "Edit Pay Rate" : "Add Pay Rate"}</DialogTitle>
+            <DialogDescription>Enter compensation details with effective dates.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Effective Date *</Label>
+                <Input
+                  type="text"
+                  placeholder="MM/DD/YYYY"
+                  value={payForm.effectiveDate}
+                  onChange={(e) => setPayForm({ ...payForm, effectiveDate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>End Date</Label>
+                <Input
+                  type="text"
+                  placeholder="MM/DD/YYYY"
+                  value={payForm.endDate}
+                  onChange={(e) => setPayForm({ ...payForm, endDate: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Rate Amount *</Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                  <Input
+                    type="text"
+                    inputMode="decimal"
+                    placeholder="0.00"
+                    className="pl-7"
+                    value={payForm.rateAmount}
+                    onChange={(e) => {
+                      let value = e.target.value.replace(/[^0-9.]/g, '')
+                      const parts = value.split('.')
+                      if (parts.length > 2) {
+                        value = parts[0] + '.' + parts.slice(1).join('')
+                      } else if (parts[1]?.length > 2) {
+                        value = parts[0] + '.' + parts[1].slice(0, 2)
+                      }
+                      setPayForm({ ...payForm, rateAmount: value })
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Unit *</Label>
+                <Select
+                  value={payForm.unit}
+                  onValueChange={(val: "hourly" | "weekly" | "monthly" | "annual") => setPayForm({ ...payForm, unit: val })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hourly">Hourly</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value="annual">Annual</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Pay Code</Label>
+              <Input
+                placeholder="e.g., SAL-EXEMPT, HRL-NONEX"
+                value={payForm.payCode}
+                onChange={(e) => setPayForm({ ...payForm, payCode: e.target.value })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPayDialog(false)}>Cancel</Button>
+            <Button onClick={handleSavePay} disabled={!payForm.effectiveDate || !payForm.rateAmount}>
+              {editingPayId ? "Save Changes" : "Add Entry"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
