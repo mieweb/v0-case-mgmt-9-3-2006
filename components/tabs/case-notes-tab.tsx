@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
+import { formatNoteTemplate } from "@/lib/format-note-template"
 import {
   Plus,
   Pencil,
@@ -1127,12 +1128,7 @@ export function CaseNotesTab() {
                   setSelectedTemplate(value)
                   const template = codes.caseNoteTemplates.find((t) => t.code === value)
                   if (template?.content) {
-                    // Convert plain text with newlines to HTML paragraphs
-                    const htmlContent = template.content
-                      .split('\n\n')
-                      .map(paragraph => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
-                      .join('')
-                    setContent(htmlContent)
+                    setContent(formatNoteTemplate(template.content))
                   }
                 }}
               >
