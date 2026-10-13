@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Plus, Trash2, Edit2 } from "lucide-react"
 import { RichTextEditor } from "@/components/rich-text-editor"
+import { formatNoteTemplate } from "@/lib/format-note-template"
 import type { Code } from "@/contexts/admin-context"
 
 interface CaseNoteTemplateManagerProps {
@@ -33,7 +34,7 @@ export function CaseNoteTemplateManager({ templates, onAdd, onUpdate, onDelete }
       setCode(template.code)
       setName(template.name || "")
       setDescription(template.description || "")
-      setContent(template.content || "")
+      setContent(formatNoteTemplate(template.content || ""))
       setActive(template.active)
     } else {
       setEditingTemplate(null)
@@ -139,13 +140,8 @@ export function CaseNoteTemplateManager({ templates, onAdd, onUpdate, onDelete }
                     <div className="border-t pt-3 mt-3">
                       <p className="text-sm font-medium mb-2">Template Preview:</p>
                       <div
-                        className="text-sm text-muted-foreground bg-muted/30 p-3 rounded max-h-32 overflow-y-auto prose prose-sm max-w-none"
-                        dangerouslySetInnerHTML={{
-                          __html:
-                            template.content.length > 500
-                              ? template.content.substring(0, 500) + "..."
-                              : template.content,
-                        }}
+                        className="text-sm text-muted-foreground bg-muted/30 p-3 rounded max-h-48 overflow-y-auto prose prose-sm max-w-none"
+                        dangerouslySetInnerHTML={{ __html: formatNoteTemplate(template.content) }}
                       />
                     </div>
                   )}
